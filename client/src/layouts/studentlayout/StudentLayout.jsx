@@ -23,10 +23,10 @@ export default function StudentLayout() {
     const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative`;
 
     if (isActive) {
-      return `${base} bg-[#F0FDF4] text-[#15803D] font-bold border-l-[3px] border-l-[#10B981]`;
+      return `${base} bg-[#F0FDF4] text-[#065F46] font-bold border-l-[3px] border-l-[#059669] rounded-lg shadow-sm`;
     }
 
-    return `${base} bg-transparent text-gray-500 hover:bg-[#F1F5F9] border-l-[3px] border-l-transparent rounded-lg`;
+    return `${base} bg-transparent text-gray-500 hover:bg-gray-100/80 hover:text-gray-900 border-l-[3px] border-l-transparent rounded-lg`;
   };
 
   const getIconClass = (isActive) => {

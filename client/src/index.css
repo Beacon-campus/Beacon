@@ -115,8 +115,13 @@ h6,
 }
 
 @keyframes fillHeight {
-  from { height: 0%; }
-  to { height: 100%; }
+  from {
+    height: 0%;
+  }
+
+  to {
+    height: 100%;
+  }
 }
 
 

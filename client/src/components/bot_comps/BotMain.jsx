@@ -202,7 +202,7 @@ export default function Bot() {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #d1d5db; }
       `}</style>
 
-      <div className="h-full w-full border border-gray-200 rounded-2xl bg-white flex overflow-hidden shadow-sm">
+      <div className="h-full w-full premium-card flex overflow-hidden">
 
         {/* ================= LEFT PANEL ================= */}
         <div className="w-64 bg-gray-50 p-5 flex flex-col gap-6 border-r border-gray-100">

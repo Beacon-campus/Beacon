@@ -156,10 +156,10 @@ export default function Notes() {
 
     return (
         <div className="w-full h-full p-4 flex flex-col">
-            <div className="flex-1 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative">
+            <div className="flex-1 flex flex-col premium-card overflow-hidden relative">
 
                 {/* Header - Fixed at Top of Card */}
-                <div className="py-3 px-6 flex items-center justify-between z-10 bg-white border-b border-gray-200">
+                <div className="py-3 px-6 flex items-center justify-between z-10 bg-transparent border-b border-white/20">
                     <h1 className="inline-block bg-black text-white text-xl font-bold px-6 py-2 rounded-2xl tracking-tight shadow-md">NOTES</h1>
 
                     <div className="flex items-center gap-4">
