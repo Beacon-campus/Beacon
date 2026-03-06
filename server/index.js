@@ -68,6 +68,7 @@ const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [];
+const frameAncestors = ["'self'", ...allowedOrigins];
 
 // INITIALIZE SOCKET.IO
 // Pass 'app' so we can use req.app.get("io") in routes!
@@ -77,6 +78,13 @@ app.use(
   helmet({
     // Allow frontend origin to embed media from this API origin.
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    // Allow the deployed frontend to frame file responses (doc/pdf preview modal).
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "frame-ancestors": frameAncestors,
+      },
+    },
   })
 );
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
