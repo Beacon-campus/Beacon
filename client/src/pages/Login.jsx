@@ -26,6 +26,9 @@ import UpdateEmailModal from "../components/UpdateEmailModal";
 import toast from "react-hot-toast";
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import studentLottie from '../assets/loading/STUDENT.lottie';
+import profile1 from "../assets/profile/1.png";
+import profile5 from "../assets/profile/5.png";
+import profile9 from "../assets/profile/9.png";
 import { notifyServerLogout } from "../services/session.service";
 
 /* ================= ICONS ================= */
@@ -415,9 +418,9 @@ export default function Login() {
           {/* Footer moved to Right Panel */}
           <div className="flex items-center justify-center gap-4 pt-6">
             <div className="flex -space-x-4 grayscale opacity-80">
-              <img src="/src/assets/profile/1.png" alt="User 1" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
-              <img src="/src/assets/profile/5.png" alt="User 2" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
-              <img src="/src/assets/profile/9.png" alt="User 3" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+              <img src={profile1} alt="User 1" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+              <img src={profile5} alt="User 2" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+              <img src={profile9} alt="User 3" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
             </div>
             <p className="text-xs font-medium text-gray-400 mt-2 text-center max-w-xs">
               Used daily across campus by students and faculty to boost productivity

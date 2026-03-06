@@ -1,8 +1,13 @@
 import axios from "axios";
 import { auth } from "../firebase/firebase";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+if (!apiBaseUrl) {
+  throw new Error("Missing required env var: VITE_API_BASE_URL");
+}
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  baseURL: apiBaseUrl,
 });
 
 apiClient.interceptors.request.use(

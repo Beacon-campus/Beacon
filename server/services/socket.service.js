@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import Message from "../models/Message.js";
 import Channel from "../models/Channel.js";
 
-const initializeSocket = (server, app, allowedOrigins = ["http://localhost:5173"]) => {
+const initializeSocket = (server, app, allowedOrigins = []) => {
   const io = new Server(server, {
     cors: {
       origin: allowedOrigins,

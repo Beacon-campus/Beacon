@@ -197,7 +197,7 @@ const MarkdownHelp = ({ isOpen, onClose }) => {
                                 <h3 className="font-semibold text-gray-800 mb-3">Links & Images</h3>
                                 <div className="grid grid-cols-1 gap-4 text-sm">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                                        <div className="font-mono text-blue-600 bg-blue-50/50 p-2 rounded text-xs overflow-hidden text-ellipsis whitespace-nowrap">[Link](http://example.com)</div>
+                                        <div className="font-mono text-blue-600 bg-blue-50/50 p-2 rounded text-xs overflow-hidden text-ellipsis whitespace-nowrap">[Link](https://example.com)</div>
                                         <a href="#" className="text-blue-600 underline hover:text-blue-800">Link</a>
                                     </div>
                                     <div className="grid grid-cols-1 gap-2">

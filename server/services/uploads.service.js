@@ -121,7 +121,11 @@ export function sanitizeFileName(fileName = "attachment") {
 }
 
 export function getBaseUrl(req) {
-  return process.env.SERVER_PUBLIC_BASE_URL || `${req.protocol}://${req.get("host")}`;
+  const configuredBaseUrl = process.env.API_URL;
+  if (!configuredBaseUrl) {
+    throw new Error("Missing required env var: API_URL");
+  }
+  return String(configuredBaseUrl).replace(/\/+$/, "");
 }
 
 export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto") {
