@@ -12,7 +12,7 @@ const MONGO_URI = process.env.MONGO_URI || "";
 const TARGET_BASE_URL = process.env.API_URL || "https://streak-api-qs2h.onrender.com";
 const DRY_RUN = String(process.env.DRY_RUN || "0") === "1";
 
-const SOURCE_PATTERNS = [
+const BASE_SOURCE_PATTERNS = [
   "http://localhost:5000",
   "https://localhost:5000",
   "http://127.0.0.1:5000",
@@ -33,18 +33,27 @@ function normalizeTargetBaseUrl(url) {
   return normalized;
 }
 
-function replaceSourceUrl(input, targetBaseUrl) {
+function buildSourcePatterns(targetBaseUrl) {
+  const parsed = new URL(targetBaseUrl);
+  return [
+    ...BASE_SOURCE_PATTERNS,
+    // Catch old mixed-content links on the production host, e.g. http://streak-api-... .
+    `http://${parsed.host}`,
+  ];
+}
+
+function replaceSourceUrl(input, targetBaseUrl, sourcePatterns) {
   if (typeof input !== "string" || !input) return input;
   let out = input;
-  for (const source of SOURCE_PATTERNS) {
+  for (const source of sourcePatterns) {
     out = out.split(source).join(targetBaseUrl);
   }
   return out;
 }
 
-function deepReplace(value, targetBaseUrl, stats) {
+function deepReplace(value, targetBaseUrl, sourcePatterns, stats) {
   if (typeof value === "string") {
-    const replaced = replaceSourceUrl(value, targetBaseUrl);
+    const replaced = replaceSourceUrl(value, targetBaseUrl, sourcePatterns);
     if (replaced !== value) {
       stats.stringsChanged += 1;
       return { value: replaced, changed: true };
@@ -55,7 +64,7 @@ function deepReplace(value, targetBaseUrl, stats) {
   if (Array.isArray(value)) {
     let changed = false;
     const next = value.map((item) => {
-      const result = deepReplace(item, targetBaseUrl, stats);
+      const result = deepReplace(item, targetBaseUrl, sourcePatterns, stats);
       changed = changed || result.changed;
       return result.value;
     });
@@ -75,7 +84,7 @@ function deepReplace(value, targetBaseUrl, stats) {
     let changed = false;
     const next = {};
     for (const [key, val] of Object.entries(value)) {
-      const result = deepReplace(val, targetBaseUrl, stats);
+      const result = deepReplace(val, targetBaseUrl, sourcePatterns, stats);
       changed = changed || result.changed;
       next[key] = result.value;
     }
@@ -85,7 +94,7 @@ function deepReplace(value, targetBaseUrl, stats) {
   return { value, changed: false };
 }
 
-async function migrateCollection(collection, targetBaseUrl, summary) {
+async function migrateCollection(collection, targetBaseUrl, sourcePatterns, summary) {
   const cursor = collection.find({}, { projection: { _id: 1 } });
   let scanned = 0;
   let changedDocs = 0;
@@ -98,7 +107,7 @@ async function migrateCollection(collection, targetBaseUrl, summary) {
 
     if (!doc) continue;
     const stats = { stringsChanged: 0 };
-    const { value: updatedDoc, changed } = deepReplace(doc, targetBaseUrl, stats);
+    const { value: updatedDoc, changed } = deepReplace(doc, targetBaseUrl, sourcePatterns, stats);
     if (!changed) continue;
 
     changedDocs += 1;
@@ -121,6 +130,7 @@ async function migrateCollection(collection, targetBaseUrl, summary) {
 
 async function run() {
   const targetBaseUrl = normalizeTargetBaseUrl(TARGET_BASE_URL);
+  const sourcePatterns = buildSourcePatterns(targetBaseUrl);
   if (!MONGO_URI) {
     throw new Error("MONGO_URI is required.");
   }
@@ -135,7 +145,7 @@ async function run() {
   const summary = {
     dryRun: DRY_RUN,
     targetBaseUrl,
-    sourcePatterns: SOURCE_PATTERNS,
+    sourcePatterns,
     totalScanned: 0,
     totalChangedDocs: 0,
     totalChangedStrings: 0,
@@ -144,7 +154,7 @@ async function run() {
 
   for (const collectionName of collections) {
     const collection = db.collection(collectionName);
-    await migrateCollection(collection, targetBaseUrl, summary);
+    await migrateCollection(collection, targetBaseUrl, sourcePatterns, summary);
   }
 
   console.log(JSON.stringify(summary, null, 2));

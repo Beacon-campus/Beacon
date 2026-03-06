@@ -73,7 +73,12 @@ const allowedOrigins = process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [];
 // Pass 'app' so we can use req.app.get("io") in routes!
 initializeSocket(server, app, allowedOrigins);
 
-app.use(helmet());
+app.use(
+  helmet({
+    // Allow frontend origin to embed media from this API origin.
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 const apiLimiter = rateLimit({
