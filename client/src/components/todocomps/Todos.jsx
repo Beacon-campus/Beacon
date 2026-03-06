@@ -27,10 +27,22 @@ export default function Todos({ userId }) {
   const [sortBy, setSortBy] = useState("new");
   const [showSort, setShowSort] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [justCompletedId, setJustCompletedId] = useState(null); // For delayed animation out
 
-  // COUNTS
-  const activeTodos = todos.filter(t => !t.completed);
-  const completedTodos = todos.filter(t => t.completed);
+  // Handle toggling complete with a small delay for animation
+  const handleToggle = (todoId, newStatus) => {
+    if (newStatus === true && !showCompleted) {
+      setJustCompletedId(todoId);
+      toggleComplete(todoId, newStatus);
+      setTimeout(() => setJustCompletedId(prev => (prev === todoId ? null : prev)), 600);
+    } else {
+      toggleComplete(todoId, newStatus);
+    }
+  };
+
+  // COUNTS & FILTERING
+  const activeTodos = todos.filter(t => !t.completed || t.id === justCompletedId);
+  const completedTodos = todos.filter(t => t.completed && t.id !== justCompletedId);
 
   // LIMITS (Matches Backend Logic)
   const MAX_TOTAL = 30; // Total allowed tasks
@@ -156,20 +168,20 @@ export default function Todos({ userId }) {
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleComplete(todo.id, !todo.completed);
+                    handleToggle(todo.id, !todo.completed);
                   }}
                   className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 
                     ${todo.completed
-                      ? "bg-[#059669] border-[#059669] text-white"
+                      ? "bg-[#059669] border-[#059669] text-white animate-[pop_0.3s_ease-out]"
                       : isActive
                         ? "bg-white border-[#059669]" 
                         : "bg-white border-gray-300 group-hover:border-slate-800 group-hover:bg-slate-50"
                     }`}
                 >
-                  {todo.completed && <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  {todo.completed && <svg className="w-3.5 h-3.5 animate-[checkmark_0.3s_ease-in-out]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                 </div>
 
-                <span className={`text-sm font-medium truncate capitalize ${todo.completed ? "line-through opacity-60" : ""}`}>
+                <span className={`text-sm font-medium truncate capitalize ${todo.completed ? "text-gray-400 line-through opacity-80" : "text-gray-700"}`}>
                   {todo.title}
                 </span>
               </div>
@@ -239,9 +251,17 @@ export default function Todos({ userId }) {
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Description</p>
               {selectedTodo.description ? (
-                <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed">
+                <p className={`text-sm whitespace-pre-wrap leading-relaxed ${selectedTodo.completed ? "text-gray-400 line-through opacity-80" : "text-gray-600"}`}>
                   {selectedTodo.description}
                 </p>
+              ) : selectedTodo.completed ? (
+                <div 
+                  className="bg-gray-100 border border-transparent rounded-xl p-4 text-center w-full mt-2 cursor-not-allowed opacity-80"
+                >
+                  <p className="text-sm font-medium text-gray-400 italic">
+                    No description provided.
+                  </p>
+                </div>
               ) : (
                 <div 
                   onClick={() => setEditMode(true)}
@@ -257,7 +277,7 @@ export default function Todos({ userId }) {
             {/* Bottom Actions */}
             <div className="mt-auto pt-6 border-t border-gray-100 flex items-stretch gap-3">
               <button
-                onClick={() => toggleComplete(selectedTodo.id, !selectedTodo.completed)}
+                onClick={() => handleToggle(selectedTodo.id, !selectedTodo.completed)}
                 className={`flex-1 h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 shadow-sm hover:shadow
                   ${selectedTodo.completed
                     ? "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-transparent"
@@ -266,7 +286,7 @@ export default function Todos({ userId }) {
               >
                 {selectedTodo.completed ? (
                   <>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                     Mark Incomplete
                   </>
                 ) : (
