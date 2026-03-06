@@ -55,7 +55,12 @@ export default function Bot() {
 
   /* ================= AUTO SCROLL ================= */
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (bottomRef.current?.parentElement) {
+      bottomRef.current.parentElement.scrollTo({
+        top: bottomRef.current.parentElement.scrollHeight,
+        behavior: "smooth"
+      });
+    }
   }, [messages, loading]);
 
   /* ================= LOAD HISTORY ================= */
@@ -194,15 +199,15 @@ export default function Bot() {
 
   /* ================= UI ================= */
   return (
-    <div className="h-full w-full p-2">
+    <>
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #e5e7eb; border-radius: 20px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #d1d5db; }
       `}</style>
-
-      <div className="h-full w-full premium-card flex overflow-hidden">
+    <div className="relative w-full h-full">
+      <div className="absolute inset-0 premium-card flex overflow-hidden">
 
         {/* ================= LEFT PANEL ================= */}
         <div className="w-64 bg-gray-50 p-5 flex flex-col gap-6 border-r border-gray-100">
@@ -417,9 +422,9 @@ export default function Bot() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
+    </>
   );
 }

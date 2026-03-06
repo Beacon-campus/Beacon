@@ -380,7 +380,7 @@ export default function TeacherLayout() {
                 <Breadcrumb />
               </div>
               
-              <div className="flex-1 min-h-0 overflow-y-auto w-full no-scrollbar">
+              <div className="flex-1 min-h-0 overflow-y-auto w-full no-scrollbar flex flex-col">
                 <Outlet />
               </div>
             </div>

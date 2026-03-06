@@ -71,7 +71,12 @@ export default function ChatWindow({
   const isDirectPeerChat = !!activeChat && !activeChat.isTeacherChat && !activeChat.type?.includes("group") && !activeChat.chatName;
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current?.parentElement) {
+      messagesEndRef.current.parentElement.scrollTo({
+        top: messagesEndRef.current.parentElement.scrollHeight,
+        behavior: "smooth"
+      });
+    }
   }, [messagesEndRef]);
 
   const handleInputChange = (e) => {

@@ -57,7 +57,12 @@ export default function OfficialChannel({
   }, [channelId, fetchAnnouncements]);
 
   const scrollToBottom = useCallback(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (messagesEndRef.current?.parentElement) {
+        messagesEndRef.current.parentElement.scrollTo({
+          top: messagesEndRef.current.parentElement.scrollHeight,
+          behavior: "smooth"
+        });
+      }
   }, []);
 
   useEffect(() => {

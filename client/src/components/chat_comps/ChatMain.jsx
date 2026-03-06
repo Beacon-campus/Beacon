@@ -217,7 +217,14 @@ export default function Chat({ role }) {
       setHasMoreOlderMessages(Boolean(pageInfo.hasMore));
       setLoadingOlderMessages(false);
 
-      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      setTimeout(() => {
+        if (messagesEndRef.current?.parentElement) {
+          messagesEndRef.current.parentElement.scrollTo({
+            top: messagesEndRef.current.parentElement.scrollHeight,
+            behavior: "smooth"
+          });
+        }
+      }, 100);
     } catch (error) {
       console.error("History Error:", error);
     }

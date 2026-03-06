@@ -78,7 +78,6 @@ h6,
 }
 
 .premium-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.85);
   border-color: rgba(255, 255, 255, 0.9);

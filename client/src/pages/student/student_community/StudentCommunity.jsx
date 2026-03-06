@@ -27,7 +27,7 @@ export default function StudentCommunity() {
   }
 
   return (
-    <div className="w-full h-full bg-white rounded-2xl shadow-sm p-2">
+    <div className="w-full h-full">
       {/* 6. Pass the context user to the chat */}
       <ChatInterface user={user} role="student" />
     </div>
