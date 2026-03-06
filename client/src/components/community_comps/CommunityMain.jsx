@@ -13,7 +13,7 @@ import StudentHub from "./StudentHub";
 import OfficialChannel from "./OfficialChannel";
 import TeacherClassList from "./TeacherClassList";
 import DoubtModal from "../shared/DoubtModal";
-import ClassroomInfoModal from "./ClassroomInfoModal";
+import ClassroomInfoModal from "./ClassRoomInfoModal";
 
 const AESTHETIC_COLORS = ["#FFD1DC", "#FFABAB", "#FFC3A0", "#FF677D", "#D4A5A5", "#B5EAD7", "#C7CEEA", "#E2F0CB", "#FF9AA2", "#FFDAC1"];
 const getClassroomColor = (id) => {
