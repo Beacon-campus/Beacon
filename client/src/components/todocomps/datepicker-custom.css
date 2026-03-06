@@ -1,0 +1,61 @@
+/* Container adjustments */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+/* The Popup Box */
+.react-datepicker {
+  font-family: inherit;
+  border-radius: 1rem;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Header (Month/Year) */
+.react-datepicker__header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+  padding-top: 1rem;
+}
+
+.react-datepicker__current-month {
+  font-weight: 700;
+  color: #111827; /* Gray-900 */
+  margin-bottom: 0.5rem;
+}
+
+.react-datepicker__day-name {
+  color: #9ca3af; /* Gray-400 */
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* The Selected Day (Make it Black instead of Blue) */
+.react-datepicker__day--selected, 
+.react-datepicker__day--keyboard-selected {
+  background-color: #111827 !important; /* Gray-900 */
+  color: #ffffff !important;
+  border-radius: 0.5rem;
+}
+
+/* Hover State */
+.react-datepicker__day:hover {
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+}
+
+/* Remove default triangle */
+.react-datepicker__triangle {
+  display: none;
+}
+
+/* Fix Icon Position */
+.react-datepicker__input-container .react-datepicker__calendar-icon {
+  padding: 0;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
