@@ -67,30 +67,14 @@ const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
-// Dynamic CORS configuration from env (comma-separated values supported)
-const allowedOrigins = String(process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [];
 
 // INITIALIZE SOCKET.IO
 // Pass 'app' so we can use req.app.get("io") in routes!
 initializeSocket(server, app, allowedOrigins);
 
 app.use(helmet());
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
