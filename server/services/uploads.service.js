@@ -125,7 +125,20 @@ export function getBaseUrl(req) {
   if (!configuredBaseUrl) {
     throw new Error("Missing required env var: API_URL");
   }
-  return String(configuredBaseUrl).replace(/\/+$/, "");
+  const normalized = String(configuredBaseUrl).replace(/\/+$/, "");
+  let parsed;
+  try {
+    parsed = new URL(normalized);
+  } catch {
+    throw new Error("Invalid API_URL. It must be a valid absolute URL.");
+  }
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    throw new Error("Invalid API_URL protocol. Use http or https.");
+  }
+  if (process.env.NODE_ENV === "production" && parsed.protocol !== "https:") {
+    throw new Error("Invalid API_URL for production. HTTPS is required.");
+  }
+  return normalized;
 }
 
 export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto") {

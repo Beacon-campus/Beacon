@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import admin from "firebase-admin";
+import path from "path";
 import { createRequire } from "module";
 import mongoose from "mongoose";
 import { createServer } from "http";
@@ -76,24 +77,26 @@ const allowedOrigins = String(process.env.CLIENT_URL || "http://localhost:5173,h
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const frameAncestors = ["'self'", ...allowedOrigins];
+
 // INITIALIZE SOCKET.IO
 // Pass 'app' so we can use req.app.get("io") in routes!
 initializeSocket(server, app, allowedOrigins);
 
-app.use(helmet());
-
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+  helmet({
+    // Allow frontend origin to embed media from this API origin.
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    // Allow the deployed frontend to frame file responses (doc/pdf preview modal).
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "frame-ancestors": frameAncestors,
+      },
     },
-    credentials: true,
   })
 );
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -123,6 +126,7 @@ app.use("/api/calendar", calendarRoutes);
 app.use("/api/timetable", timetableRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/uploads/file", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/bot", botRoutes);
 app.use("/api/friends", friendsRoutes);

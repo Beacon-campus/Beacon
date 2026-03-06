@@ -77,7 +77,17 @@ export const uploadAttachment = async (req, res) => {
     });
 
     const originalResourceType = getResourceTypeForMime(fileType);
-    await uploadBufferToCloudinary(objectPath, buffer, fileType, originalResourceType);
+    try {
+      await uploadBufferToCloudinary(objectPath, buffer, fileType, originalResourceType);
+    } catch (error) {
+      console.error("Cloudinary upload failed (original):", {
+        message: error?.message || "Unknown upload error",
+        path: objectPath,
+        type: fileType,
+        scope,
+      });
+      return res.status(500).json({ error: "Upload failed while storing original file" });
+    }
     const original = buildUrls(req, objectPath, safeName);
 
     let previewPath = null;
@@ -93,7 +103,17 @@ export const uploadAttachment = async (req, res) => {
       if (previewResult.ok && previewResult.buffer?.length) {
         const pdfName = `${path.basename(safeName, path.extname(safeName))}.pdf`;
         const previewObjectPath = objectPath.replace(/[^/]+$/, `${Date.now()}-preview-${pdfName}`);
-        await uploadBufferToCloudinary(previewObjectPath, previewResult.buffer, "application/pdf", "raw");
+        try {
+          await uploadBufferToCloudinary(previewObjectPath, previewResult.buffer, "application/pdf", "raw");
+        } catch (error) {
+          console.error("Cloudinary upload failed (preview):", {
+            message: error?.message || "Unknown preview upload error",
+            path: previewObjectPath,
+            type: "application/pdf",
+            scope,
+          });
+          return res.status(500).json({ error: "Upload failed while storing preview file" });
+        }
         const previewUrls = buildUrls(req, previewObjectPath, pdfName);
         previewPath = previewObjectPath;
         previewUrl = previewUrls.url;
@@ -117,24 +137,28 @@ export const uploadAttachment = async (req, res) => {
       previewStatus = "unavailable";
     }
 
-    await createLogFromRequest(req, {
-      eventType: "MEDIA_UPLOAD",
-      category: "media",
-      action: "upload_attachment",
-      status: "success",
-      message: "Attachment uploaded",
-      metadata: {
-        scope,
-        fileName: safeName,
-        fileType,
-        kind: fileType.startsWith("image/") ? "image" : "file",
-        size: buffer.length,
-        path: objectPath,
-        classroomId,
-        subjectId,
-        assignmentId,
-      },
-    });
+    try {
+      await createLogFromRequest(req, {
+        eventType: "MEDIA_UPLOAD",
+        category: "media",
+        action: "upload_attachment",
+        status: "success",
+        message: "Attachment uploaded",
+        metadata: {
+          scope,
+          fileName: safeName,
+          fileType,
+          kind: fileType.startsWith("image/") ? "image" : "file",
+          size: buffer.length,
+          path: objectPath,
+          classroomId,
+          subjectId,
+          assignmentId,
+        },
+      });
+    } catch (logError) {
+      console.error("Upload success log failed:", logError?.message || logError);
+    }
 
     return res.status(201).json({
       name: safeName,
@@ -153,7 +177,8 @@ export const uploadAttachment = async (req, res) => {
       previewError,
     });
   } catch (error) {
-    await createLogFromRequest(req, {
+    try {
+      await createLogFromRequest(req, {
       eventType: "MEDIA_UPLOAD",
       category: "media",
       action: "upload_attachment",
@@ -165,7 +190,16 @@ export const uploadAttachment = async (req, res) => {
         fileType: req.body?.fileType || "",
       },
     });
-    console.error("POST /api/uploads/chat-attachment failed:", error);
+    } catch (logError) {
+      console.error("Upload failure log failed:", logError?.message || logError);
+    }
+    console.error("POST /api/uploads/chat-attachment failed:", {
+      message: error?.message || "Unknown server error",
+      stack: error?.stack,
+      scope: req.body?.scope || "unknown",
+      fileName: req.body?.fileName || "",
+      fileType: req.body?.fileType || "",
+    });
     return res.status(500).json({ error: "Server error while uploading file" });
   }
 };
