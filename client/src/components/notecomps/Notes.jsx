@@ -49,18 +49,29 @@ const EditModal = ({ note, onClose, onUpdate, onAdd }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className={`w-full max-w-lg bg-white rounded-xl shadow-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in duration-200 max-h-[80vh]`}>
+            <div className={`w-full max-w-[600px] bg-white rounded-xl shadow-2xl p-6 flex flex-col animate-in fade-in zoom-in duration-200 max-h-[85vh]`}>
 
                 {!isEditing ? (
                     <>
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-xl font-bold text-gray-800 break-words flex-1">{note.title || <span className="text-gray-400 italic">No Title</span>}</h3>
-                            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
+                        <div className="flex justify-between items-start mb-4 gap-4">
+                            <h3 className="text-xl font-bold text-gray-800 break-words flex-1 leading-tight">
+                                {note.title || <span className="text-gray-400 italic">No Title</span>}
+                            </h3>
+                            <div className="flex items-center gap-1 shrink-0">
+                                <button 
+                                    onClick={() => setIsEditing(true)} 
+                                    className="p-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors group relative"
+                                    title="Edit Note"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                </button>
+                                <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-[200px] prose prose-sm max-w-none text-gray-700">
+                        <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-[100px] prose prose-sm max-w-none text-gray-700">
                             {note.content ? (
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
                             ) : (
@@ -70,16 +81,10 @@ const EditModal = ({ note, onClose, onUpdate, onAdd }) => {
 
                         {/* Watermark in View Mode */}
                         {note.watermark && (
-                            <div className="text-right text-sm text-black italic font-medium select-none border-t border-gray-100 pt-2">
+                            <div className="mt-4 text-right text-sm text-black italic font-medium select-none border-t border-gray-100 pt-2">
                                 {note.watermark}
                             </div>
                         )}
-
-                        <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-auto">
-                            <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-80 font-medium">
-                                Edit
-                            </button>
-                        </div>
                     </>
                 ) : (
                     /* Edit Mode - Reduced for shared notes? No, enable full edit but save as copy */
@@ -158,21 +163,19 @@ export default function Notes() {
         <div className="w-full h-full p-4 flex flex-col">
             <div className="flex-1 flex flex-col premium-card overflow-hidden relative">
 
-                {/* Header - Fixed at Top of Card */}
-                <div className="py-3 px-6 flex items-center justify-between z-10 bg-transparent border-b border-white/20">
-                    <h1 className="inline-block bg-black text-white text-xl font-bold px-6 py-2 rounded-2xl tracking-tight shadow-md">NOTES</h1>
-
-                    <div className="flex items-center gap-4">
+                {/* Header Actions - Now floating to remove structural gap */}
+                <div className="absolute top-4 right-6 z-20 flex items-center justify-end">
+                    <div className="flex items-center gap-3">
                         {/* Create Note Button (Moved from FAB) */}
                         <button
                             onClick={() => setIsCreateOpen(true)}
-                            className="group flex items-center bg-black text-white rounded-full shadow-md hover:shadow-lg transition-all duration-700 ease-out h-10 w-10 hover:w-40 overflow-hidden"
+                            className="group flex items-center bg-white text-gray-700 rounded-full shadow-sm hover:shadow-md border border-gray-200 hover:border-[#10B981] hover:text-[#15803D] hover:bg-[#F0FDF4] transition-all duration-500 ease-out h-10 w-10 hover:w-40 overflow-hidden active:scale-95"
                             title="Create Note"
                         >
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-700 w-0 group-hover:w-auto whitespace-nowrap text-xs font-bold pl-0 group-hover:pl-4">
-                                TAKE A NOTE
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 w-0 group-hover:w-auto whitespace-nowrap text-sm font-bold pl-0 group-hover:pl-4">
+                                Create Note
                             </span>
-                            <div className="w-10 h-10 flex items-center justify-center shrink-0 ml-auto group-hover:rotate-90 transition-transform duration-700">
+                            <div className="w-10 h-10 flex items-center justify-center shrink-0 ml-auto group-hover:rotate-90 transition-transform duration-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
                                 </svg>
@@ -181,7 +184,7 @@ export default function Notes() {
 
                         <button
                             onClick={() => setIsHelpOpen(true)}
-                            className="p-2 bg-black text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:bg-gray-800 hover:scale-110"
+                            className="flex items-center justify-center bg-white text-gray-700 rounded-full shadow-sm hover:shadow-md border border-gray-200 hover:border-[#10B981] hover:text-[#15803D] hover:bg-[#F0FDF4] transition-all duration-300 h-10 w-10 active:scale-95"
                             title="Markdown Guide"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -199,8 +202,8 @@ export default function Notes() {
                     {/* PINNED SECTION */}
                     {pinnedNotes.length > 0 && (
                         <div className="mb-6">
-                            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Pinned</h2>
-                            <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6">
+                            <h2 className="text-sm font-extrabold text-gray-700 tracking-wide mb-4 ml-1">Pinned Notes</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {pinnedNotes.map(note => (
                                     <NoteCard
                                         key={note.id}
@@ -218,13 +221,13 @@ export default function Notes() {
                     {/* SHARED BY SECTION */}
                     {sharedNotes.length > 0 && (
                         <div className="mb-6">
-                            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1 flex items-center gap-2">
+                            <h2 className="text-sm font-extrabold text-gray-700 tracking-wide mb-4 ml-1 flex items-center gap-2">
                                 Shared With Me
-                                <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-[10px]">
+                                <span className="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-bold">
                                     {sharedNotes.length}
                                 </span>
                             </h2>
-                            <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {sharedNotes.map(note => (
                                     <NoteCard
                                         key={note.id}
@@ -241,10 +244,10 @@ export default function Notes() {
 
                     {/* OTHERS SECTION */}
                     {(pinnedNotes.length > 0 || sharedNotes.length > 0) && otherNotes.length > 0 && (
-                        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">Others</h2>
+                        <h2 className="text-sm font-extrabold text-gray-700 tracking-wide mb-4 ml-1">Other Notes</h2>
                     )}
 
-                    <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {otherNotes.map(note => (
                             <NoteCard
                                 key={note.id}
