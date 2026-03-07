@@ -304,7 +304,7 @@ const Whiteboard = () => {
 
   return (
     <div
-      className="w-full h-full overflow-hidden relative"
+      className={`w-full h-full overflow-hidden relative tool-${activeToolType}`}
       id="custom-excalidraw"
       // 1. BLOCK KEYBOARD SHORTCUTS (F for Frame, 9 for Image)
       onKeyDownCapture={(e) => {
@@ -402,6 +402,15 @@ const Whiteboard = () => {
 
       <style>
         {`
+          /* 
+            CURSOR FIX FOR WINDOWS: 
+            Windows OS flips the standard crosshair color based on contrast. In light mode, it can glitch white-on-white.
+            This CSS forces a custom dark SVG crosshair whenever a tool that needs a crosshair is active. 
+          */
+          #custom-excalidraw:not(.tool-selection):not(.tool-text):not(.tool-eraser):not(.tool-laser):not(.tool-hand) .excalidraw,
+          #custom-excalidraw:not(.tool-selection):not(.tool-text):not(.tool-eraser):not(.tool-laser):not(.tool-hand) .excalidraw canvas {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="%230f172a" stroke-width="2" stroke-linecap="round"/></svg>') 12 12, crosshair !important;
+          }
           :root,
           .excalidraw,
           .excalidraw.theme--light {
