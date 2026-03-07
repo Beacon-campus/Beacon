@@ -9,6 +9,7 @@ const funStatusMessages = [
   "Leonardo da Vinci is currently using your whiteboard...",
   "Waking up the study bots from their digital nap...",
   "Brewing coffee for the Docker containers...",
+  "A Wise man once said..."
 ];
 
 const studyQuotes = [
@@ -111,9 +112,8 @@ export default function ServerWakeupModal({ children }) {
         </div>
 
         <p
-          className={`text-center text-2xl md:text-4xl font-bold text-slate-800 transition-opacity duration-300 ${
-            messageVisible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`text-center text-2xl md:text-4xl font-bold text-slate-800 transition-opacity duration-300 ${messageVisible ? "opacity-100" : "opacity-0"
+            }`}
         >
           {currentMessage}
         </p>
