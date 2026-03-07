@@ -21,7 +21,7 @@ const studyQuotes = [
   { text: "Small progress is still progress.", author: "Anonymous" },
 ];
 
-const VALID_READY_STATUS = new Set([200, 401, 403, 429]);
+const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
 const WAKE_INTERVAL_MS = 3500;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
@@ -68,6 +68,12 @@ export default function ServerWakeupModal({ children }) {
         nodeResult,
         dockerResult,
       });
+      const nodeStatus =
+        nodeResult.status === "fulfilled" ? nodeResult.value.status : null;
+      const dockerStatus =
+        dockerResult.status === "fulfilled" ? dockerResult.value.status : null;
+      console.log("[ServerWakeupModal] Node status code:", nodeStatus);
+      console.log("[ServerWakeupModal] Docker status code:", dockerStatus);
       const nodeReady =
         nodeResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(nodeResult.value.status);
@@ -78,6 +84,8 @@ export default function ServerWakeupModal({ children }) {
         nodeReady,
         dockerReady,
       });
+      console.log("[ServerWakeupModal] nodeReady:", nodeReady);
+      console.log("[ServerWakeupModal] dockerReady:", dockerReady);
 
       if (!cancelled && nodeReady && dockerReady) {
         setIsAwake(true);
@@ -135,6 +143,14 @@ export default function ServerWakeupModal({ children }) {
         <p className="mt-12 text-center text-lg md:text-xl italic text-slate-600 max-w-2xl">
           "{selectedQuote.text}" - {selectedQuote.author}
         </p>
+
+        <button
+          type="button"
+          onClick={() => setIsAwake(true)}
+          className="mt-8 rounded-full bg-white/70 px-6 py-2 text-sm font-semibold text-slate-800 border border-white/80 shadow-sm hover:bg-white transition-colors"
+        >
+          Skip
+        </button>
       </div>
     </div>
   );
