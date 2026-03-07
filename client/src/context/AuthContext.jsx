@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
@@ -9,10 +9,22 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const didInitialMongoFetchDelay = useRef(false);
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Fetch MongoDB Profile (Static Data)
   const fetchMongoProfile = async (firebaseUser) => {
+    if (!firebaseUser || !firebaseUser.uid || typeof firebaseUser.getIdToken !== "function") {
+      return null;
+    }
+
     try {
+      if (!didInitialMongoFetchDelay.current) {
+        didInitialMongoFetchDelay.current = true;
+        await wait(200);
+      }
+
       const token = await firebaseUser.getIdToken();
       const response = await fetch(`${server}/me`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -65,10 +77,11 @@ export function AuthProvider({ children }) {
             });
 
             // Sync MongoDB
-            try {
-              const token = await fbUser.getIdToken();
-              await fetch(`${server}/sync-email`, {
-                method: "PUT",
+          try {
+            await wait(200);
+            const token = await fbUser.getIdToken();
+            await fetch(`${server}/sync-email`, {
+              method: "PUT",
                 headers: { Authorization: `Bearer ${token}` }
               });
               console.log("✅ MongoDB email sync triggered");
@@ -149,6 +162,7 @@ export function AuthProvider({ children }) {
 
           // Sync MongoDB
           try {
+            await wait(200);
             const token = await auth.currentUser.getIdToken();
             await fetch(`${server}/sync-email`, {
               method: "PUT",

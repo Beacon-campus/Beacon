@@ -22,7 +22,7 @@ const studyQuotes = [
   { text: "Small progress is still progress.", author: "Anonymous" },
 ];
 
-const VALID_READY_STATUS = new Set([200, 401, 403]);
+const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
 const WAKE_INTERVAL_MS = 3500;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
@@ -34,8 +34,7 @@ export default function ServerWakeupModal({ children }) {
   const [selectedQuote, setSelectedQuote] = useState(studyQuotes[0]);
 
   const nodeApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const dockerBaseUrl =
-    import.meta.env.VITE_DOCKER_BASE_URL || "https://streak-api-docker.onrender.com";
+  const dockerBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * studyQuotes.length);
@@ -43,28 +42,51 @@ export default function ServerWakeupModal({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!nodeApiBaseUrl) {
+    if (!nodeApiBaseUrl || !dockerBaseUrl || isAwake) {
       return;
     }
 
     let cancelled = false;
 
     const pingServers = async () => {
-      const nodeUrl = `${nodeApiBaseUrl}/api/calendar/current`;
-      const dockerUrl = dockerBaseUrl;
+      if (isAwake) return;
+
+      const nodeBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      const dockerServiceBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
+      if (!nodeBaseUrl || !dockerServiceBaseUrl) return;
+
+      const nodeUrl = `${nodeBaseUrl.replace(/\/api$/, "")}/health`;
+      const dockerUrl = `${dockerServiceBaseUrl.replace(/\/+$/, "")}/health`;
 
       const results = await Promise.allSettled([
-        fetch(nodeUrl, { method: "GET", credentials: "include" }),
-        fetch(dockerUrl, { method: "GET", credentials: "include" }),
+        fetch(nodeUrl, { method: "GET" }),
+        fetch(dockerUrl, { method: "GET" }),
       ]);
 
       const [nodeResult, dockerResult] = results;
+      console.log("[ServerWakeupModal] Ping URLs:", { nodeUrl, dockerUrl });
+      console.log("[ServerWakeupModal] Ping raw results:", {
+        nodeResult,
+        dockerResult,
+      });
+      const nodeStatus =
+        nodeResult.status === "fulfilled" ? nodeResult.value.status : null;
+      const dockerStatus =
+        dockerResult.status === "fulfilled" ? dockerResult.value.status : null;
+      console.log("[ServerWakeupModal] Node status code:", nodeStatus);
+      console.log("[ServerWakeupModal] Docker status code:", dockerStatus);
       const nodeReady =
         nodeResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(nodeResult.value.status);
       const dockerReady =
         dockerResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(dockerResult.value.status);
+      console.log("[ServerWakeupModal] Ping readiness:", {
+        nodeReady,
+        dockerReady,
+      });
+      console.log("[ServerWakeupModal] nodeReady:", nodeReady);
+      console.log("[ServerWakeupModal] dockerReady:", dockerReady);
 
       if (!cancelled && nodeReady && dockerReady) {
         setIsAwake(true);
@@ -78,7 +100,7 @@ export default function ServerWakeupModal({ children }) {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [nodeApiBaseUrl, dockerBaseUrl]);
+  }, [nodeApiBaseUrl, dockerBaseUrl, isAwake]);
 
   const isWaking = !isAwake;
 
@@ -121,6 +143,14 @@ export default function ServerWakeupModal({ children }) {
         <p className="mt-12 text-center text-lg md:text-xl italic text-slate-600 max-w-2xl">
           "{selectedQuote.text}" - {selectedQuote.author}
         </p>
+
+        <button
+          type="button"
+          onClick={() => setIsAwake(true)}
+          className="mt-8 rounded-full bg-white/70 px-6 py-2 text-sm font-semibold text-slate-800 border border-white/80 shadow-sm hover:bg-white transition-colors"
+        >
+          Skip
+        </button>
       </div>
     </div>
   );

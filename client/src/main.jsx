@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
+import { HomeDataProvider } from "./context/HomeDataContext";
 import ServerWakeupModal from "./components/ServerWakeupModal";
 import "./index.css";
 
@@ -16,8 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <ServerWakeupModal>
       <AuthProvider>
-        {/* AuthProvider stays here to provide user data to everything inside App */}
-        <App />
+        <HomeDataProvider>
+          <App />
+        </HomeDataProvider>
       </AuthProvider>
     </ServerWakeupModal>
   </BrowserRouter>

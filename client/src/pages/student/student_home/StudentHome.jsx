@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { auth } from "../../../firebase/firebase";
-import useTodos from "../../../hooks/useTodos";
+import { useHomeData } from "../../../context/HomeDataContext";
 import { useNavigate } from "react-router-dom";
 import socket from "../../../services/socket.service";
 import WelcomeCard from "../../../components/shared/home_widgets/WelcomeCard";
@@ -9,7 +9,6 @@ import EventWidget from "../../../components/shared/home_widgets/EventWidget";
 import NotificationsWidget from "../../../components/shared/home_widgets/NotificationsWidget";
 import QuickTodosWidget from "../../../components/shared/home_widgets/QuickTodosWidget";
 import AnnouncementsWidget from "../../../components/shared/home_widgets/AnnouncementsWidget";
-import { fetchRecentUniversityAnnouncements } from "../../../services/university.service";
 
 // Helper for relative time
 const getRelativeTime = (targetDateStr) => {
@@ -44,8 +43,15 @@ export default function StudentHome() {
     const [quote, setQuote] = useState({ text: "Loading...", author: "" });
     const [nextEvent, setNextEvent] = useState(null);
     const [loadingEvent, setLoadingEvent] = useState(true);
-    const [announcements, setAnnouncements] = useState([]);
-    const [notifications, setNotifications] = useState([]);
+    const {
+        todos,
+        notifications,
+        universityAnnouncements,
+        fetchAllHomeData,
+        fetchNotifications,
+        toggleTodoComplete,
+        setUniversityAnnouncements,
+    } = useHomeData();
 
     // Carousel State
     const [activeNotif, setActiveNotif] = useState(0);
@@ -79,18 +85,18 @@ export default function StudentHome() {
 
     // Auto-Scroll Announcements
     useEffect(() => {
-        if (announcements.length <= 1) return;
+        if (universityAnnouncements.length <= 1) return;
         const interval = setInterval(() => {
-            setActiveAnnounce((prev) => (prev + 1) % announcements.length);
+            setActiveAnnounce((prev) => (prev + 1) % universityAnnouncements.length);
         }, 5200);
         return () => clearInterval(interval);
-    }, [announcements.length]);
+    }, [universityAnnouncements.length]);
 
     useEffect(() => {
-        if (activeAnnounce >= announcements.length && announcements.length > 0) {
+        if (activeAnnounce >= universityAnnouncements.length && universityAnnouncements.length > 0) {
             setActiveAnnounce(0);
         }
-    }, [activeAnnounce, announcements.length]);
+    }, [activeAnnounce, universityAnnouncements.length]);
 
     useEffect(() => {
         if (activeNotif >= homeNotifications.length && homeNotifications.length > 0) {
@@ -98,8 +104,10 @@ export default function StudentHome() {
         }
     }, [activeNotif, homeNotifications.length]);
 
-    // Todo Data
-    const { todos, toggleComplete } = useTodos();
+    useEffect(() => {
+        if (!user) return;
+        fetchAllHomeData();
+    }, [user, fetchAllHomeData]);
 
     const handleComplete = (id) => {
         if (animatingIds.includes(id)) return;
@@ -107,7 +115,7 @@ export default function StudentHome() {
 
         // Wait for animation to finish before actual toggle
         setTimeout(() => {
-            toggleComplete(id, true);
+            toggleTodoComplete(id, true);
             setAnimatingIds(prev => prev.filter(tid => tid !== id));
         }, 400);
     };
@@ -126,13 +134,13 @@ export default function StudentHome() {
 
     const nextAnnounce = (e) => {
         e.stopPropagation();
-        if (!announcements.length) return;
-        setActiveAnnounce(prev => (prev + 1) % announcements.length);
+        if (!universityAnnouncements.length) return;
+        setActiveAnnounce(prev => (prev + 1) % universityAnnouncements.length);
     };
     const prevAnnounce = (e) => {
         e.stopPropagation();
-        if (!announcements.length) return;
-        setActiveAnnounce(prev => (prev - 1 + announcements.length) % announcements.length);
+        if (!universityAnnouncements.length) return;
+        setActiveAnnounce(prev => (prev - 1 + universityAnnouncements.length) % universityAnnouncements.length);
     };
 
     // Get Top 3 Upcoming Todos
@@ -215,111 +223,26 @@ export default function StudentHome() {
     }, [user]);
 
     useEffect(() => {
-        const loadAnnouncements = async () => {
-            if (!user || !auth.currentUser) return;
-            try {
-                const data = await fetchRecentUniversityAnnouncements(8);
-                const normalized = (data || []).map((item) => ({
-                    ...item,
-                    text: item.message,
-                    sender: item.createdBy?.name || "Admin",
-                }));
-                setAnnouncements(normalized);
-            } catch (err) {
-                console.error("Failed to fetch university announcements:", err);
-                setAnnouncements([]);
-            }
-        };
-        loadAnnouncements();
-    }, [user]);
-
-    useEffect(() => {
-        const normalizeType = (rawType = "") => {
-            const type = String(rawType || "").toUpperCase();
-            if (type.includes("URGENT")) return "urgent";
-            if (type.includes("FRIEND")) return "friend_req";
-            if (type.includes("UNIVERSITY") || type.includes("ANNOUNCEMENT")) return "university";
-            if (type.includes("DOUBT")) return "alert";
-            if (type.includes("ASSIGNMENT")) return "assignment";
-            return "info";
-        };
-
-        const loadNotifications = async () => {
-            if (!user || !auth.currentUser) return;
-            try {
-                const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/notifications`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error("Failed to fetch notifications");
-                const data = await res.json();
-                const latest = (data || [])
-                    .filter((n) => !["FRIEND_REQUEST", "FRIEND_REQUEST_RECEIVED"].includes(n.type))
-                    .sort((a, b) => new Date(b.timestamp || b.createdAt || 0) - new Date(a.timestamp || a.createdAt || 0))
-                    .slice(0, 3)
-                    .map((n) => ({
-                        id: n._id || n.id,
-                        title: n.title || "Notification",
-                        desc: n.content || n.description || "",
-                        type: normalizeType(n.type),
-                    }));
-                setNotifications(latest);
-            } catch (err) {
-                console.error("Failed to fetch home notifications:", err);
-                setNotifications([]);
-            }
-        };
-
-        loadNotifications();
-    }, [user]);
-
-    useEffect(() => {
         const onNewAnnouncement = (item) => {
             const normalized = {
                 ...item,
                 text: item.message,
                 sender: item.createdBy?.name || "Admin",
             };
-            setAnnouncements((prev) => {
+            setUniversityAnnouncements((prev) => {
                 if (prev.some((a) => a._id === normalized._id)) return prev;
                 return [normalized, ...prev].slice(0, 8);
             });
         };
         socket.on("university_announcement_new", onNewAnnouncement);
         return () => socket.off("university_announcement_new", onNewAnnouncement);
-    }, []);
+    }, [setUniversityAnnouncements]);
 
     useEffect(() => {
-        const normalizeType = (rawType = "") => {
-            const type = String(rawType || "").toUpperCase();
-            if (type.includes("URGENT")) return "urgent";
-            if (type.includes("FRIEND")) return "friend_req";
-            if (type.includes("UNIVERSITY") || type.includes("ANNOUNCEMENT")) return "university";
-            if (type.includes("DOUBT")) return "alert";
-            if (type.includes("ASSIGNMENT")) return "assignment";
-            return "info";
-        };
-
         const onNewNotification = async () => {
             if (!user || !auth.currentUser) return;
             try {
-                const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/notifications`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) return;
-                const data = await res.json();
-                const latest = (data || [])
-                    .filter((n) => !["FRIEND_REQUEST", "FRIEND_REQUEST_RECEIVED"].includes(n.type))
-                    .sort((a, b) => new Date(b.timestamp || b.createdAt || 0) - new Date(a.timestamp || a.createdAt || 0))
-                    .slice(0, 3)
-                    .map((n) => ({
-                        id: n._id || n.id,
-                        title: n.title || "Notification",
-                        desc: n.content || n.description || "",
-                        type: normalizeType(n.type),
-                    }));
-                setNotifications(latest);
+                await fetchNotifications(true, 8);
             } catch {
                 // ignore live refresh errors
             }
@@ -330,7 +253,7 @@ export default function StudentHome() {
             socket.off("new_notification", onNewNotification);
             socket.off("event", onNewNotification);
         };
-    }, [user]);
+    }, [user, fetchNotifications]);
 
     // Logic for Header & Badge
     const relativeTime = nextEvent ? getRelativeTime(nextEvent.date) : "";
@@ -389,7 +312,7 @@ export default function StudentHome() {
 
                     <AnnouncementsWidget
                         activeAnnounce={activeAnnounce}
-                        announcements={announcements}
+                        announcements={universityAnnouncements}
                         setActiveAnnounce={setActiveAnnounce}
                         prevAnnounce={prevAnnounce}
                         nextAnnounce={nextAnnounce}

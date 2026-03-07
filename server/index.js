@@ -98,9 +98,12 @@ app.use(
 );
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
+// Public health check route (must stay above API rate limiter)
+app.get("/health", (_, res) => res.status(200).send("OK"));
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 150, // Limit each IP to 150 requests per `window`
+  max: 500, // Temporary higher limit for wakeup/polling testing
   message: { error: "Too many requests from this IP, please try again after 15 minutes." },
   standardHeaders: true, 
   legacyHeaders: false,
