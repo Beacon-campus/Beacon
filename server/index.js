@@ -58,16 +58,25 @@ try {
   console.log("Error loading service account from .env or file.");
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+if (serviceAccount) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  console.warn("⚠️ Firebase skipped: No service account found. Please provide FIREBASE_PROJECT_ID etc. in .env or serviceAccountKey.json");
+}
 
 /* ================= EXPRESS & SOCKET SETUP ================= */
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [];
+// Dynamic CORS configuration from env (comma-separated values supported)
+const allowedOrigins = String(process.env.CLIENT_URL || "http://localhost:5173,http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const frameAncestors = ["'self'", ...allowedOrigins];
 
 // INITIALIZE SOCKET.IO
@@ -87,7 +96,7 @@ app.use(
     },
   })
 );
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

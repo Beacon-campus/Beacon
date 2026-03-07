@@ -112,7 +112,7 @@ export default function NoteCard({ note, onDelete, onUpdate, onClick, onShare })
     return (
         <>
             <div
-                className={`group relative rounded-xl border p-4 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col gap-2 ${COLORS[note.color] || COLORS.default} h-min break-inside-avoid mb-4`}
+                className={`group relative rounded-xl border p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col gap-3 ${COLORS[note.color] || COLORS.default} h-full`}
                 onClick={() => onClick(note)}
             >
                 {/* Pin Button */}
@@ -124,11 +124,11 @@ export default function NoteCard({ note, onDelete, onUpdate, onClick, onShare })
                 </button>
 
                 {/* Title */}
-                {note.title && <h3 className="font-semibold text-gray-800 pr-6 text-lg break-words">{note.title}</h3>}
+                {note.title && <h3 className="font-extrabold text-gray-900 pr-6 text-lg tracking-tight break-words leading-tight">{note.title}</h3>}
 
                 {/* Content */}
                 {note.content && (
-                    <div className="text-gray-600 text-sm break-words prose prose-sm prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-nav:my-1 max-h-[300px] overflow-hidden mask-linear-gradient">
+                    <div className="text-gray-600 text-sm break-words prose prose-sm prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-nav:my-1 max-h-[300px] overflow-hidden mask-linear-gradient leading-relaxed">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
                     </div>
                 )}
@@ -199,8 +199,9 @@ export default function NoteCard({ note, onDelete, onUpdate, onClick, onShare })
                 </div>
                 {/* Watermark inside card */}
                 {note.watermark && (
-                    <div className="mt-2 text-xs text-black italic font-medium text-right select-none">
-                        {note.watermark}
+                    <div className="mt-auto pt-3 border-t border-black/5 text-[10px] text-gray-500 font-bold text-right select-none uppercase tracking-widest flex items-center justify-end gap-1.5 opacity-80">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        {note.watermark.replace('- ', '')}
                     </div>
                 )}
             </div>

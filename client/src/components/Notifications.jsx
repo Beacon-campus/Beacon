@@ -284,7 +284,7 @@ export default function Notifications() {
 
   return (
     <div className="h-full w-full p-2">
-      <div className="h-full w-full border border-gray-200 rounded-2xl bg-white p-6 flex flex-col gap-6 shadow-sm overflow-hidden">
+      <div className="h-full w-full premium-card p-6 flex flex-col gap-6 overflow-hidden">
 
         {/* ================= HEADER ================= */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-100">

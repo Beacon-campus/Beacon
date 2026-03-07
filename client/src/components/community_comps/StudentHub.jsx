@@ -57,7 +57,12 @@ export default function StudentHub({
     }, [channelId]);
 
     const scrollToBottom = useCallback(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (chatEndRef.current?.parentElement) {
+          chatEndRef.current.parentElement.scrollTo({
+            top: chatEndRef.current.parentElement.scrollHeight,
+            behavior: "smooth"
+          });
+        }
     }, []);
 
     useEffect(() => {

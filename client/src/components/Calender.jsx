@@ -585,7 +585,7 @@ export default function Calendar() {
   return (
     <div className="h-full w-full p-2">
       <NoScrollbarStyle />
-      <div className="h-full w-full border border-gray-200 rounded-3xl bg-white p-6 flex gap-6 shadow-sm overflow-hidden">
+      <div className="h-full w-full premium-card p-6 flex gap-6 overflow-hidden">
 
         {/* LEFT SIDE */}
         <div className="flex-1 flex flex-col gap-6 h-full overflow-hidden">

@@ -67,7 +67,12 @@ export default function GroupChatWindow({
 
     useEffect(() => {
         const scrollToBottom = () => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            if (messagesEndRef.current?.parentElement) {
+              messagesEndRef.current.parentElement.scrollTo({
+                top: messagesEndRef.current.parentElement.scrollHeight,
+                behavior: "smooth"
+              });
+            }
         };
         scrollToBottom();
         const timeoutId = setTimeout(scrollToBottom, 300);
