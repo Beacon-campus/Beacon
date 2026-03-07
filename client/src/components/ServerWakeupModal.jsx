@@ -33,8 +33,7 @@ export default function ServerWakeupModal({ children }) {
   const [selectedQuote, setSelectedQuote] = useState(studyQuotes[0]);
 
   const nodeApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const dockerBaseUrl =
-    import.meta.env.VITE_DOCKER_BASE_URL || "https://streak-api-docker.onrender.com";
+  const dockerBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * studyQuotes.length);
@@ -42,15 +41,21 @@ export default function ServerWakeupModal({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!nodeApiBaseUrl) {
+    if (!nodeApiBaseUrl || !dockerBaseUrl || isAwake) {
       return;
     }
 
     let cancelled = false;
 
     const pingServers = async () => {
-      const nodeUrl = `${nodeApiBaseUrl.replace(/\/api$/, "")}/health`;
-      const dockerUrl = `${dockerBaseUrl.replace(/\/+$/, "")}/health`;
+      if (isAwake) return;
+
+      const nodeBaseUrl = import.meta.env.VITE_API_BASE_URL;
+      const dockerServiceBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
+      if (!nodeBaseUrl || !dockerServiceBaseUrl) return;
+
+      const nodeUrl = `${nodeBaseUrl.replace(/\/api$/, "")}/health`;
+      const dockerUrl = `${dockerServiceBaseUrl.replace(/\/+$/, "")}/health`;
 
       const results = await Promise.allSettled([
         fetch(nodeUrl, { method: "GET" }),
@@ -86,7 +91,7 @@ export default function ServerWakeupModal({ children }) {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [nodeApiBaseUrl, dockerBaseUrl]);
+  }, [nodeApiBaseUrl, dockerBaseUrl, isAwake]);
 
   const isWaking = !isAwake;
 
