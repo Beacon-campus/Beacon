@@ -14,7 +14,7 @@ const ZoomInIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentCol
 const ZoomOutIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM5 10h10"></path></svg>;
 const ResetIcon = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>;
 const MoonIcon = () => <svg className="w-10 h-10 text-indigo-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>;
-const CoffeeIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>;
+const CoffeeIcon = ({ className = "w-4 h-4" }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>;
 
 // --- Glitch Text Component ---
 const GlitchText = ({ text, className = "" }) => (
@@ -25,11 +25,26 @@ const GlitchText = ({ text, className = "" }) => (
   </span>
 );
 
-// --- Simple Scrollbar Hider ---
-const NoScrollbarStyle = () => (
+// --- CSS Styles ---
+const ComponentStyles = () => (
   <style>{`
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Custom Scrollbar for Event List */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #e2e8f0;
+      border-radius: 20px;
+    }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+    }
   `}</style>
 );
 
@@ -536,9 +551,10 @@ export default function Calendar() {
   const renderClassCard = (item, label, isActive = false) => {
     if (!item) {
       return (
-        <div className="flex-1 min-w-[130px] border rounded-xl p-3 flex flex-col justify-center items-center bg-gray-50 border-gray-100 text-center opacity-60">
+        <div className="flex-1 min-w-[130px] bg-[#F3F4F6] rounded-xl p-3 flex flex-col justify-center items-center text-center">
           <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{label}</span>
-          <p className="text-sm font-semibold text-gray-300">No Class</p>
+          <div className="text-gray-300 my-1"><CoffeeIcon className="w-5 h-5" /></div>
+          <p className="text-sm font-semibold text-gray-400">No Class</p>
         </div>
       );
     }
@@ -557,49 +573,49 @@ export default function Calendar() {
     }
 
     return (
-      <div className={`flex-1 min-w-[130px] border rounded-xl p-3 flex flex-col relative group transition-all ${isActive ? "bg-white border-primary shadow-md ring-1 ring-primary/10" : "bg-white border-gray-200"}`}>
+      <div className={`flex-1 min-w-[130px] border-none rounded-xl p-3 flex flex-col relative group transition-all ${isActive ? "bg-[#F0FDF4] shadow-lg shadow-[#059669]/10 z-10 transform scale-[1.02]" : "bg-white border border-gray-100 shadow-sm text-gray-700"}`}>
         <div className="flex justify-between items-center mb-2">
-          <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isActive ? "text-primary" : "text-gray-400"}`}>{label}</span>
-          <span className={`text-[9px] px-1.5 py-0.5 font-bold border rounded-md ${isActive ? "bg-indigo-50 text-indigo-700 border-indigo-100" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+          <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isActive ? "text-[#065F46]" : "text-gray-400"}`}>{label}</span>
+          <span className={`text-[9px] px-1.5 py-0.5 font-bold border rounded-md ${isActive ? "bg-white/60 text-[#065F46] border-[#059669]/20" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
             {item.type}
           </span>
         </div>
         <div className="flex-1 flex flex-col justify-center items-center text-center gap-1 min-h-[3rem]">
-          <p className={`text-lg font-extrabold leading-tight line-clamp-2 ${isActive ? "text-primary" : "text-gray-700"}`}>
+          <p className={`text-lg font-extrabold leading-tight line-clamp-2 ${isActive ? "text-[#065F46]" : "text-gray-700"}`}>
             {item.subject}
           </p>
-          <p className="text-xs font-bold text-gray-500 line-clamp-1">
+          <p className={`text-xs font-bold line-clamp-1 ${isActive ? "text-[#065F46]/70" : "text-gray-500"}`}>
             {item.teacher}
           </p>
         </div>
-        <div className="mt-2 text-center border-t border-gray-100 pt-2">
-          <p className={`text-sm font-bold font-mono ${isActive ? "text-primary" : "text-gray-500"}`}>
+        <div className={`mt-2 text-center border-t ${isActive ? 'border-[#059669]/10' : 'border-gray-100'} pt-2`}>
+          <p className={`text-sm font-bold font-mono ${isActive ? "text-[#065F46]" : "text-gray-500"}`}>
             {item.startTime} - {item.endTime}
           </p>
         </div>
-        {isActive && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-sm"></span>}
+        {isActive && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#059669] animate-pulse shadow-sm"></span>}
       </div>
     );
   };
 
   return (
     <div className="h-full w-full p-2">
-      <NoScrollbarStyle />
-      <div className="h-full w-full premium-card p-6 flex gap-6 overflow-hidden">
+      <ComponentStyles />
+      <div className="h-full w-full premium-card p-6 flex overflow-hidden">
 
         {/* LEFT SIDE */}
-        <div className="flex-1 flex flex-col gap-6 h-full overflow-hidden">
+        <div className="flex-1 flex flex-col gap-8 h-full overflow-hidden pr-6 border-r border-gray-50">
 
           {/* TODAY CARD */}
-          <div className="flex-1 border border-gray-200 rounded-3xl bg-gray-50 p-5 flex flex-col relative overflow-hidden transition-all duration-300 shrink-0">
+          <div className="flex-1 flex flex-col relative overflow-hidden transition-all duration-300 shrink-0">
 
-            <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex items-center mb-6 relative z-10 gap-3">
               <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                 <ClockIcon /> Today
               </h2>
-              <span className="text-2xl font-mono font-medium text-gray-700 bg-white px-4 py-1 rounded-xl border border-gray-200 shadow-sm">
-                {hoursString}<span className={`transition-opacity duration-400 ${blink ? "opacity-40" : "opacity-100"}`}>:</span>{minutesString}
-                <span className="text-sm ml-1 text-gray-400">{ampm}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+              <span className="text-lg font-bold text-primary">
+                {hoursString}<span className={`transition-opacity duration-400 ${blink ? "opacity-40" : "opacity-100"}`}>:</span>{minutesString} <span className="text-sm font-medium">{ampm}</span>
               </span>
             </div>
 
@@ -614,7 +630,7 @@ export default function Calendar() {
             {user && timetableState === "ended" && (
               <div className="flex-1 flex flex-col items-center justify-evenly text-center relative z-10 animate-in fade-in slide-in-from-bottom-2 h-full">
                 <div>
-                  <div className="inline-flex p-3 bg-indigo-50 mb-2">
+                  <div className="inline-flex p-3 bg-indigo-50 mb-2 rounded-xl">
                     <MoonIcon />
                   </div>
                   <h3 className="text-lg font-bold text-primary">Classes concluded for today</h3>
@@ -650,7 +666,7 @@ export default function Calendar() {
           </div>
 
           {/* UPCOMING EVENTS */}
-          <div className="flex-1 border border-gray-200 rounded-3xl bg-gray-50 p-6 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-3 shrink-0">
               <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                 <CalendarIconSmall /> Upcoming Events
@@ -670,25 +686,24 @@ export default function Calendar() {
                   const diffTime = eventDate - todayRef;
                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                   let displayDate = event.dateString;
-                  let badgeColor = "bg-blue-50 border-blue-100 text-blue-800";
-                  if (event.type === "Holiday") badgeColor = "bg-orange-50 border-orange-100 text-orange-800";
-                  if (event.type === "Exam") badgeColor = "bg-red-50 border-red-100 text-red-800";
+                  // Standardized neutral styling for general future events
+                  let badgeColor = "bg-gray-100 border-gray-200 text-gray-700";
 
                   if (diffDays === 0) {
                     displayDate = "Today";
                     badgeColor = "bg-red-50 border-red-100 text-red-700";
                   } else if (diffDays === 1) {
                     displayDate = "Tomorrow";
-                    badgeColor = "bg-amber-50 border-amber-100 text-amber-700";
+                    badgeColor = "bg-indigo-50 border-indigo-100 text-indigo-700";
                   }
 
                   return (
-                    <div key={i} className="flex items-center justify-between border border-gray-200 rounded-lg bg-white px-4 py-2.5 hover:shadow-sm transition-shadow shrink-0">
-                      <div className="flex flex-col">
+                    <div key={i} className="flex items-center justify-between border border-gray-200 rounded-lg bg-white px-4 py-3.5 hover:shadow-sm transition-shadow shrink-0">
+                      <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-bold text-gray-800 leading-tight">{event.title}</span>
-                        <span className="text-[10px] font-medium text-gray-400">{eventDate.toLocaleDateString('default', { month: 'short', day: 'numeric' })}</span>
+                        <span className="text-[10px] font-bold text-gray-400">{eventDate.toLocaleDateString('default', { month: 'short', day: 'numeric' })}</span>
                       </div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold border ${badgeColor}`}>
+                      <span className={`text-[10px] px-2.5 py-1 rounded font-bold border ${badgeColor}`}>
                         {displayDate}
                       </span>
                     </div>
@@ -702,14 +717,22 @@ export default function Calendar() {
         </div>
 
         {/* RIGHT SIDE (CALENDAR PREVIEW - BRICK WALL TRIGGER) */}
-        <div className="w-80 border border-gray-200 rounded-3xl bg-gray-50 flex flex-col items-center justify-center p-8 cursor-pointer hover:bg-gray-100 transition-colors group relative overflow-hidden shrink-0" onClick={() => setShowCalendar(true)}>
-          <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none transform scale-150 group-hover:scale-125 transition-transform duration-700">
+        <div className="w-80 flex flex-col items-center justify-center pl-6 cursor-pointer group relative overflow-hidden shrink-0" onClick={() => setShowCalendar(true)}>
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none transform scale-150 group-hover:scale-125 transition-transform duration-700">
             <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z" /></svg>
           </div>
           <div className="z-10 flex flex-col items-center gap-4 text-center">
             <div className="w-20 h-20 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform"><CalendarIconLarge /></div>
-            <div><h3 className="text-xl font-bold text-primary">Academic Calendar</h3><p className="text-sm text-gray-500 mt-1">Tap to view full schedule</p></div>
-            <button type="button" className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-medium hover:bg-black transition-all shadow-lg shadow-primary/10 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleDownloadPdf} disabled={isDownloading}>
+            <div>
+              <h3 className="text-xl font-bold text-primary group-hover:text-black transition-colors">Academic Calendar</h3>
+              <p className="text-sm text-gray-500 mt-1">Tap to view full schedule</p>
+            </div>
+            <button 
+              type="button" 
+              className="mt-4 flex items-center gap-2 px-5 py-2.5 bg-transparent border-2 border-primary text-primary rounded-xl text-sm font-bold hover:bg-primary hover:text-white transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" 
+              onClick={(e) => { e.stopPropagation(); handleDownloadPdf(); }} 
+              disabled={isDownloading}
+            >
               <DownloadIcon /> {isDownloading ? "Generating PDF..." : "Download PDF"}
             </button>
           </div>
