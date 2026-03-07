@@ -186,11 +186,11 @@ const Whiteboard = () => {
       const existingBtn = document.getElementById("custom-laser-btn");
 
       // Theme Constants
-      const COLOR_ACTIVE_BG = "#1f2937";
+      const COLOR_ACTIVE_BG = "#0f172a";
       const COLOR_ACTIVE_TEXT = "#ffffff";
       const COLOR_INACTIVE_BG = "transparent";
-      const COLOR_INACTIVE_TEXT = "#374151";
-      const COLOR_HOVER_BG = "#e5e7eb";
+      const COLOR_INACTIVE_TEXT = "#475569";
+      const COLOR_HOVER_BG = "#f1f5f9";
 
       const isActive = activeToolType === "laser";
 
@@ -257,7 +257,7 @@ const Whiteboard = () => {
 
         // 🔑 FORCE SVG TO REPAINT (THIS FIXES YOUR ISSUE)
         existingBtn.querySelectorAll("svg").forEach((svg) => {
-          svg.style.stroke = isActive ? "#ffffff" : "#374151";
+          svg.style.stroke = isActive ? "#ffffff" : "#475569";
           svg.style.fill = "none";
         });
 
@@ -405,25 +405,25 @@ const Whiteboard = () => {
           :root,
           .excalidraw,
           .excalidraw.theme--light {
-            --color-primary: #374151 !important;
-            --color-primary-darker: #1f2937 !important;
-            --color-primary-light: #f3f4f6 !important;
-            --color-primary-light-darker: #e5e7eb !important;
-            --color-brand: #374151 !important;
-            --color-brand-hover: #374151 !important;
-            --color-brand-active: #1f2937 !important;
-            --color-primary-darkest: #111827 !important; 
-            --focus-highlight-color: #374151 !important; 
-            --select-highlight-color: #374151 !important; 
-            --color-surface-primary-container: #1f2937 !important;
+            --color-primary: #1e293b !important;
+            --color-primary-darker: #0f172a !important;
+            --color-primary-light: #f8fafc !important;
+            --color-primary-light-darker: #e2e8f0 !important;
+            --color-brand: #1e293b !important;
+            --color-brand-hover: #0f172a !important;
+            --color-brand-active: #0f172a !important;
+            --color-primary-darkest: #020617 !important; 
+            --focus-highlight-color: #0f172a !important; 
+            --select-highlight-color: #0f172a !important; 
+            --color-surface-primary-container: #0f172a !important;
             --color-on-primary-container: #ffffff !important;
-            --color-surface-secondary-container: #e5e7eb !important;
-            --color-on-secondary-container: #111827 !important;
+            --color-surface-secondary-container: #e2e8f0 !important;
+            --color-on-secondary-container: #020617 !important;
             --color-selection: #a0a0a0 !important;
-            --button-hover-bg: #f3f4f6 !important;
-            --color-slider-track: #e5e7eb !important;
-            --color-slider-thumb: #374151 !important;
-            --link-color: #374151 !important;
+            --button-hover-bg: #f8fafc !important;
+            --color-slider-track: #e2e8f0 !important;
+            --color-slider-thumb: #1e293b !important;
+            --link-color: #1e293b !important;
           }
 
           /* 2. COMPLETELY HIDE THE 'MORE TOOLS' DROPDOWN BUTTON */
@@ -443,23 +443,77 @@ const Whiteboard = () => {
         
           /* Standard UI Cleanup */
           .excalidraw .dropdown-menu-button {
-            background-color: #f3f4f6 !important;
+            background-color: #f8fafc !important;
             border-radius: 0.5rem !important;
           }
-          .excalidraw .dropdown-menu-button:hover {
-            background-color: #e5e7eb !important;
+          .excalidraw .dropdown-menu-button:hover,
+          .excalidraw .dropdown-menu-button:active {
+            background-color: #e2e8f0 !important;
           }
           .excalidraw .dropdown-menu-button svg {
-            fill: #374151 !important;
+            fill: #1e293b !important;
           }
         
-          .excalidraw .ToolIcon input:checked + .ToolIcon__icon,
-          .excalidraw .buttonList label.active {
-            background-color: #1f2937 !important;
-            border-color: #1f2937 !important;
+          /* Base styles for the sliding pill effect */
+          .excalidraw .buttonList {
+             position: relative;
+             z-index: 1;
           }
+
+          /* The Sliding Background Pill Container */
+          .excalidraw .ToolIcon__icon,
+          .excalidraw .buttonList label {
+            background-color: transparent !important; /* Force transparent so pseudoelement behind shows */
+            border-color: transparent !important;
+            transition: color 0.3s ease-in-out !important;
+            position: relative;
+            z-index: 2; /* keep text/icon above the pill */
+          }
+          .excalidraw .ToolIcon__icon svg, 
+          .excalidraw .buttonList label svg {
+             transition: stroke 0.3s ease-in-out, fill 0.3s ease-in-out !important;
+             z-index: 2;
+             position: relative;
+          }
+
+          /* The sliding Background Pill itself */
+          .excalidraw .ToolIcon__icon::before,
+          .excalidraw .buttonList label::before {
+             content: '';
+             position: absolute;
+             inset: 0;
+             border-radius: 0.5rem;
+             background-color: #0f172a;
+             opacity: 0;
+             transform: scale(0.9);
+             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+             z-index: 1; /* Behind the icon */
+          }
+
+          /* Hover State - Soft gray background */
+          .excalidraw .ToolIcon:hover .ToolIcon__icon::before,
+          .excalidraw .buttonList label:hover::before {
+             background-color: #f1f5f9;
+             opacity: 1;
+             transform: scale(1);
+          }
+
+          /* Active State - The Dark Navy */
+          .excalidraw .ToolIcon input:checked + .ToolIcon__icon::before,
+          .excalidraw .buttonList label.active::before,
+          html[dir] .excalidraw .buttonList label.active::before,
+          .excalidraw .ToolIcon input:active + .ToolIcon__icon::before,
+          .excalidraw .ToolIcon__icon:active::before {
+             background-color: #0f172a !important;
+             opacity: 1;
+             transform: scale(1);
+          }
+          
+          /* Change icon color to white when active */
           .excalidraw .ToolIcon input:checked + .ToolIcon__icon svg,
-          .excalidraw .buttonList label.active svg {
+          .excalidraw .buttonList label.active svg,
+          html[dir] .excalidraw .buttonList label.active svg,
+          .excalidraw .ToolIcon__icon:active svg {
             stroke: #ffffff !important;
             fill: transparent !important;
             color: #ffffff !important;
