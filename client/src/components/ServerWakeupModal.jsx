@@ -21,7 +21,7 @@ const studyQuotes = [
   { text: "Small progress is still progress.", author: "Anonymous" },
 ];
 
-const VALID_READY_STATUS = new Set([200, 401, 403]);
+const VALID_READY_STATUS = new Set([200, 401, 403, 429]);
 const WAKE_INTERVAL_MS = 3500;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
@@ -49,21 +49,30 @@ export default function ServerWakeupModal({ children }) {
     let cancelled = false;
 
     const pingServers = async () => {
-      const nodeUrl = `${nodeApiBaseUrl}/api/calendar/current`;
-      const dockerUrl = dockerBaseUrl;
+      const nodeUrl = `${nodeApiBaseUrl.replace(/\/api$/, "")}/health`;
+      const dockerUrl = `${dockerBaseUrl.replace(/\/+$/, "")}/health`;
 
       const results = await Promise.allSettled([
-        fetch(nodeUrl, { method: "GET", credentials: "include" }),
-        fetch(dockerUrl, { method: "GET", credentials: "include" }),
+        fetch(nodeUrl, { method: "GET" }),
+        fetch(dockerUrl, { method: "GET" }),
       ]);
 
       const [nodeResult, dockerResult] = results;
+      console.log("[ServerWakeupModal] Ping URLs:", { nodeUrl, dockerUrl });
+      console.log("[ServerWakeupModal] Ping raw results:", {
+        nodeResult,
+        dockerResult,
+      });
       const nodeReady =
         nodeResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(nodeResult.value.status);
       const dockerReady =
         dockerResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(dockerResult.value.status);
+      console.log("[ServerWakeupModal] Ping readiness:", {
+        nodeReady,
+        dockerReady,
+      });
 
       if (!cancelled && nodeReady && dockerReady) {
         setIsAwake(true);
