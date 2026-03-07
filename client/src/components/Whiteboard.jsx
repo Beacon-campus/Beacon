@@ -181,100 +181,81 @@ const Whiteboard = () => {
   useEffect(() => {
     if (!excalidrawAPI) return;
 
-    const injectLaserButton = () => {
-      const toolbarStack = document.querySelector(".App-toolbar .Stack");
-      const existingBtn = document.getElementById("custom-laser-btn");
+      const injectLaserButton = () => {
+        const toolbarStack = document.querySelector(".App-toolbar .Stack");
+        let existingBtn = document.getElementById("custom-laser-btn");
 
-      // Theme Constants
-      const COLOR_ACTIVE_BG = "#0f172a";
-      const COLOR_ACTIVE_TEXT = "#ffffff";
-      const COLOR_INACTIVE_BG = "transparent";
-      const COLOR_INACTIVE_TEXT = "#475569";
-      const COLOR_HOVER_BG = "#f1f5f9";
+        const isActive = activeToolType === "laser";
 
-      const isActive = activeToolType === "laser";
+        if (toolbarStack && !existingBtn) {
+          existingBtn = document.createElement("button");
+          existingBtn.id = "custom-laser-btn";
+          existingBtn.title = "Laser Pointer — K";
+          existingBtn.type = "button";
+          // We add buttonList label simulation classes so our custom CSS animations apply to it too
+          existingBtn.className = "ToolIcon__icon"; 
 
-      if (toolbarStack && !existingBtn) {
-        const btn = document.createElement("button");
-        btn.id = "custom-laser-btn";
-        btn.title = "Laser Pointer — K";
-        btn.type = "button";
-        btn.className = "ToolIcon__icon";
+          Object.assign(existingBtn.style, {
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "36px",
+            height: "36px",
+            borderRadius: "0.5rem",
+            border: "none",
+            cursor: "pointer",
+            backgroundColor: "transparent",
+            color: "#475569",
+          });
 
-        Object.assign(btn.style, {
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "36px",
-          height: "36px",
-          borderRadius: "0.5rem",
-          border: "none",
-          cursor: "pointer",
-          transition: "background-color 0.2s ease",
-          backgroundColor: isActive ? COLOR_ACTIVE_BG : COLOR_INACTIVE_BG,
-          color: isActive ? COLOR_ACTIVE_TEXT : COLOR_INACTIVE_TEXT,
-        });
+          existingBtn.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%; position: relative; z-index: 2;">
+            <svg viewBox="0 0 20 20"
+                 style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round; transition: stroke 0.3s ease-in-out, fill 0.3s ease-in-out;">
+              <g transform="rotate(90 10 10)">
+                <path d="m9.644 13.69 7.774-7.773a2.357 2.357 0 0 0-3.334-3.334l-7.773 7.774L8 12l1.643 1.69Z"/>
+                <path d="m13.25 3.417 3.333 3.333M10 10l2-2M5 15l3-3M2.156 17.894l1-1M5.453 19.029l-.144-1.407M2.377 11.887l.866 1.118M8.354 17.273l-1.194-.758M.953 14.652l1.408.13"/>
+              </g>
+            </svg>
+            <span id="laser-k-shortcut"
+                  style="position:absolute;bottom:2px;right:3px;font-size:0.6rem;font-weight:500;opacity:0.6;color:inherit;">
+              K
+            </span>
+          </div>
+        `;
 
-        btn.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
-          <svg viewBox="0 0 20 20"
-               style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round;">
-            <g transform="rotate(90 10 10)">
-              <path d="m9.644 13.69 7.774-7.773a2.357 2.357 0 0 0-3.334-3.334l-7.773 7.774L8 12l1.643 1.69Z"/>
-              <path d="m13.25 3.417 3.333 3.333M10 10l2-2M5 15l3-3M2.156 17.894l1-1M5.453 19.029l-.144-1.407M2.377 11.887l.866 1.118M8.354 17.273l-1.194-.758M.953 14.652l1.408.13"/>
-            </g>
-          </svg>
-          <span id="laser-k-shortcut"
-                style="position:absolute;bottom:2px;right:3px;font-size:0.6rem;font-weight:500;opacity:${isActive ? "1" : "0.6"};color:inherit;">
-            K
-          </span>
-        </div>
-      `;
+          existingBtn.onclick = () => {
+            excalidrawAPI.setActiveTool({ type: "laser" });
+          };
 
-        btn.onclick = () => {
-          excalidrawAPI.setActiveTool({ type: "laser" });
-        };
-
-        btn.onmouseenter = () => {
-          if (!isActive) btn.style.backgroundColor = COLOR_HOVER_BG;
-        };
-        btn.onmouseleave = () => {
-          if (!isActive) btn.style.backgroundColor = COLOR_INACTIVE_BG;
-        };
-
-        toolbarStack.appendChild(btn);
-      }
-
-      // 🔁 UPDATE EXISTING BUTTON (MOST IMPORTANT PART)
-      if (existingBtn) {
-        existingBtn.style.backgroundColor = isActive
-          ? COLOR_ACTIVE_BG
-          : COLOR_INACTIVE_BG;
-        existingBtn.style.color = isActive
-          ? COLOR_ACTIVE_TEXT
-          : COLOR_INACTIVE_TEXT;
-
-        // 🔑 FORCE SVG TO REPAINT (THIS FIXES YOUR ISSUE)
-        existingBtn.querySelectorAll("svg").forEach((svg) => {
-          svg.style.stroke = isActive ? "#ffffff" : "#475569";
-          svg.style.fill = "none";
-        });
-
-        const kSpan = existingBtn.querySelector("#laser-k-shortcut");
-        if (kSpan) {
-          kSpan.style.opacity = isActive ? "1" : "0.6";
+          toolbarStack.appendChild(existingBtn);
         }
 
-        existingBtn.onmouseenter = () => {
-          if (!isActive) existingBtn.style.backgroundColor = COLOR_HOVER_BG;
-        };
-        existingBtn.onmouseleave = () => {
-          if (!isActive)
-            existingBtn.style.backgroundColor = COLOR_INACTIVE_BG;
-        };
-      }
-    };
+        // 🔁 UPDATE EXISTING BUTTON STATE
+        if (existingBtn) {
+          // Instead of hardcoding colors, we toggle a custom active class!
+          // We piggy back on the CSS rules we already wrote for `.buttonList label.active` 
+          // by temporarily adding `.active` class to our custom button
+          if (isActive) {
+             existingBtn.classList.add("active");
+          } else {
+             existingBtn.classList.remove("active");
+          }
+
+          // Force styling the SVG specifically for our custom injected button
+          existingBtn.querySelectorAll("svg").forEach((svg) => {
+            svg.style.stroke = isActive ? "#ffffff" : "#475569";
+            svg.style.fill = "none";
+          });
+
+          const kSpan = existingBtn.querySelector("#laser-k-shortcut");
+          if (kSpan) {
+            kSpan.style.opacity = isActive ? "1" : "0.6";
+            kSpan.style.color = isActive ? "#ffffff" : "inherit";
+          }
+        }
+      };
 
     injectLaserButton();
     const interval = setInterval(injectLaserButton, 100);
@@ -487,7 +468,8 @@ const Whiteboard = () => {
 
           /* The sliding Background Pill itself */
           .excalidraw .ToolIcon__icon::before,
-          .excalidraw .buttonList label::before {
+          .excalidraw .buttonList label::before,
+          #custom-laser-btn::before {
              content: '';
              position: absolute;
              inset: 0;
@@ -501,7 +483,8 @@ const Whiteboard = () => {
 
           /* Hover State - Soft gray background */
           .excalidraw .ToolIcon:hover .ToolIcon__icon::before,
-          .excalidraw .buttonList label:hover::before {
+          .excalidraw .buttonList label:hover::before,
+          #custom-laser-btn:hover::before {
              background-color: #f1f5f9;
              opacity: 1;
              transform: scale(1);
@@ -512,7 +495,8 @@ const Whiteboard = () => {
           .excalidraw .buttonList label.active::before,
           html[dir] .excalidraw .buttonList label.active::before,
           .excalidraw .ToolIcon input:active + .ToolIcon__icon::before,
-          .excalidraw .ToolIcon__icon:active::before {
+          .excalidraw .ToolIcon__icon:active::before,
+          #custom-laser-btn.active::before {
              background-color: #0f172a !important;
              opacity: 1;
              transform: scale(1);
