@@ -12,6 +12,25 @@ const CheckAllIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentC
 
 import socket from "../services/socket.service";
 
+// --- CSS Styles ---
+const ComponentStyles = () => (
+  <style>{`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 20px;
+    }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+      background-color: #94a3b8;
+    }
+  `}</style>
+);
+
 export default function Notifications() {
   const { user: currentUserInfo, refreshUser } = useAuth();
   const [notifications, setNotifications] = useState([]);
@@ -284,6 +303,7 @@ export default function Notifications() {
 
   return (
     <div className="h-full w-full p-2">
+      <ComponentStyles />
       <div className="h-full w-full premium-card p-6 flex flex-col gap-6 overflow-hidden">
 
         {/* ================= HEADER ================= */}
@@ -298,14 +318,16 @@ export default function Notifications() {
                 <p className="text-xs text-gray-500 mt-1">You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
               </div>
             </div>
+          </div>
 
-            {/* ================= ICON-ONLY PILL FILTERS (Moved Up) ================= */}
-            <div className="bg-gray-100 p-1 rounded-full flex items-center ml-6 shadow-inner gap-1">
+          <div className="flex items-center gap-4">
+            {/* ================= ICON-ONLY PILL FILTERS ================= */}
+            <div className="bg-gray-100 p-1 rounded-full flex items-center shadow-inner gap-1">
               <button
                 onClick={() => setFilter("all")}
                 title="All Notifications"
                 className={`flex items-center justify-center rounded-full transition-all duration-300 ease-in-out w-9 h-9
-                        ${filter === "all" ? "bg-black text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
+                        ${filter === "all" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
                     `}
               >
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -316,21 +338,21 @@ export default function Notifications() {
                   onClick={() => setFilter("friend_request")}
                   title="Friend Requests"
                   className={`flex items-center justify-center rounded-full transition-all duration-300 ease-in-out w-9 h-9
-                        ${filter === "friend_request" ? "bg-black text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
+                        ${filter === "friend_request" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
                     `}
                 >
                   <svg className="w-5 h-5 flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </button>
               )}
             </div>
-          </div>
 
-          <button
-            onClick={deleteAllNotifications}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            Delete all
-          </button>
+            <button
+              onClick={deleteAllNotifications}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              Delete all
+            </button>
+          </div>
         </div>
 
         {/* ================= NOTIFICATION LIST ================= */}
@@ -356,25 +378,46 @@ export default function Notifications() {
               return (
                 <React.Fragment key={notif.id || notif._id || idx}>
                   <div
-                    className={`group relative border rounded-xl p-4 flex items-start gap-4 transition-all duration-200
-                            ${!notif.read && !isAccepted
-                        ? "bg-gray-50 border-gray-200 hover:border-gray-300"
-                        : "bg-white border-transparent hover:bg-gray-50 hover:border-gray-200"
+                    onClick={(e) => {
+                      // Prevent clicks inside dynamic content/buttons from firing this
+                      if (e.target.closest('button') || e.target.closest('a')) return;
+
+                      if (!isFriendRequest && !isFriendRequestGroup && !isAccepted) {
+                        if (notif.type === "ASSIGNMENT_SUBMITTED" || notif.type === "ASSIGNMENT_DOUBT_REPLY" || notif.type === "ASSIGNMENT_DOUBT") {
+                          if (isTeacher) {
+                            navigate(`/teacher/community/publish-assignment/${notif.classroomId}`, { state: { openAssignmentId: notif.relatedId }});
+                          } else {
+                            navigate(chatPath, { state: { openAssignmentId: notif.relatedId, initialTab: "doubts", timestamp: Date.now() }});
+                          }
+                        } else if (notif.type === "ASSIGNMENT_PUBLISHED") {
+                          navigate(chatPath, { state: { openAssignmentId: notif.relatedId, initialTab: "details", timestamp: Date.now() }});
+                        } else if (notif.link) {
+                          navigate(notif.link);
+                        }
+                      } else if (isAccepted) {
+                        // Automatically open chat if clicked when accepted
+                        openDmWithUser(notif.relatedId);
+                      }
+                    }}
+                    className={`group relative border-b border-gray-100 p-4 pl-6 flex items-start gap-4 transition-all duration-200 ${!isFriendRequestGroup && (!isFriendRequest || isAccepted) ? "cursor-pointer" : ""}
+                            ${(!notif.read && !isAccepted) || notif.unread
+                        ? "bg-blue-50/40 hover:bg-blue-50/60"
+                        : "bg-transparent hover:bg-gray-50"
                       }`}
                   >
-                    {/* Unread Indicator Dot */}
+                    {/* Unread Indicator Bar */}
                     {((!notif.read && !isAccepted) || notif.unread) && (
-                      <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500"></div>
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
                     )}
 
                     {/* Icon Container */}
-                    <div className={`w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center border
-                              ${(!notif.read && !isAccepted) || notif.unread ? "bg-white border-gray-200" : "bg-gray-50 border-gray-100"}
+                    <div className={`w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center
+                              ${(!notif.read && !isAccepted) || notif.unread ? "bg-white shadow-sm" : "bg-gray-100"}
                           `}>
                       {isFriendRequest ? (
                         <svg className="w-6 h-6 text-blue-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                       ) : (
-                        <svg className="w-6 h-6 text-gray-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <svg className={`w-6 h-6 ${(!notif.read && !isAccepted) || notif.unread ? 'text-blue-500' : 'text-gray-500'}`} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       )}
                     </div>
 
@@ -412,7 +455,7 @@ export default function Notifications() {
                               <div className="flex gap-2 shrink-0">
                                 <button
                                   onClick={() => handleAcceptRequest(reqUser._id)}
-                                  className="text-xs font-bold bg-black text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors shadow-sm">
+                                  className="text-xs font-bold bg-[#0F172A] text-white px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
                                   Accept
                                 </button>
                                 <button
@@ -435,12 +478,12 @@ export default function Notifications() {
                       {isFriendRequest && !isAccepted && !isFriendRequestGroup && (
                         <div className="mt-3 flex gap-3">
                           <button
-                            onClick={() => handleAcceptRequest(notif.relatedId)}
-                            className="text-xs font-bold bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors shadow-sm">
+                            onClick={(e) => { e.stopPropagation(); handleAcceptRequest(notif.relatedId); }}
+                            className="text-xs font-bold bg-[#0F172A] text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors shadow-sm">
                             Accept
                           </button>
                           <button
-                            onClick={() => handleDeclineRequest(notif.relatedId)}
+                            onClick={(e) => { e.stopPropagation(); handleDeclineRequest(notif.relatedId); }}
                             className="text-xs font-bold text-gray-500 hover:text-gray-700 px-2 py-2">
                             Decline
                           </button>
@@ -451,7 +494,8 @@ export default function Notifications() {
                       {isAccepted && (
                         <div className="mt-3 flex gap-3">
                           <button
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.stopPropagation();
                               try {
                                 const user = auth.currentUser;
                                 const token = await user.getIdToken();
@@ -537,7 +581,7 @@ export default function Notifications() {
                       {notif.isGrouped && notif.subNotifications?.length > 1 && (
                         <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
                           <button
-                            onClick={() => toggleGroupExpand(notif.relatedId)}
+                            onClick={(e) => { e.stopPropagation(); toggleGroupExpand(notif.relatedId); }}
                             className="text-xs font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
                           >
                             {expandedGroups[notif.relatedId] ? 'Hide' : 'Show'} {notif.subNotifications.length} Notifications
