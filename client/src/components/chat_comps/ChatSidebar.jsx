@@ -145,11 +145,11 @@ export default function ChatSidebar({
                     {chat.lastMessage?.sender === currentUserInfo?._id && "You: "}
                     {chat.lastMessage?.text || "No messages yet"}
                   </p>
-                  {chat.unreadCount > 0 && (
-                      <div className="min-w-[18px] h-[18px] px-1 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                          {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
-                      </div>
-                  )}
+                                     {chat.unreadCount > 0 && (
+                                       <div className="min-w-[18px] h-[18px] px-1 bg-[#059669] text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                         {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
+                                       </div>
+                                     )}
               </div>
             </div>
           </div>

@@ -105,26 +105,19 @@ const MessageItem = ({
                                 ? "px-4 py-2 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 text-gray-500 italic opacity-80"
                                 : msg.type === 'note'
                                     ? "p-0 border-none bg-transparent shadow-none"
-                                    : `px-4 py-2 rounded-2xl ${isMe
-                                        ? `bg-black text-white ${!isConsecutive ? 'rounded-tr-none' : ''}`
-                                        : `bg-white border border-gray-200 text-gray-800 ${!isConsecutive ? 'rounded-tl-none' : ''}`
+                                    : (msg.type === 'image' || msg.type === 'file')
+                                        ? "p-0 bg-transparent shadow-none"
+                                    : `px-[14px] py-[8px] min-h-[38px] flex flex-col justify-center rounded-[20px] ${isMe
+                                        ? `bg-[#F0FDF4] text-[#0F172A] ${!isConsecutive ? 'rounded-br-[2px]' : ''}`
+                                        : `bg-[#F3F4F6] border-none text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
                                     }`
                             }
-                        ${!msg.isDeleted && msg.type !== 'note' ? "group-hover:shadow-md" : ""}
+                        ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' ? "group-hover:shadow-md" : ""}
                         `}>
                         {/* CONTENT RENDERER */}
                         {msg.isDeleted ? (
                             <span className="flex items-center gap-1.5 text-xs font-medium">
-                                <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="text-red-500">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                                 </svg>
@@ -147,68 +140,63 @@ const MessageItem = ({
                                 onAskQuery={onAskQuery}
                             />
                         ) : msg.type === "image" ? (
-                            <div className="flex flex-col gap-2">
-                                <img
-                                    src={msg.noteData?.url}
-                                    alt={msg.noteData?.name || "Shared image"}
-                                    className="rounded-lg max-w-[260px] w-full object-cover border border-gray-200 cursor-zoom-in"
-                                    onClick={() => setOpenImageViewer(true)}
-                                />
-                                <div className={`flex items-center justify-end gap-1 text-[10px] ${isMe ? "text-gray-400/80" : "text-gray-400"}`}>
-                                    <span>{timeString}</span>
-                                    {isMe && showReadReceipt && <LightbulbIcon isSeen={msg.readBy && msg.readBy.filter(id => id !== currentUser?._id).length > 0} />}
-                                </div>
-                            </div>
+                            <img
+                                src={msg.noteData?.url}
+                                alt={msg.noteData?.name || "Shared image"}
+                                className={`rounded-2xl max-w-[260px] w-full object-cover shadow-sm cursor-zoom-in ${isMe && !isConsecutive ? 'rounded-br-sm' : ''} ${!isMe && !isConsecutive ? 'rounded-bl-sm' : ''}`}
+                                onClick={() => setOpenImageViewer(true)}
+                            />
                         ) : msg.type === "file" ? (
-                            <div className="flex flex-col gap-2 min-w-[180px]">
-                                <p className="font-semibold text-xs break-all">{msg.noteData?.name || "Shared file"}</p>
-                                <div className="flex items-center gap-3 text-xs">
-                                    <button
-                                        type="button"
-                                        onClick={() => setOpenDocViewer(true)}
-                                        className="underline"
-                                    >
-                                        View
-                                    </button>
-                                    <a
-                                        href={msg.noteData?.downloadUrl || msg.noteData?.url}
-                                        download={msg.noteData?.name || "file"}
-                                        className="underline"
-                                    >
-                                        Download
-                                    </a>
+                            <div className={`flex items-center gap-3 p-3 bg-white border border-gray-200 shadow-sm min-w-[220px] max-w-[260px] cursor-pointer hover:bg-gray-50 transition-colors rounded-xl ${isMe && !isConsecutive ? 'rounded-br-[4px]' : ''} ${!isMe && !isConsecutive ? 'rounded-bl-[4px]' : ''}`} onClick={() => setOpenDocViewer(true)}>
+                                <div className="w-10 h-10 rounded-lg bg-red-50 flex flex-shrink-0 items-center justify-center text-red-500">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                                 </div>
-                                <div className={`flex items-center justify-end gap-1 text-[10px] ${isMe ? "text-gray-400/80" : "text-gray-400"}`}>
-                                    <span>{timeString}</span>
-                                    {isMe && showReadReceipt && <LightbulbIcon isSeen={msg.readBy && msg.readBy.filter(id => id !== currentUser?._id).length > 0} />}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-sm text-gray-800 truncate">{msg.noteData?.name?.replace(/^[0-9]+-[0-9a-fA-F-]+-/, '') || "Shared file"}</p>
+                                    <p className="text-[11px] text-gray-400 font-medium mt-0.5">Click to view</p>
                                 </div>
+                                <a href={msg.noteData?.downloadUrl || msg.noteData?.url} download={msg.noteData?.name || "file"} onClick={(e) => e.stopPropagation()} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                </a>
                             </div>
                         ) : (
-                            <div className="flex flex-col gap-1 min-w-[65px]">
+                            <div className="flex flex-col min-w-[65px]">
                                 {msg.assignmentTitle && (
-                                    <div className="text-[10px] font-bold text-gray-400 mb-0.5 uppercase tracking-wide">
+                                    <div className="text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">
                                         Assignment - {msg.assignmentTitle}
                                     </div>
                                 )}
                                 {msg.gifUrl && (
-                                    <img src={msg.gifUrl} alt="GIF" className="rounded-lg max-w-[200px] w-full object-cover" />
+                                    <img src={msg.gifUrl} alt="GIF" className="rounded-lg mb-2 max-w-[200px] w-full object-cover" />
                                 )}
-                                {msg.text && <p className="text-[13.5px] leading-relaxed whitespace-pre-wrap break-words m-0">{msg.text || msg.content?.text}</p>}
+                                {msg.text && (
+                                    <p className="text-[14.5px] leading-[1.6] whitespace-pre-wrap break-words m-0 relative z-10">{msg.text || msg.content?.text}</p>
+                                )}
+                            </div>
+                        )}
 
-                                {/* TIMESTAMP & READ RECEIPT */}
-                                <div className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${isMe ? "text-gray-400/80" : "text-gray-400"}`}>
-                                    <span>{timeString}</span>
-                                    {isMe && showReadReceipt && <LightbulbIcon isSeen={msg.readBy && msg.readBy.filter(id => id !== currentUser?._id).length > 0} />}
-                                </div>
+                        {/* IN-BUBBLE TIMESTAMP & RECEIPT */}
+                        {timeString && !msg.isDeleted && msg.type !== 'note' && (
+                            <div className={`flex items-center gap-1 opacity-70 select-none ${
+                                (msg.type === 'image' || msg.type === 'file') ? 'justify-end mt-1 w-full text-gray-500' : 'justify-end mt-1 -mb-1 -mr-1'
+                            }`}>
+                                <span className="text-[10px] sm:text-[11px] font-medium tracking-wide">
+                                    {timeString}
+                                </span>
+                                {isMe && showReadReceipt && (
+                                    <LightbulbIcon 
+                                        isSeen={msg.readBy && msg.readBy.filter(id => id !== currentUser?._id).length > 0} 
+                                    />
+                                )}
                             </div>
                         )}
 
                         {/* TEACHER/ANNOUNCEMENT ACTIONS */}
                         {isTeacherChat && !msg.isDeleted && msg.type === "announcement" && (
-                            <div className="mt-2 pt-2 border-t border-white/10">
+                            <div className="mt-2 pt-2 border-t border-black/5">
                                 <button
                                     onClick={() => onOpenDoubt(msg)}
-                                    className="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full font-bold flex items-center gap-1 transition-colors">
+                                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1.5 rounded-full font-bold flex items-center gap-1 transition-colors">
                                     💬 Discuss / Ask Doubt
                                 </button>
                             </div>

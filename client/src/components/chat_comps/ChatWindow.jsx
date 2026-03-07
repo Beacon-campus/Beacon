@@ -408,15 +408,25 @@ export default function ChatWindow({
             </div>
             <h3 className="font-bold text-gray-800">{activeChatTitle}</h3>
             {role === 'student' && !activeChat.isTeacherChat && !activeChat.type?.includes("group") && (
-              <div className="ml-auto flex items-center" onClick={(e) => e.stopPropagation()}>
+              <div className="ml-auto flex items-center relative group" onClick={(e) => e.stopPropagation()}>
                 {(() => {
                   const other = activeChat?.participants?.find(p => p.firebaseUid !== auth.currentUser?.uid);
                   if (!other || isRestricted) return null;
                   return (
-                    <button onClick={(e) => { e.stopPropagation(); onUnfriend(other); }} className="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2">
-                      <span>Unfriend</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                    </button>
+                    <>
+                      <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors hidden md:block group-hover:bg-gray-100">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                      </button>
+                      <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors md:hidden">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                      </button>
+                      <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-50">
+                        <button onClick={(e) => { e.stopPropagation(); onUnfriend(other); }} className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 font-medium rounded-xl flex items-center gap-2 transition-colors">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                          Unfriend
+                        </button>
+                      </div>
+                    </>
                   );
                 })()}
               </div>
@@ -430,8 +440,8 @@ export default function ChatWindow({
               </div>
             )}
             {showScrollButton && (
-              <button onClick={scrollToBottom} className="absolute top-14 right-1/2 translate-x-1/2 bg-black text-white p-2 rounded-full shadow-lg hover:bg-gray-800 transition-all z-20 animate-in fade-in zoom-in duration-200">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+              <button onClick={scrollToBottom} className="absolute bottom-4 right-6 bg-white border border-gray-100 text-gray-500 p-2.5 rounded-full shadow-md hover:text-[#0F172A] hover:bg-gray-50 transition-all z-20 animate-in fade-in zoom-in duration-200">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
               </button>
             )}
             <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
@@ -491,7 +501,7 @@ export default function ChatWindow({
                 {(emojiError || languageError) && <p className="text-xs text-red-500 font-bold px-2 animate-pulse">{emojiError || languageError}</p>}
                 {isUploadingAttachment && <p className="text-xs text-gray-500 font-semibold px-2">Uploading attachment...</p>}
 
-                <div className="flex items-center gap-2 relative">
+                <div className="flex items-center gap-2 relative w-full bg-gray-50 rounded-[28px] border border-gray-100 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
                   <input
                     ref={uploadInputRef}
                     type="file"
@@ -499,31 +509,46 @@ export default function ChatWindow({
                     accept={ACCEPTED_ATTACHMENT_EXTENSIONS}
                     onChange={handleUploadSelected}
                   />
-                  <button onClick={handlePickUpload} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Attach document/image">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <div className="relative">
-                    <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-2 rounded-full transition-colors ${showMediaPicker ? 'bg-gray-200' : 'hover:bg-gray-100'}`} title="Add GIF or Emoji">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current text-gray-500 hover:text-black transition-colors"><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z" /></svg>
+                  
+                  {/* LEFT ICONS */}
+                  <div className="flex items-center pl-1 shrink-0">
+                    <button onClick={handlePickUpload} className="p-2 text-gray-400 hover:text-[#0F172A] rounded-full transition-colors" title="Attach document/image">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                     </button>
-                    {showMediaPicker && (
-                      <div className="absolute bottom-full left-0 mb-2 z-50">
-                        <ChatMediaPicker
-                          hideGifs={role === 'teacher'}
-                          onGifSelect={handleGifSelect}
-                          onEmojiSelect={handleEmojiSelect}
-                          onClose={() => setShowMediaPicker(false)}
-                        />
-                      </div>
-                    )}
+                    <div className="relative">
+                      <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-2 rounded-full transition-colors ${showMediaPicker ? "text-[#0F172A] bg-gray-200" : "text-gray-400 hover:text-[#0F172A]"}`} title="Add GIF or Emoji">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                      </button>
+                      {showMediaPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 z-50">
+                          <ChatMediaPicker
+                            hideGifs={role === 'teacher'}
+                            onGifSelect={handleGifSelect}
+                            onEmojiSelect={handleEmojiSelect}
+                            onClose={() => setShowMediaPicker(false)}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <input type="text" value={newMessage} onChange={handleInputChange} onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} placeholder="Type a message..." className={`flex-1 bg-gray-100 rounded-full px-4 py-3 pr-20 focus:outline-none focus:ring-2 transition-all text-sm ${emojiError || languageError || isOverLimit ? "focus:ring-red-500 bg-red-50" : "focus:ring-black/5"}`} />
-                  <div className={`absolute bottom-3 right-14 text-[10px] font-bold pointer-events-none transition-colors ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>{newMessage.length} / {MAX_CHAR_COUNT}</div>
-                  <button onClick={handleSend} disabled={isSendDisabled} className="bg-black text-white p-3 rounded-full hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-black/20"><img src={SendIcon} className="w-5 h-5 invert" alt="Send" /></button>
+                  {/* INPUT AREA */}
+                  <input 
+                    type="text" 
+                    value={newMessage} 
+                    onChange={handleInputChange} 
+                    onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} 
+                    placeholder="Type a message..." 
+                    className={`flex-1 bg-transparent px-2 outline-none text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || isOverLimit ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} 
+                  />
+                  
+                  {/* CHAR COUNT */}
+                  <div className={`absolute -top-5 right-2 text-[10px] font-bold pointer-events-none transition-colors ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>{newMessage.length} / {MAX_CHAR_COUNT}</div>
+                  
+                  {/* SEND BUTTON */}
+                  <button onClick={handleSend} disabled={isSendDisabled} className={`p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${isSendDisabled ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}>
+                    <img src={SendIcon} className={`w-5 h-5 translate-x-0.5 ${isSendDisabled ? "opacity-30" : "invert"}`} alt="Send" />
+                  </button>
                 </div>
               </div>
             )}

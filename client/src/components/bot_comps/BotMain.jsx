@@ -285,23 +285,21 @@ export default function Bot() {
             </div>
           </div>
 
-          {/* User Info */}
-          <div className="pt-4 border-t border-gray-200 px-2 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full border border-gray-300 overflow-hidden flex-shrink-0">
-              <img
-                src={getAvatarUrl(user?.profile?.avatar || (user?.role === 'teacher' ? 1 : 11))}
-                alt="User"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="text-xs text-gray-500 truncate max-w-[120px]">
-              {user?.email}
-            </div>
-          </div>
         </div>
 
         {/* ================= RIGHT PANEL ================= */}
         <div className="flex-1 flex flex-col bg-white relative">
+
+          {/* Chat Header */}
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+            <h2 className="text-lg font-bold text-gray-800">
+              {sessionId ? (history.find(h => h._id === sessionId)?.title || "Chat Session") : "New Conversation"}
+            </h2>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm">
+              <ClockIcon />
+              <span>Deletes in {getDaysRemaining()} days</span>
+            </div>
+          </div>
 
           {/* Warning */}
           {docSize > WARNING_THRESHOLD && (
@@ -332,7 +330,7 @@ export default function Bot() {
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex gap-3 max-w-3xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+                className={`flex gap-2 max-w-[70%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
                   }`}
               >
                 <div className={`w-8 h-8 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center ${msg.role === "user" ? "border-2 border-white shadow-sm" : "bg-gray-100 border border-gray-200"
@@ -349,17 +347,17 @@ export default function Bot() {
                 </div>
 
                 <div
-                  className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm overflow-hidden ${msg.role === "user"
-                    ? "bg-primary text-white rounded-tr-none"
-                    : "bg-gray-50 border border-gray-200 text-primary rounded-tl-none prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0"
+                  className={`px-4 py-3 rounded-2xl text-[15px] leading-[1.6] shadow-sm overflow-hidden ${msg.role === "user"
+                    ? "bg-[#F0FDF4] text-[#0F172A] rounded-br-[4px]"
+                    : "bg-[#F3F4F6] text-gray-800 border-none rounded-bl-[4px] prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1"
                     }`}
                 >
                   <ReactMarkdown
                     components={{
-                      ul: ({ node, ...props }) => <ul style={{ listStyleType: 'disc', paddingLeft: '1.5em', marginBottom: '0.5em' }} {...props} />,
-                      ol: ({ node, ...props }) => <ol style={{ listStyleType: 'decimal', paddingLeft: '1.5em', marginBottom: '0.5em' }} {...props} />,
-                      li: ({ node, ...props }) => <li style={{ marginBottom: '0.25em' }} {...props} />,
-                      p: ({ node, ...props }) => <p style={{ marginBottom: '0.5em' }} {...props} />,
+                      ul: ({ node, ...props }) => <ul style={{ listStyleType: 'disc', paddingLeft: '2.5em', marginBottom: '0.75em' }} {...props} />,
+                      ol: ({ node, ...props }) => <ol style={{ listStyleType: 'decimal', paddingLeft: '2.5em', marginBottom: '0.75em' }} {...props} />,
+                      li: ({ node, ...props }) => <li style={{ marginBottom: '0.75em', lineHeight: '1.6' }} {...props} />,
+                      p: ({ node, ...props }) => <p style={{ marginBottom: '0.75em', lineHeight: '1.6' }} {...props} />,
                       strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
                     }}
                   >
@@ -386,23 +384,23 @@ export default function Bot() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-100">
+          <div className="p-4 bg-white border-t border-gray-100 shrink-0">
             <div className="max-w-4xl mx-auto">
-              <div className="relative flex items-center gap-3">
+              <div className="relative flex items-center bg-gray-50 rounded-2xl focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                   placeholder="Ask your question here..."
-                  className="flex-1 pl-5 pr-14 py-4 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-gray-300 focus:ring-4 focus:ring-gray-100 transition-all outline-none text-sm font-medium text-primary placeholder-gray-400"
+                  className="flex-1 bg-transparent pl-5 pr-14 py-4 outline-none text-[15px] text-gray-800 placeholder-gray-400"
                 />
 
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className={`absolute right-2 p-2 rounded-lg transition-all duration-200 ${input.trim() && !loading
-                    ? "bg-primary text-white hover:bg-black shadow-md"
+                  className={`absolute right-3 p-2 rounded-full transition-all duration-200 ${input.trim() && !loading
+                    ? "bg-[#059669] text-white shadow-md hover:scale-105"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                 >
@@ -410,15 +408,12 @@ export default function Bot() {
                 </button>
               </div>
 
-              <div className="flex justify-between items-center mt-2 px-1">
-                <p className="text-[10px] text-gray-400">AI can make mistakes. Please Double check important information on the Internet.</p>
-
-                <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-medium bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
-                  <ClockIcon />
-                  <span>
-                    Chat deletes in <span className="text-gray-600">{getDaysRemaining()} days</span>
-                  </span>
-                </div>
+              <div className="text-center mt-3">
+                <p className="text-[11px] text-gray-400 font-medium">
+                  AI can make mistakes. Please double-check important information. 
+                  <span className="mx-2 opacity-50">•</span> 
+                  Chat history deletes automatically after 7 days.
+                </p>
               </div>
             </div>
           </div>

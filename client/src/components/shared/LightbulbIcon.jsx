@@ -21,7 +21,9 @@ const LightbulbIcon = ({ isSeen }) => {
       // I will assume a monochrome icon behavior.
       // White if delivered (on black bubble), Yellow if seen
       fill={isSeen ? "#EAB308" : "#FFFFFF"} 
-      className="transition-colors duration-300"
+      stroke={isSeen ? "none" : "#9CA3AF"} 
+      strokeWidth={isSeen ? "0" : "32"}
+      className="transition-all duration-300"
       xmlns="http://www.w3.org/2000/svg"
     >
       <g>
