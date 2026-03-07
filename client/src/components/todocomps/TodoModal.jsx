@@ -64,14 +64,12 @@ export default function TodoModal({
               placeholder="e.g. Finish History Essay"
               value={title}
               maxLength={MAX_TITLE_CHARS}
-              disabled={mode === "edit"}
               onChange={e => {
                 setTitle(e.target.value);
                 if(error) setError("");
               }}
               className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors outline-none
                 ${error ? "bg-red-50 border-red-200 text-red-900 placeholder-red-300" : "bg-gray-50 border-transparent text-primary placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-primary/10"}
-                ${mode === "edit" ? "opacity-60 cursor-not-allowed bg-gray-100" : ""}
               `}
             />
             {error && <p className="text-red-500 text-xs mt-1 font-medium ml-1">{error}</p>}
@@ -107,13 +105,7 @@ export default function TodoModal({
                 onChange={(date) => setDueDate(date)}
                 dateFormat="MMM d, yyyy"
                 placeholderText="Select due date"
-                disabled={mode === "edit"}
-                className={`w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer
-                    ${mode === "edit"
-                        ? "bg-gray-100 text-gray-400 border-transparent cursor-not-allowed"
-                        : "bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
-                    }
-                `}
+                className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
                 // This renders the calendar icon inside the input
                 showIcon
                 icon={
