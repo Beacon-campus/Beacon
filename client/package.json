@@ -23,6 +23,7 @@
     "glob": "^13.0.6",
     "jspdf": "^4.0.0",
     "jszip": "^3.10.1",
+    "lottie-react": "^2.4.1",
     "obscenity": "^0.4.6",
     "papaparse": "^5.5.3",
     "react": "^18.3.1",
