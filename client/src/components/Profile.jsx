@@ -73,7 +73,6 @@ export default function ProfileLayout() {
   // --- Sections with IDs ---
   const sections = [
     { key: "guidelines", label: "Guidelines" },
-    { key: "themes", label: "Themes" },
     { key: "security", label: "Security" }, // Added Security
     { key: "open", label: "Open Source and Attribution" },
     { key: "backup", label: "Backup and download" },
@@ -408,33 +407,7 @@ export default function ProfileLayout() {
                       </div>
                     </div>
                   </div>
-                ) : activeSection === "themes" ? (
-                  <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h3 className="text-lg font-bold text-primary mb-4">Appearance</h3>
-                      <div className="flex flex-col gap-4">
-                        <p className="text-sm text-gray-600">Choose your preferred accent color.</p>
-                        <div className="flex gap-4">
-                          <button
-                            onClick={() => setCurrentTheme('#000000')}
-                            className={`flex flex-col items-center gap-2 group transition-all`}
-                          >
-                            <div className={`w-14 h-14 rounded-full border-2 ${currentTheme === '#000000' ? 'border-green-500 ring-2 ring-green-100' : 'border-gray-200'} bg-black shadow-sm transition-all group-hover:scale-105`}></div>
-                            <span className={`text-xs font-semibold ${currentTheme === '#000000' ? 'text-primary' : 'text-gray-500'}`}>Default</span>
-                          </button>
 
-                          <button
-                            onClick={() => setCurrentTheme('#303030')}
-                            className={`flex flex-col items-center gap-2 group transition-all`}
-                          >
-                            <div className={`w-14 h-14 rounded-full border-2 ${currentTheme === '#303030' ? 'border-green-500 ring-2 ring-green-100' : 'border-gray-200'} bg-[#303030] shadow-sm transition-all group-hover:scale-105`}></div>
-                            <span className={`text-xs font-semibold ${currentTheme === '#303030' ? 'text-primary' : 'text-gray-500'}`}>Charcoal</span>
-                          </button>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400 italic">
                     Content for {activeSection} coming soon.
