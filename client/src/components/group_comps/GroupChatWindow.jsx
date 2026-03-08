@@ -8,6 +8,9 @@ import ChatMediaPicker from "../chat_comps/ChatMediaPicker";
 import MessageItem from "../shared/MessageItem";
 import { toast } from "react-hot-toast";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/attachmentUpload";
+import axios from "axios";
+import { server } from "../../main";
+import { useCallback } from "react";
 
 export default function GroupChatWindow({
     groupId,
@@ -137,6 +140,26 @@ export default function GroupChatWindow({
         }, 1000);
     };
 
+    const handleDeleteMessage = useCallback(async (messageId, type) => {
+        try {
+            const token = await auth.currentUser.getIdToken();
+            if (type === "me") {
+                // Optimistically update UI if Delete for Me
+                // (though socket will also handle it, this is faster)
+                // ProjectContext handles local message lists
+            }
+            await axios.put(
+                `${server}/chat/message/delete`,
+                { messageId, type },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success("Message deleted");
+        } catch (error) {
+            console.error("Delete failed:", error);
+            toast.error("Failed to delete message");
+        }
+    }, []);
+
     useEffect(() => {
         const handleSendError = (payload) => {
             if (!payload || payload.channelId !== groupId) return;
@@ -250,6 +273,7 @@ export default function GroupChatWindow({
                                     isConsecutive={isConsecutive}
                                     isLastInStack={isLastInStack}
                                     showReadReceipt={false}
+                                    onDelete={handleDeleteMessage}
                                 />
                             </div>
                         );

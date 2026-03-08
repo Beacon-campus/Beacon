@@ -134,12 +134,36 @@ export function ProjectProvider({ children }) {
       }));
     };
 
+    const handleDelete = ({ messageId, type, channelId }) => {
+      setGroupMessages((prev) => {
+        const current = prev[channelId] || [];
+        if (type === "everyone") {
+          return {
+            ...prev,
+            [channelId]: current.map((m) =>
+              String(m._id) === String(messageId)
+                ? { ...m, isDeleted: true, text: "This message was deleted" }
+                : m
+            ),
+          };
+        } else if (type === "me") {
+          return {
+            ...prev,
+            [channelId]: current.filter((m) => String(m._id) !== String(messageId)),
+          };
+        }
+        return prev;
+      });
+    };
+
     socket.on("receive_message", handleReceive);
     socket.on("group_updated", handleUpdate);
+    socket.on("message_deleted", handleDelete);
 
     return () => {
       socket.off("receive_message", handleReceive);
       socket.off("group_updated", handleUpdate);
+      socket.off("message_deleted", handleDelete);
     };
   }, [user]);
 
