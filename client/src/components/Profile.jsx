@@ -445,68 +445,74 @@ export default function ProfileLayout() {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        className="max-w-md h-auto p-8 block"
+        className="max-w-md h-auto px-8 py-5 block"
       >
         <button
           onClick={() => setIsEditModalOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10 p-1"
         >
-          ✕
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <h2 className="text-xl font-bold text-primary text-center mb-6">Customize Profile</h2>
+        <h2 className="text-lg font-bold text-primary text-center mb-4">Customize Profile</h2>
 
         {/* Avatar Selection */}
-        <div className="flex flex-col items-center mb-6">
-          <label className="text-xs text-gray-400 uppercase font-semibold mb-3">Choose Avatar</label>
-          <div className="flex items-center gap-6">
-            <button onClick={handlePrevAvatar} className="p-2 rounded-full hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors">←</button>
-            <div className="w-24 h-24 rounded-full border-4 border-green-500 overflow-hidden shadow-sm relative">
+        <div className="flex flex-col items-center mb-4">
+          <label className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-3">Choose Avatar</label>
+          <div className="flex items-center gap-5">
+            <button onClick={handlePrevAvatar} className="p-2 rounded-full hover:bg-gray-100 border border-gray-200 text-gray-800 transition-all shadow-sm active:scale-95">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+            <div className="w-20 h-20 rounded-full border-4 border-green-500 overflow-hidden shadow-md relative ring-4 ring-green-50/50">
               <img src={getAvatarUrl(tempData.profileImageId)} alt="Selected" className="w-full h-full object-cover block" />
             </div>
-            <button onClick={handleNextAvatar} className="p-2 rounded-full hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors">→</button>
+            <button onClick={handleNextAvatar} className="p-2 rounded-full hover:bg-gray-100 border border-gray-200 text-gray-800 transition-all shadow-sm active:scale-95">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+            </button>
           </div>
-          <p className="text-xs text-gray-400 mt-2">Avatar {availableAvatars.indexOf(tempData.profileImageId) + 1} of {availableAvatars.length}</p>
+          <p className="text-[9px] text-gray-400 font-bold mt-2 uppercase tracking-wider">Avatar {availableAvatars.indexOf(tempData.profileImageId) + 1} of {availableAvatars.length}</p>
         </div>
 
         {/* Display Name Input */}
-        <div className="mb-8">
-          <label className="block text-xs text-gray-400 uppercase font-semibold mb-2 ml-1">Display Name</label>
+        <div className="mb-4">
+          <label className="block text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-2 ml-1">Display Name</label>
           <input
             type="text"
             value={tempData.displayName}
             onChange={(e) => setTempData({ ...tempData, displayName: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-primary font-medium focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full bg-[#F9FAFB] border border-gray-200 rounded-xl px-4 py-2.5 text-primary font-semibold focus:ring-2 focus:ring-green-500 focus:bg-white focus:border-transparent outline-none transition-all shadow-sm"
             placeholder="Enter public display name"
           />
         </div>
 
         {/* About Me Input */}
-        <div className="mb-8">
-          <label className="block text-xs text-gray-400 uppercase font-semibold mb-2 ml-1">About Me (Max 50 words)</label>
+        <div className="mb-4">
+          <label className="block text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-2 ml-1">About Me (Max 50 words)</label>
           <textarea
             value={tempData.about}
             onChange={(e) => setTempData({ ...tempData, about: e.target.value })}
             maxLength={300}
-            rows={4}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none text-sm"
+            rows={3}
+            className="w-full bg-[#F9FAFB] border border-gray-200 rounded-xl px-4 py-2.5 text-gray-700 font-medium focus:ring-2 focus:ring-green-500 focus:bg-white focus:border-transparent outline-none transition-all resize-none text-sm shadow-sm"
             placeholder="Tell us a little about yourself..."
           />
-          <div className="text-right text-[10px] text-gray-400 mt-1">
+          <div className="text-right text-[10px] text-gray-500 font-bold tracking-wider mt-1">
             {tempData.about?.length || 0}/300 chars
           </div>
         </div>
 
         {/* Banner Color Selection */}
-        <div className="mb-8">
-          <label className="block text-xs text-gray-400 uppercase font-semibold mb-3 ml-1">Card Banner Tint</label>
-          <div className="flex flex-wrap gap-3">
+        <div className="mb-6">
+          <label className="block text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-3 ml-1">Card Banner Tint</label>
+          <div className="flex flex-wrap gap-3 px-1">
             {Object.keys(COLORS).map((colorKey) => (
               <button
                 key={colorKey}
                 onClick={() => setTempData({ ...tempData, bannerColor: colorKey })}
-                className={`w-8 h-8 rounded-full border-2 transition-all ${COLORS[colorKey]} 
-                          ${tempData.bannerColor === colorKey ? 'border-gray-800 scale-110 shadow-md' : 'border-gray-200 hover:scale-105'}`}
+                className={`w-7 h-7 rounded-full border-2 transition-all ${COLORS[colorKey]} 
+                           ${tempData.bannerColor === colorKey 
+                             ? 'ring-2 ring-offset-2 ring-[#0F172A] scale-110 border-transparent shadow-md' 
+                             : 'border-transparent hover:scale-110 shadow-sm'}`}
                 title={colorKey.charAt(0).toUpperCase() + colorKey.slice(1)}
               />
             ))}
@@ -515,11 +521,16 @@ export default function ProfileLayout() {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <button onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors border border-transparent hover:border-gray-200">Cancel</button>
+          <button 
+            onClick={() => setIsEditModalOpen(false)} 
+            className="flex-1 py-3 text-gray-600 font-bold text-sm bg-gray-100/80 hover:bg-gray-100 rounded-xl transition-all active:scale-95"
+          >
+            Cancel
+          </button>
           <button
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className="flex-1 py-3 bg-primary text-white font-medium rounded-xl hover:bg-black transition-all shadow-md active:scale-95 disabled:opacity-50"
+            className="flex-1 py-3 bg-[#0F172A] text-white font-bold text-sm rounded-xl hover:bg-[#1e293b] transition-all shadow-md active:scale-95 disabled:opacity-50"
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </button>
