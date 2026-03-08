@@ -28,8 +28,10 @@ const EyeOffIcon = () => (
 export default function ChangePasswordModal({ onClose, isProfileView }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -37,6 +39,10 @@ export default function ChangePasswordModal({ onClose, isProfileView }) {
     setLoading(true);
 
     try {
+      if (newPassword !== confirmPassword) {
+        throw new Error("New passwords do not match!");
+      }
+
       const user = auth.currentUser;
       if (!user) throw new Error("Session expired. Please login again.");
 
@@ -95,12 +101,12 @@ export default function ChangePasswordModal({ onClose, isProfileView }) {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="w-full px-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
           />
           <button
             type="button"
             onClick={() => setShowCurrent(!showCurrent)}
-            className="absolute right-3 top-3.5 text-gray-500"
+            className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
           >
             {showCurrent ? <EyeOffIcon /> : <EyeIcon />}
           </button>
@@ -114,31 +120,50 @@ export default function ChangePasswordModal({ onClose, isProfileView }) {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="w-full px-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
           />
           <button
             type="button"
             onClick={() => setShowNew(!showNew)}
-            className="absolute right-3 top-3.5 text-gray-500"
+            className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
           >
             {showNew ? <EyeOffIcon /> : <EyeIcon />}
+          </button>
+        </div>
+
+        {/* CONFIRM NEW PASSWORD */}
+        <div className="relative">
+          <input
+            type={showConfirm ? "text" : "password"}
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="w-full px-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirm(!showConfirm)}
+            className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            {showConfirm ? <EyeOffIcon /> : <EyeIcon />}
           </button>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm disabled:opacity-70"
+          className="w-full py-3.5 bg-[#0F172A] hover:bg-[#1e293b] text-white font-bold rounded-xl transition-all shadow-md active:scale-[0.98] disabled:opacity-70 mt-2"
         >
           {loading ? "Updating..." : "Update Password"}
         </button>
 
-        {/* CANCEL BUTTON (Only if onClose is provided) */}
+        {/* CANCEL BUTTON */}
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 text-gray-600 font-medium hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-200"
+            className="w-full py-3.5 text-gray-600 font-bold bg-gray-100/80 hover:bg-gray-200/80 rounded-xl transition-all"
           >
             Cancel
           </button>

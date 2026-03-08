@@ -400,7 +400,7 @@ export default function ProfileLayout() {
                         </div>
                         <button
                           onClick={() => setIsPasswordModalOpen(true)}
-                          className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-black transition-colors shadow-md"
+                          className="px-4 py-2 bg-[#0F172A] text-white rounded-lg text-sm font-medium hover:bg-[#1e293b] transition-all shadow-md active:scale-95"
                         >
                           Change Password
                         </button>

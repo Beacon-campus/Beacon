@@ -20,13 +20,13 @@ export default function StudentLayout() {
 
 
   const getLinkClass = ({ isActive }) => {
-    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative border-l-[3px] rounded-lg`;
+    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative border-l-4 rounded-lg`;
 
     if (isActive) {
-      return `${base} bg-[#F0FDF4] text-[#059669] border-l-[#059669] font-bold`;
+      return `${base} bg-green-50 text-green-700 border-l-green-500 font-bold`;
     }
 
-    return `${base} bg-transparent text-gray-500 hover:bg-gray-50 border-l-transparent`;
+    return `${base} bg-transparent text-gray-500 hover:bg-gray-50/50 hover:text-gray-800 border-l-transparent`;
   };
 
   const getIconClass = (isActive) => {

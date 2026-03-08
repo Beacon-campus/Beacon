@@ -19,13 +19,13 @@ export default function TeacherLayout() {
   const isCommunity = location.pathname.startsWith("/teacher/community");
 
   const getLinkClass = ({ isActive }) => {
-    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-3 px-3.5 py-2.5 mx-3"} text-sm font-medium transition-all duration-200 group relative rounded-[12px] border-l-[3px]`;
+    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-3 px-3.5 py-2.5 mx-3"} text-sm font-medium transition-all duration-200 group relative rounded-[12px] border-l-4`;
 
     if (isActive) {
-      return `${base} bg-[#F0FDF4] text-[#15803D] border-l-[#15803D] font-bold`;
+      return `${base} bg-green-50 text-green-700 border-l-green-500 font-bold`;
     }
 
-    return `${base} bg-transparent text-gray-500 border-l-transparent hover:bg-gray-50`;
+    return `${base} bg-transparent text-gray-500 border-l-transparent hover:bg-gray-50/50 hover:text-gray-800`;
   };
 
   const getIconClass = (isActive) => {
