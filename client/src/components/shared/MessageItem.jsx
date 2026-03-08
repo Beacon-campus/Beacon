@@ -105,14 +105,14 @@ const MessageItem = ({
                                 ? "px-4 py-2 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 text-gray-500 italic opacity-80"
                                 : msg.type === 'note'
                                     ? "p-0 border-none bg-transparent shadow-none"
-                                    : (msg.type === 'image' || msg.type === 'file')
+                                    : (msg.type === 'image' || msg.type === 'file' || msg.type === 'assignment')
                                         ? "p-0 bg-transparent shadow-none"
                                     : `px-[16px] py-[10px] min-h-[38px] flex flex-col justify-center rounded-[20px] ${isMe
                                         ? `bg-[#F0FDF4] text-[#0F172A] ${!isConsecutive ? 'rounded-br-[2px]' : ''}`
                                         : `bg-[#F3F4F6] shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-black/5 text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
                                     }`
                             }
-                        ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' ? "group-hover:shadow-md" : ""}
+                        ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' && msg.type !== 'assignment' ? "group-hover:shadow-md" : ""}
                         `}>
                         {/* CONTENT RENDERER */}
                         {msg.isDeleted ? (
@@ -138,6 +138,11 @@ const MessageItem = ({
                                 isSubmitted={isSubmitted}
                                 onViewAssignment={onViewAssignment}
                                 onAskQuery={onAskQuery}
+                                isMe={isMe}
+                                isConsecutive={isConsecutive}
+                                timeString={timeString}
+                                showReadReceipt={showReadReceipt}
+                                currentUser={currentUser}
                             />
                         ) : msg.type === "image" ? (
                             <img
@@ -162,7 +167,7 @@ const MessageItem = ({
                         ) : (
                             <div className="flex flex-col">
                                 {msg.assignmentTitle && (
-                                    <div className="text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">
+                                    <div className="text-[10.5px] font-[800] text-gray-500 mb-2 uppercase tracking-wide opacity-90">
                                         Assignment - {msg.assignmentTitle}
                                     </div>
                                 )}
@@ -173,8 +178,8 @@ const MessageItem = ({
                                     <div className="flex items-end gap-[8px]">
                                         <p className="text-[14.5px] leading-[1.6] whitespace-pre-wrap break-words m-0 relative z-10 text-left pt-[2px] w-full">{msg.text || msg.content?.text}</p>
                                         
-                                        <div className={`flex items-center justify-end gap-[3px] opacity-60 select-none shrink-0 mb-[-2px] min-w-max`}>
-                                            <span className="text-[10px] text-[#9CA3AF] font-medium tracking-wide translate-y-[0.5px]">
+                                        <div className={`flex items-center justify-end gap-[3px] opacity-70 select-none shrink-0 mb-[-2px] min-w-max`}>
+                                            <span className="text-[10px] text-[#6B7280] font-bold tracking-wide translate-y-[0.5px]">
                                                 {timeString}
                                             </span>
                                             {isMe && showReadReceipt && (
@@ -187,11 +192,11 @@ const MessageItem = ({
                         )}
 
                         {/* TIMESTAMP FOR NON-TEXT MESSAGES OR MEDIA (FALLBACK) */}
-                        {(!msg.text || msg.type === 'image' || msg.type === 'file' || msg.type === 'assignment') && timeString && !msg.isDeleted && msg.type !== 'note' && (
-                            <div className={`flex items-center gap-1 opacity-60 select-none ${
-                                (msg.type === 'image' || msg.type === 'file') ? 'justify-end mt-1.5 w-full text-[#9CA3AF]' : 'justify-end mt-1 -mb-1 -mr-1'
+                        {(!msg.text || msg.type === 'image' || msg.type === 'file') && timeString && !msg.isDeleted && msg.type !== 'note' && msg.type !== 'assignment' && (
+                            <div className={`flex items-center gap-1 opacity-70 select-none ${
+                                (msg.type === 'image' || msg.type === 'file') ? 'justify-end mt-1.5 w-full text-[#6B7280]' : 'justify-end mt-1 -mb-1 -mr-1'
                             }`}>
-                                <span className="text-[10px] font-medium tracking-wide text-[#9CA3AF] translate-y-[0.5px]">
+                                <span className="text-[10px] font-bold tracking-wide text-[#6B7280] translate-y-[0.5px]">
                                     {timeString}
                                 </span>
                                 {isMe && showReadReceipt && (

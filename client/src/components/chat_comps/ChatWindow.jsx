@@ -481,7 +481,10 @@ export default function ChatWindow({
 
           <div className="p-4 border-t border-gray-100 bg-white shrink-0">
             {(role === 'student' && activeChat.isTeacherChat && !activeChat.canMessage) ? (
-              <p className="text-center text-gray-400 text-sm">Direct messages are not allowed in teacher channels.</p>
+              <div className="flex items-center justify-center gap-2 w-full bg-gray-50 rounded-[28px] border border-gray-100 py-3 px-4 shadow-sm text-gray-400 cursor-not-allowed select-none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <p className="text-[13px] font-semibold">Direct messages are not allowed in teacher channels.</p>
+              </div>
             ) : isRestricted ? (
               <p className="text-center text-red-400 text-sm font-semibold bg-red-50 p-2 rounded-lg">You must be friends with this user to message them.</p>
             ) : (
