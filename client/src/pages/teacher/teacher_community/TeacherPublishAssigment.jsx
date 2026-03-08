@@ -307,7 +307,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full py-3.5 bg-primary text-white font-bold rounded-xl hover:bg-black transition-all disabled:opacity-60"
+          className="w-full py-3.5 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl transition-all disabled:opacity-60"
         >
           {isSubmitting ? "Publishing..." : "Publish Assignment"}
         </button>
@@ -1169,7 +1169,7 @@ export default function TeacherPublishAssignment() {
           <div className="shrink-0 pt-4 px-2">
             <button
               onClick={() => setShowPublishModal(true)}
-              className="w-full p-4 rounded-2xl bg-primary hover:bg-black text-white font-bold text-center shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full p-4 rounded-2xl bg-[#0F172A] hover:bg-slate-800 text-white font-bold text-center shadow-md transition-all flex items-center justify-center gap-2"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-white">
                 <path d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm4 13h-3v3a1 1 0 0 1 -2 0v-3h-3a1 1 0 0 1 0-2h3v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 0 2z" />
@@ -1193,7 +1193,7 @@ export default function TeacherPublishAssignment() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleGoToGrading}
-                  className="w-full py-3 bg-primary hover:bg-black text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                 >
                   Grade students
                 </button>
