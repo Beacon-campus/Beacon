@@ -161,7 +161,7 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
             </div>
 
             {/* --- PARTICIPANTS --- */}
-            <div className="flex-1 overflow-y-auto px-6 mb-6 max-h-48 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-6 mb-6 max-h-48 soft-scrollbar">
                 <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-3 sticky top-0 bg-white py-2 z-10">
                     Participants ({participants.length || 0})
                 </h3>

@@ -12,24 +12,7 @@ const CheckAllIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentC
 
 import socket from "../services/socket.service";
 
-// --- CSS Styles ---
-const ComponentStyles = () => (
-  <style>{`
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 20px;
-    }
-    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-      background-color: #94a3b8;
-    }
-  `}</style>
-);
+
 
 export default function Notifications() {
   const { user: currentUserInfo, refreshUser } = useAuth();
@@ -303,7 +286,6 @@ export default function Notifications() {
 
   return (
     <div className="h-full w-full p-2">
-      <ComponentStyles />
       <div className="h-full w-full premium-card p-6 flex flex-col gap-6 overflow-hidden">
 
         {/* ================= HEADER ================= */}
@@ -356,7 +338,7 @@ export default function Notifications() {
         </div>
 
         {/* ================= NOTIFICATION LIST ================= */}
-        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+        <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-3">
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-40 text-gray-400">
@@ -428,7 +410,7 @@ export default function Notifications() {
                           {isAccepted ? "Friend Request Accepted" : (notif.isGrouped ? `${notif.activityCount} New Activities` : (notif.title || (isFriendRequest ? "Friend Request" : "Notification")))}
                         </h3>
                         <span className="text-xs text-gray-400 font-medium whitespace-nowrap ml-2">
-                          {new Date(notif.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(notif.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                         </span>
                       </div>
 
@@ -617,7 +599,7 @@ export default function Notifications() {
                                   {sub.content?.split(" ")[0] || "Someone"}
                                 </span>
                                 <span className="text-[10px] text-gray-400">
-                                  {new Date(sub.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {new Date(sub.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                                 </span>
                               </div>
                               <p className="text-xs text-gray-500 truncate">{sub.content}</p>

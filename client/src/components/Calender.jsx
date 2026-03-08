@@ -25,28 +25,6 @@ const GlitchText = ({ text, className = "" }) => (
   </span>
 );
 
-// --- CSS Styles ---
-const ComponentStyles = () => (
-  <style>{`
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* Custom Scrollbar for Event List */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #e2e8f0;
-      border-radius: 20px;
-    }
-    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-    }
-  `}</style>
-);
 
 export default function Calendar() {
   const { user } = useAuth();
@@ -600,7 +578,7 @@ export default function Calendar() {
 
   return (
     <div className="h-full w-full p-2">
-      <ComponentStyles />
+
       <div className="h-full w-full premium-card p-6 flex overflow-hidden">
 
         {/* LEFT SIDE */}
@@ -677,7 +655,7 @@ export default function Calendar() {
             {loading ? (
               <div className="flex items-center justify-center h-full text-gray-400">Loading events...</div>
             ) : upcomingEvents.length > 0 ? (
-              <div className="flex flex-col gap-2 overflow-y-auto pr-1 custom-scrollbar min-h-0 flex-1">
+              <div className="flex-1 overflow-y-auto soft-scrollbar pr-2 min-h-0 flex-1">
                 {upcomingEvents.map((event, i) => {
                   const eventDate = new Date(event.date);
                   eventDate.setHours(0, 0, 0, 0);
@@ -995,7 +973,7 @@ export default function Calendar() {
           ) : (
             /* IMAGE VIEW (Scrollable & Zoomable Stack) */
             <div
-              className={`flex-1 overflow-auto bg-gray-50 flex flex-col items-center p-8 rounded-2xl relative custom-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+              className={`flex-1 overflow-auto bg-gray-50 flex flex-col items-center p-8 rounded-2xl relative soft-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}

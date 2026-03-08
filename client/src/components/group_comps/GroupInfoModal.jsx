@@ -131,7 +131,7 @@ export default function GroupInfoModal({ isOpen, onClose, group }) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 mb-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
         <h3 className="text-[10px] font-black text-gray-400 uppercase mb-3 sticky top-0 bg-white py-2 z-10 border-b border-gray-50">Team Members</h3>
         <div className="space-y-3">
           {fullData?.participants?.map(member => (

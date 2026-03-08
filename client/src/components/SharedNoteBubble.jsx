@@ -112,7 +112,7 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-6 prose prose-sm max-w-none custom-scrollbar">
+                        <div className="overflow-y-auto pr-1 soft-scrollbar prose prose-sm max-w-none text-gray-700">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {noteData.content}
                             </ReactMarkdown>

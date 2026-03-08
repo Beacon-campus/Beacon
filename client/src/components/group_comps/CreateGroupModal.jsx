@@ -117,7 +117,7 @@ export default function CreateGroupModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Scrollable List */}
-                <div className="flex-1 overflow-y-auto space-y-1 mb-4 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
                     {filteredQuickAdd.map(item => {
                         const isSelected = teammates.includes(item.profile.regno.toUpperCase());
                         return (

@@ -135,7 +135,7 @@ export default function UserModal({ isOpen, onClose, mode, user, onRefresh }) {
                 </div>
 
                 {/* Form Body - Scrollable */}
-                <div className="p-6 overflow-y-auto custom-scrollbar">
+                <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
                     <form id="user-form" onSubmit={handleSubmit} className="space-y-4">
 
                         {/* Status Banner (Edit Only) */}

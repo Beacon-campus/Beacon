@@ -200,12 +200,7 @@ export default function Bot() {
   /* ================= UI ================= */
   return (
     <>
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #e5e7eb; border-radius: 20px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #d1d5db; }
-      `}</style>
+
     <div className="relative w-full h-full">
       <div className="absolute inset-0 premium-card flex overflow-hidden">
 
@@ -232,7 +227,7 @@ export default function Bot() {
           </button>
 
           {/* History List */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+          <div className="flex-1 overflow-y-auto soft-scrollbar pr-1">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">Recent</p>
             <div className="space-y-1">
               {history.map((chat) => (
@@ -314,7 +309,7 @@ export default function Bot() {
           )}
 
           {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 soft-scrollbar">
             {messages.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 opacity-60">
                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">

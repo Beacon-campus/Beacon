@@ -23,7 +23,7 @@ const CommentThread = ({ comment, onReply, depth = 0 }) => {
                             {isTeacher && <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200">TEACHER</span>}
                         </span>
                         <span className="text-[10px] text-gray-400">
-                            {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                         </span>
                     </div>
                     <p className="text-sm text-gray-700 mt-0.5 leading-relaxed">{comment.content}</p>

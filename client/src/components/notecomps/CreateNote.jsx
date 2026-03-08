@@ -71,7 +71,7 @@ export default function CreateNote({ onAdd, onClose, noteCount }) {
                         placeholder="Take a note..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className={`w-full resize-none text-base text-gray-700 placeholder-gray-400 bg-transparent border-none outline-none focus:ring-0 p-0 min-h-[150px] custom-scrollbar ${COLORS[color]}`}
+                        className="min-h-[150px] flex-1 resize-none border-none outline-none text-gray-700 placeholder-gray-400 soft-scrollbar"
                     />
 
                     <div className="flex items-center justify-between mt-4 pt-2 border-t border-black/5">

@@ -144,7 +144,7 @@ export default function Todos({ userId }) {
         </div>
 
         {/* Task List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 space-y-2 soft-scrollbar">
           {list.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center text-gray-400">
               <p>No tasks found.</p>
@@ -248,7 +248,7 @@ export default function Todos({ userId }) {
             </div>
 
             {/* Description Body */}
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Description</p>
               {selectedTodo.description ? (
                 <p className={`text-sm whitespace-pre-wrap leading-relaxed ${selectedTodo.completed ? "text-gray-400 line-through opacity-80" : "text-gray-600"}`}>

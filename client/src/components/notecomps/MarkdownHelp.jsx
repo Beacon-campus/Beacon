@@ -26,7 +26,7 @@ const MarkdownHelp = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
                     <div className="space-y-6">
                         <p className="text-gray-600">
                             Notes support Markdown formatting. Here is a comprehensive guide:

@@ -206,7 +206,7 @@ export default function ShareNoteModal({ note, onClose }) {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-4">
                     {filteredItems.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-300">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-2 opacity-20"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>

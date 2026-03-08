@@ -71,7 +71,7 @@ const EditModal = ({ note, onClose, onUpdate, onAdd }) => {
                             </div>
                         </div>
 
-                        <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-[100px] prose prose-sm max-w-none text-gray-700">
+                        <div className="overflow-y-auto pr-2 soft-scrollbar flex-1 min-h-[100px] prose prose-sm max-w-none text-gray-700">
                             {note.content ? (
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
                             ) : (
@@ -104,7 +104,7 @@ const EditModal = ({ note, onClose, onUpdate, onAdd }) => {
                             value={content}
                             onChange={e => setContent(e.target.value)}
                             placeholder="Note content"
-                            className="min-h-[200px] flex-1 resize-none border-none outline-none text-gray-700 placeholder-gray-400 custom-scrollbar"
+                            className="min-h-[200px] flex-1 resize-none border-none outline-none text-gray-700 placeholder-gray-400 soft-scrollbar"
                             autoFocus
                         />
                         <div className="flex justify-end gap-2 pt-4 border-t border-gray-100 mt-auto">
@@ -197,7 +197,7 @@ export default function Notes() {
                 </div>
 
                 {/* Notes Area (Scrollable within Card) */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 soft-scrollbar">
 
                     {/* PINNED SECTION */}
                     {pinnedNotes.length > 0 && (

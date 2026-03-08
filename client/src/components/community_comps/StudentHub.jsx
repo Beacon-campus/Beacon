@@ -187,7 +187,7 @@ export default function StudentHub({
                     {showScrollButton && (
                         <button onClick={scrollToBottom} className="absolute top-14 right-1/2 translate-x-1/2 bg-black text-white p-2 rounded-full shadow-lg z-20 animate-in fade-in zoom-in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></button>
                     )}
-                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto space-y-4 pb-4 px-4 pt-4" onScroll={handleScroll}>
+                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto space-y-4 pb-4 px-4 pt-4 soft-scrollbar" onScroll={handleScroll}>
                         {isLoadingOlder && (
                             <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
                                 Loading older messages...

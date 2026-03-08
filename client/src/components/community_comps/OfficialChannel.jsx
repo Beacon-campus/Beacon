@@ -198,7 +198,7 @@ export default function OfficialChannel({
 
       <div 
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto p-6 flex flex-col custom-scrollbar"
+        className="flex-1 overflow-y-auto p-6 flex flex-col soft-scrollbar"
         onScroll={handleScroll}
       >
          {isLoadingOlder && (

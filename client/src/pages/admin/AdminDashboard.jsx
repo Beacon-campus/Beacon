@@ -160,7 +160,7 @@ export default function AdminDashboard() {
   const rows = useMemo(
     () =>
       (timeline || []).map((point) => ({
-        time: new Date(point.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        time: new Date(point.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
         requestCount: point.requestCount || 0,
         p95: point.p95 || 0,
         errorRate: point.errorRate || 0,
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
     const storagePct = usage?.storage_limit ? Number((((usage.storage || 0) / usage.storage_limit) * 100).toFixed(2)) : 0;
     const bandwidthPct = usage?.bandwidth_limit ? Number((((usage.bandwidth || 0) / usage.bandwidth_limit) * 100).toFixed(2)) : 0;
     return {
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
       requestCount: overview?.requests?.last5m?.count || 0,
       p95: overview?.requests?.last5m?.p95 || 0,
       errorRate: overview?.requests?.last60m?.errorRate || 0,

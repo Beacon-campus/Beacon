@@ -69,7 +69,7 @@ const MessageItem = ({
 
     // Format time
     const timeString = (msg.time || msg.createdAt)
-        ? new Date(msg.time || msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        ? new Date(msg.time || msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
         : "";
 
     const showProfile = isCommunity && !isMe;

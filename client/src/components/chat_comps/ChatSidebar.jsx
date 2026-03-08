@@ -136,7 +136,7 @@ export default function ChatSidebar({
                   </h3>
                   {chat.lastMessage?.sentAt && (
                        <span className={`text-[10px] whitespace-nowrap ${chat.unreadCount > 0 ? "text-black font-bold" : "text-gray-400"}`}>
-                           {new Date(chat.lastMessage.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           {new Date(chat.lastMessage.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                        </span>
                   )}
               </div>
@@ -178,7 +178,7 @@ export default function ChatSidebar({
              </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 overflow-y-auto soft-scrollbar">
             
             {/* PEERS SECTION */}
             <CollapsibleSection title={role === "student" ? "Classmates" : "Peers"} isOpen={isPeersOpen} onToggle={() => setIsPeersOpen(!isPeersOpen)}>
@@ -233,7 +233,7 @@ export default function ChatSidebar({
                                          </h3>
                                          {chat.lastMessage?.sentAt && (
                                            <span className={`text-[10px] whitespace-nowrap ${chat.unreadCount > 0 ? "text-black font-bold" : "text-gray-400"}`}>
-                                             {new Date(chat.lastMessage.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                             {new Date(chat.lastMessage.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                                            </span>
                                          )}
                                        </div>

@@ -312,7 +312,7 @@ export default function ClassroomManagement() {
                     <p className="text-sm mt-1">Adjust your filters or query to locate nodes.</p>
                 </div>
             ) : (
-                <div className="flex-1 overflow-auto p-6 lg:p-10 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
 
                     {/* COURSE TILES GRID */}
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 max-w-[1400px] mx-auto mb-8">
