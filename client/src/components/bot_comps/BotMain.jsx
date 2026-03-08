@@ -10,7 +10,12 @@ const getAvatarUrl = (id) => {
 };
 
 /* ================= ICONS ================= */
-const SendIcon = () => <svg className="w-5 h-5 translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>;
+const SendIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="rotate-45 -translate-x-0.5">
+    <line x1="22" y1="2" x2="11" y2="13"></line>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+  </svg>
+);
 const PlusIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>;
 const BotAvatar = () => <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>;
 const TrashIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>;
@@ -394,10 +399,11 @@ export default function Bot() {
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || loading}
-                  className={`absolute right-3 p-2 rounded-full transition-all duration-200 ${input.trim() && !loading
-                    ? "bg-[#059669] text-white shadow-md hover:scale-105"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    }`}
+                  className={`absolute right-2 px-4 py-2 rounded-xl transition-all duration-300 flex items-center justify-center ${
+                    input.trim() && !loading
+                      ? "bg-[#0F172A] text-white shadow-lg shadow-[#0F172A]/20 hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   <SendIcon />
                 </button>
