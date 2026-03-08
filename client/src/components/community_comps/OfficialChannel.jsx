@@ -190,9 +190,9 @@ export default function OfficialChannel({
       {showScrollButton && (
           <button 
               onClick={scrollToBottom}
-              className="absolute top-14 right-1/2 translate-x-1/2 bg-black text-white p-2 rounded-full shadow-lg hover:bg-gray-800 transition-all z-20 animate-in fade-in zoom-in duration-200"
+              className="absolute top-14 right-1/2 translate-x-1/2 bg-[#F3F4F6] text-gray-500 p-2.5 rounded-full shadow-md hover:bg-gray-200 hover:text-gray-700 transition-all z-20 animate-in fade-in zoom-in duration-200 border border-gray-200"
           >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
           </button>
       )}
 
@@ -206,7 +206,11 @@ export default function OfficialChannel({
               Loading older announcements...
             </div>
          )}
-         {announcements.length === 0 ? (
+         {announcements.filter(post => {
+             if (post.type === 'text' && !post.content?.trim() && !post.noteData) return false;
+             if (post.type === 'note' && (!post.noteData || (!post.noteData.title && !post.noteData.content))) return false;
+             return true;
+         }).length === 0 ? (
             <div className="absolute inset-0 z-0 flex flex-col items-center justify-center p-10 text-center select-none gap-6">
                 <div className="text-[80px] opacity-60 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-default">
                     📢
@@ -219,11 +223,15 @@ export default function OfficialChannel({
                 </div>
             </div>
          ) : (
-            announcements.map((post, idx) => {
+            announcements.filter(post => {
+                if (post.type === 'text' && !post.content?.trim() && !post.noteData) return false;
+                if (post.type === 'note' && (!post.noteData || (!post.noteData.title && !post.noteData.content))) return false;
+                return true;
+            }).map((post, idx, validArr) => {
                const isMe = post.teacherId?._id === currentUser?._id || post.teacherId === currentUser?._id;
                
-               const prevMsg = idx > 0 ? announcements[idx - 1] : null;
-               const nextMsg = idx < announcements.length - 1 ? announcements[idx + 1] : null;
+               const prevMsg = idx > 0 ? validArr[idx - 1] : null;
+               const nextMsg = idx < validArr.length - 1 ? validArr[idx + 1] : null;
                
                const getId = (m) => m?.teacherId?._id || m?.teacherId;
                const currentSenderId = getId(post);
@@ -274,10 +282,10 @@ export default function OfficialChannel({
                            </span>
                        )}
                        
-                       {post.type === 'note' ? (
-                           <SharedNoteBubble message={post} isMe={isMe} onOpenDoubt={onOpenDoubt} createdAt={post.createdAt} showReadReceipt={false} />
-                       ) : (
-                           <div className={`p-4 shadow-sm relative ${bubbleRadius} ${isMe ? "bg-black text-white text-right" : "bg-white text-gray-800 border border-gray-100 text-left"}`}>
+                        {post.type === 'note' ? (
+                            <SharedNoteBubble message={post} isMe={isMe} onOpenDoubt={onOpenDoubt} createdAt={post.createdAt} showReadReceipt={false} />
+                        ) : (
+                            <div className={`p-4 shadow-sm relative ${bubbleRadius} ${isMe ? "bg-[#F0FDF4] border border-[#d1e6d8] text-gray-800 text-right" : "bg-white text-gray-800 border border-gray-100 text-left"}`}>
                                {post.type === "image" ? (
                                    <img
                                      src={post.noteData?.url}
@@ -303,20 +311,22 @@ export default function OfficialChannel({
                                    <div className="text-sm leading-relaxed whitespace-pre-wrap">{post.content}</div>
                                )}
                                
-                               <div className={`mt-3 flex items-center justify-between border-t pt-2 gap-4 ${isMe ? "justify-end border-white/10" : "justify-between border-gray-100"}`}>
-                                   <div className="flex items-center gap-3">
+                               <div className="mt-2.5 flex items-center justify-between gap-4">
+                                   <div className="flex items-center gap-2">
                                        <button 
                                           onClick={() => onOpenDoubt(post)} 
                                           className={`text-[10px] font-black tracking-wide px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm ${
-                                              isMe ? "text-black bg-white hover:bg-gray-200" : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                              isMe 
+                                                ? "text-[#0F172A] bg-white hover:bg-gray-50 border-none" 
+                                                : "text-[#0F172A] bg-[#0F172A]/5 hover:bg-[#0F172A]/10 border border-[#0F172A]/5"
                                           }`}
                                        >
                                            Check Queries
                                        </button>
-                                       <span className="text-[9px] font-bold uppercase tracking-widest opacity-50">
-                                           {new Date(post.createdAt).toLocaleDateString()}
-                                       </span>
                                    </div>
+                                   <span className={`text-[9px] font-bold uppercase tracking-widest opacity-40 absolute bottom-2 right-3 ${isMe ? "text-gray-500" : "text-gray-500"}`}>
+                                       {new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                   </span>
                                </div>
                            </div>
                        )}
@@ -338,19 +348,19 @@ export default function OfficialChannel({
                   accept={ACCEPTED_ATTACHMENT_EXTENSIONS}
                   onChange={handleUploadSelected}
                 />
-                <button onClick={handlePickUpload} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors" title="Attach document/image">
+                <button onClick={handlePickUpload} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors group" title="Attach document/image">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="currentColor" className="text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="currentColor" className="text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                 </button>
                 <div className="relative">
                      <button 
                          onClick={() => setShowMediaPicker(!showMediaPicker)} 
-                         className={`p-2.5 rounded-full transition-colors ${showMediaPicker ? 'bg-gray-200' : 'hover:bg-gray-100'}`} 
+                         className={`p-2.5 rounded-full transition-colors flex items-center justify-center ${showMediaPicker ? 'bg-gray-200' : 'hover:bg-gray-100'}`} 
                          title="Add Emoji"
                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" className="fill-current text-gray-500 hover:text-black transition-colors"><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" className={`fill-current transition-colors ${showMediaPicker ? 'text-gray-600' : 'text-gray-400 hover:text-gray-600'}`}><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z"/></svg>
                      </button>
                      {showMediaPicker && (
                          <div className="absolute bottom-full left-0 mb-2 z-50">
@@ -374,7 +384,7 @@ export default function OfficialChannel({
                 <button 
                     onClick={postAnnouncement} 
                     disabled={(!announcementInput.trim() && !selectedAttachment) || isUploadingAttachment}
-                    className="bg-black text-white px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-20"
+                    className={`px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 disabled:opacity-20 ${(!announcementInput.trim() && !selectedAttachment) ? 'bg-gray-300 text-gray-500' : 'bg-[#00D084] text-white hover:scale-105'}`}
                 >
                     Post
                 </button>

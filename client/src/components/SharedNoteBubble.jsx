@@ -76,7 +76,7 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
     };
 
     return (
-        <div className={`flex flex-col w-[300px] overflow-hidden border ${colorStyle.bg} ${colorStyle.border} ${!isMe ? 'shadow-sm' : ''} ${tailRadius}`}>
+        <div className={`relative pb-8 flex flex-col w-[300px] overflow-hidden border ${colorStyle.bg} ${colorStyle.border} ${!isMe ? 'shadow-sm' : ''} ${tailRadius}`}>
             {/* Header */}
             <div className="flex items-center gap-3 p-3 bg-white/30 border-b border-black/5">
                 <div className="p-1.5 rounded-lg shrink-0">
@@ -129,13 +129,13 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
             )}
 
             {/* MESSAGE FOOTER - Time, Read Receipt, and optionally Check Queries */}
-            <div className="border-t border-black/5 flex items-center justify-between px-3 py-2.5 bg-white/10">
+            <div className="flex items-center justify-between px-3 pt-2">
                 {onOpenDoubt ? (
                     <>
                         <div className="flex items-center gap-4">
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onOpenDoubt(message); }} 
-                                className="text-[10px] font-black tracking-wide text-gray-700 hover:text-black transition-colors"
+                                className="text-[10px] font-black tracking-wide px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm text-[#0F172A] bg-white hover:bg-gray-50"
                             >
                                 Check Queries
                             </button>
@@ -153,9 +153,9 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
                                 </button>
                             </div>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="absolute bottom-2 right-3 flex items-center gap-1">
                             {createdAt && (
-                                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                                <span className="text-[9px] font-bold uppercase tracking-widest text-[#1F2937]/40">
                                     {new Date(createdAt).toLocaleDateString()}
                                 </span>
                             )}
@@ -177,7 +177,7 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
                                 <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                             </button>
                         </div>
-                        <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 font-bold">
+                        <div className="absolute bottom-2 right-3 flex items-center justify-end gap-1 text-[9px] font-bold uppercase tracking-widest text-[#1F2937]/40">
                             <span>{timeString}</span>
                             {showReadReceipt && isMe && <LightbulbIcon isSeen={isSeen} />}
                         </div>

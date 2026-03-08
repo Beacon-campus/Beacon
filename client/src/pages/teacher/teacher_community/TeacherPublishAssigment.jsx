@@ -140,19 +140,19 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-thin scrollbar-thumb-gray-200">
+      <div className="flex-1 overflow-y-auto p-6 space-y-8 soft-scrollbar relative z-20">
         <div>
           <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
             Assignment Type
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex rounded-xl bg-gray-100 p-1">
             {["offline", "quiz", "qna"].map((type) => (
               <button
                 key={type}
                 onClick={() => setAssignmentType(type)}
-                className={`p-3 rounded-xl border-2 transition-all text-sm font-bold capitalize ${assignmentType === type
-                  ? "border-primary bg-primary text-white"
-                  : "border-gray-100 bg-white text-gray-500 hover:border-gray-200"
+                className={`flex-1 py-2.5 rounded-lg text-sm font-bold capitalize transition-all duration-200 ${assignmentType === type
+                  ? "bg-white text-primary shadow-sm ring-1 ring-black/5"
+                  : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 {type === "qna" ? "QnA / Project" : type}
@@ -170,7 +170,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
+              className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2.5 text-sm"
               placeholder="e.g. Chapter 1 Review"
             />
           </div>
@@ -184,7 +184,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
               rows="3"
               value={formData.instructions}
               onChange={handleInputChange}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
+              className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none"
             />
           </div>
 
@@ -201,7 +201,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                 onFocus={openNativeDateTimePicker}
                 onClick={openNativeDateTimePicker}
                 step="60"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
               />
             </div>
             <div>
@@ -213,7 +213,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                 name="totalMarks"
                 value={formData.totalMarks}
                 onChange={handleInputChange}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
                 placeholder="20"
               />
             </div>
@@ -835,8 +835,13 @@ export default function TeacherPublishAssignment() {
                 onClick={() => handleClassSelect(cls)}
                 className="p-6 rounded-2xl border-2 border-gray-200 cursor-pointer hover:shadow-md transition-all flex flex-col items-center justify-center text-center h-40 gap-2 bg-gray-50"
               >
-                <h3 className="font-bold text-primary text-lg">{cls.name}</h3>
-                <p className="text-sm text-gray-600">(You teach {cls.subject})</p>
+                <div className="flex items-center gap-2">
+                   <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                   </svg>
+                   <h3 className="font-bold text-primary text-lg">{cls.name}</h3>
+                </div>
+                <p className="text-sm text-gray-500">(You teach {cls.subject})</p>
               </div>
             ))}
           </div>
@@ -852,9 +857,9 @@ export default function TeacherPublishAssignment() {
         <div className="flex items-center gap-4 mb-6 shrink-0">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl shadow-md hover:bg-black transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-[#F3F4F6] text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
           >
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-white">
+            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600">
               <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
             </svg>
             <span className="font-bold text-sm">Go back</span>
@@ -1116,19 +1121,19 @@ export default function TeacherPublishAssignment() {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl shadow-md hover:bg-black transition-all hover:scale-105 active:scale-95"
+          className="flex items-center gap-2 px-4 py-2 bg-[#F3F4F6] text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
         >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-white">
+          <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600">
             <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
           </svg>
           <span className="font-bold text-sm">Go back</span>
         </button>
-        <h2 className="text-xl font-bold text-primary">{selectedClass?.name} / Assignments</h2>
+        <h2 className="text-xl font-bold text-gray-800">{selectedClass?.name} / <span className="text-gray-500">Assignments</span></h2>
       </div>
 
       <div className="flex flex-1 gap-8 overflow-hidden min-h-0">
         <div className="w-1/2 flex flex-col h-full overflow-hidden">
-          <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-200 pb-4">
+          <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-2 soft-scrollbar pb-4 pr-3 relative">
             {loadingAssignments ? (
               <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
                 <p className="text-gray-400 font-medium">Loading assignments...</p>
@@ -1142,9 +1147,9 @@ export default function TeacherPublishAssignment() {
                 <div
                   key={assign._id}
                   onClick={() => setSelectedAssignment(assign)}
-                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${String(selectedAssignment?._id) === String(assign._id)
-                    ? "border-yellow-400 bg-yellow-50 shadow-md"
-                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${String(selectedAssignment?._id) === String(assign._id)
+                    ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
+                    : "border-gray-200 bg-white hover:border-gray-300"
                     }`}
                 >
                   <h3 className="font-bold text-primary">{assign.title}</h3>
@@ -1161,10 +1166,10 @@ export default function TeacherPublishAssignment() {
             )}
           </div>
 
-          <div className="shrink-0 pt-4">
+          <div className="shrink-0 pt-4 px-2">
             <button
               onClick={() => setShowPublishModal(true)}
-              className="w-full p-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-center shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full p-4 rounded-2xl bg-primary hover:bg-black text-white font-bold text-center shadow-md transition-all flex items-center justify-center gap-2"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-white">
                 <path d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm4 13h-3v3a1 1 0 0 1 -2 0v-3h-3a1 1 0 0 1 0-2h3v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 0 2z" />
@@ -1188,7 +1193,7 @@ export default function TeacherPublishAssignment() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleGoToGrading}
-                  className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-md transition-all"
+                  className="w-full py-3 bg-primary hover:bg-black text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                 >
                   Grade students
                 </button>

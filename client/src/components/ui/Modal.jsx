@@ -17,7 +17,7 @@ export default function Modal({
   children, 
   className = "",
   overlayClassName = "", // For specific overlay overrides if needed
-  backdropClassName = "bg-black/60 backdrop-blur-sm" // Default backdrop
+  backdropClassName = "bg-black/40 backdrop-blur-md" // Default glassmorphism backdrop
 }) {
   
   // 1. Handle Scroll Lock
@@ -57,7 +57,7 @@ export default function Modal({
     >
         {/* Backdrop */}
         <div 
-            className={`absolute inset-0 ${backdropClassName}`}
+            className={`absolute inset-0 transition-opacity ${backdropClassName}`}
             onClick={onClose}
             aria-hidden="true"
         />
