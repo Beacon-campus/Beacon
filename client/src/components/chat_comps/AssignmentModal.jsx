@@ -80,21 +80,21 @@ export default function AssignmentModal({
               )}
 
               {assignment?.type === "quiz" && role === "student" && (
-                <div className="rounded-xl border-2 border-dashed border-purple-200 bg-purple-50 p-5">
-                  <div className="mb-3 text-sm font-bold text-purple-800">Quiz Assignment</div>
+                <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-5 shadow-sm">
+                  <div className="mb-3 text-[13px] font-bold text-gray-700 uppercase tracking-wide">Quiz Assignment</div>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setShowQuizRules(true)}
-                      className={`flex-1 rounded-lg border px-3 py-2 text-xs font-bold ${quizRulesAccepted ? "border-green-200 bg-green-100 text-green-700" : "border-purple-200 bg-white text-purple-700"}`}
+                      className={`flex-1 rounded-xl border-2 px-3 py-2 text-xs font-bold transition-colors ${quizRulesAccepted ? "border-green-500 text-green-700 bg-green-50" : "border-gray-200 bg-transparent text-gray-600 hover:bg-gray-100"}`}
                     >
-                      {quizRulesAccepted ? "Rules Accepted" : "Read Rules"}
+                      {quizRulesAccepted ? "Rules Accepted ✓" : "Read Rules"}
                     </button>
                     <button
                       type="button"
                       onClick={() => window.open(`/student/quiz/${assignment?._id}`, "_blank")}
                       disabled={!quizRulesAccepted}
-                      className="flex-1 rounded-lg bg-black px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                      className="flex-1 rounded-xl bg-[#0F172A] px-3 py-2 text-xs font-bold tracking-wide text-white transition-all hover:bg-gray-800 disabled:opacity-50 disabled:hover:bg-[#0F172A]"
                     >
                       Start Quiz
                     </button>
@@ -217,13 +217,16 @@ export default function AssignmentModal({
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <h3 className="mb-3 text-xl font-bold text-gray-800">Quiz Rules</h3>
-            <div className="mb-5 space-y-2 rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-              <p>1. Stay in fullscreen while taking quiz.</p>
-              <p>2. Tab switching may reset and flag attempt.</p>
-              <p>3. Shortcuts/copy actions can be blocked.</p>
+            <div className="mb-5 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+              <p className="font-medium">⚠️ Important Instructions:</p>
+              <ul className="list-disc pl-5 space-y-1 opacity-90 mt-2">
+                <li>Stay in fullscreen while taking quiz.</li>
+                <li>Tab switching may reset and flag attempt.</li>
+                <li>Shortcuts/copy actions can be blocked.</li>
+              </ul>
             </div>
             <div className="flex gap-3">
-              <button type="button" onClick={() => setShowQuizRules(false)} className="flex-1 rounded-xl py-3 text-sm font-bold text-gray-500 hover:bg-gray-100">
+              <button type="button" onClick={() => setShowQuizRules(false)} className="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-bold text-gray-500 hover:bg-gray-200 transition-colors">
                 Cancel
               </button>
               <button
@@ -232,7 +235,7 @@ export default function AssignmentModal({
                   setQuizRulesAccepted(true);
                   setShowQuizRules(false);
                 }}
-                className="flex-1 rounded-xl bg-purple-600 py-3 text-sm font-bold text-white hover:bg-purple-700"
+                className="flex-1 rounded-xl bg-[#0F172A] py-3 text-sm font-bold tracking-wide text-white hover:bg-gray-800 transition-colors shadow-md"
               >
                 I Agree
               </button>
