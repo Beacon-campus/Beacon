@@ -28,12 +28,12 @@ export default function AssignmentModal({
   return (
     <>
       <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-        <div className="flex h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
           <div className="z-10 shrink-0 border-b border-gray-100 bg-white p-4">
-            <div className="flex items-start justify-between">
-              <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <h3 className="line-clamp-1 text-lg font-bold text-gray-800">{assignment?.title || "Loading..."}</h3>
-                <span className="mt-1 inline-block rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-700">
+                <span className="inline-block rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-700">
                   {assignment?.type || "qna"}
                 </span>
               </div>
@@ -47,23 +47,29 @@ export default function AssignmentModal({
             <button
               type="button"
               onClick={() => setAssignmentTab("details")}
-              className={`flex-1 border-b-2 py-3 text-sm font-bold transition-colors ${assignmentTab === "details" ? "border-black bg-white text-black" : "border-transparent text-gray-500 hover:bg-gray-100"}`}
+              className={`flex-1 relative py-3.5 text-sm font-bold transition-all ${assignmentTab === "details" ? "text-[#0F172A]" : "text-gray-400 hover:text-gray-700 hover:bg-gray-100/50"}`}
             >
               Details
+              {assignmentTab === "details" && (
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[3px] w-12 bg-[#0F172A] rounded-t-sm" />
+              )}
             </button>
             <button
               type="button"
               onClick={() => setAssignmentTab("queries")}
-              className={`flex-1 border-b-2 py-3 text-sm font-bold transition-colors ${assignmentTab === "queries" ? "border-black bg-white text-black" : "border-transparent text-gray-500 hover:bg-gray-100"}`}
+              className={`flex-1 relative py-3.5 text-sm font-bold transition-all ${assignmentTab === "queries" ? "text-[#0F172A]" : "text-gray-400 hover:text-gray-700 hover:bg-gray-100/50"}`}
             >
               Queries
+              {assignmentTab === "queries" && (
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[3px] w-12 bg-[#0F172A] rounded-t-sm" />
+              )}
             </button>
           </div>
 
           {assignmentTab === "details" ? (
             <div className="flex-1 overflow-y-auto p-6">
-              <h4 className="mb-2 font-bold text-gray-700">Instructions</h4>
-              <p className="mb-6 whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
+              <h4 className="mb-2 font-bold text-gray-500">Instructions</h4>
+              <p className="mb-6 whitespace-pre-wrap text-[15px] leading-relaxed text-gray-700">
                 {assignment?.instructions || "No instructions provided."}
               </p>
 
@@ -188,8 +194,8 @@ export default function AssignmentModal({
           )}
 
           {assignmentTab === "details" && (
-            <div className="flex shrink-0 justify-end gap-3 border-t border-gray-100 bg-gray-50 p-4">
-              <button type="button" onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200">
+            <div className="flex shrink-0 justify-end gap-3 border-t border-gray-100 bg-white p-5">
+              <button type="button" onClick={onClose} className="rounded-xl bg-gray-100 px-6 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 transition-colors">
                 Close
               </button>
               {(assignment?.type === "qna" || !assignment?.type) && role === "student" && !submitted && (
@@ -197,7 +203,7 @@ export default function AssignmentModal({
                   type="button"
                   onClick={onSubmit}
                   disabled={!submissionFile || isSubmitting}
-                  className="rounded-xl bg-black px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-black/20 disabled:opacity-50"
+                  className="rounded-xl bg-[#0F172A] px-6 py-2.5 text-sm font-bold tracking-wide text-white shadow-md disabled:opacity-50 transition-all hover:bg-gray-800"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Assignment"}
                 </button>
