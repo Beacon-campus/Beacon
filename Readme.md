@@ -243,4 +243,3 @@ Expected defaults:
 - Sketch save payload is rejected if too large.
 - Uploads require allowed MIME and size rules.
 - Some admin pages are intentionally UI placeholders (see status section).
-

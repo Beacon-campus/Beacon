@@ -283,7 +283,11 @@ export default function ChatWindow({
   const handleViewAssignment = async (assignmentId, tab = "details") => {
     try {
       const user = auth.currentUser;
-      if (!user || !assignmentId) return;
+      if (!user) return;
+      if (!assignmentId) {
+        toast.error("Assignment details are unavailable.");
+        return;
+      }
       const token = await user.getIdToken();
       setAssignmentTab(tab);
       setAssignmentModalOpen(true);

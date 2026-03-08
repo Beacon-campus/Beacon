@@ -507,34 +507,17 @@ export default function Chat({ role }) {
     }
 
     const handleAutoOpen = async () => {
-      let openAssignmentId = null;
-      let focusAssignmentId = null;
-      let initialTab = null;
-      let timestamp = null;
-      if (location.state?.openAssignmentId) {
-        openAssignmentId = location.state.openAssignmentId;
-        initialTab = location.state.initialTab;
-        timestamp = location.state.timestamp;
-      }
-      if (location.state?.focusAssignmentId) {
-        focusAssignmentId = location.state.focusAssignmentId;
-        timestamp = location.state.timestamp;
-      }
-
+      let openAssignmentId = location.state?.openAssignmentId;
+      let focusAssignmentId = location.state?.focusAssignmentId;
       let activeChatId = location.state?.activeChatId;
 
       if (location.state?.resolveDoubtReply) {
         const notif = location.state.resolveDoubtReply;
-        const isBroadcast = notif.replyMode === "broadcast";
-        timestamp = location.state.timestamp;
-
         activeChatId = `teacher-${notif.classroomId}-${notif.teacherId}`;
-
-        if (isBroadcast) {
+        if (notif.replyMode === "broadcast") {
           focusAssignmentId = notif.relatedId;
         } else {
           openAssignmentId = notif.relatedId;
-          initialTab = "doubts";
         }
       }
 
@@ -565,19 +548,10 @@ export default function Chat({ role }) {
         } else {
           console.warn("📍 Chat: Target chat still not found after fetch.");
         }
+      }
 
-        if (location.state?.timestamp) {
-          lastProcessedTimestamp.current = location.state.timestamp;
-        }
-
-        // Pass openAssignmentId via state so ChatWindow can see it
-        navigate(location.pathname, { replace: true, state: (openAssignmentId || focusAssignmentId) ? { initialAssignmentId: openAssignmentId, focusAssignmentId: focusAssignmentId, initialTab: initialTab, timestamp: timestamp } : {} });
-      } else if (openAssignmentId || focusAssignmentId) {
-        if (location.state?.timestamp) {
-          lastProcessedTimestamp.current = location.state.timestamp;
-        }
-        // Just storing it temporarily if there was no activeChatId but an openAssignmentId
-        navigate(location.pathname, { replace: true, state: { initialAssignmentId: openAssignmentId, focusAssignmentId: focusAssignmentId, initialTab: initialTab, timestamp: timestamp } });
+      if (location.state?.timestamp) {
+        lastProcessedTimestamp.current = location.state.timestamp;
       }
     };
     handleAutoOpen();
@@ -739,9 +713,9 @@ export default function Chat({ role }) {
         onDeleteMessage={handleDeleteMessage}
         onOpenDoubt={openDoubtModal}
         messagesEndRef={messagesEndRef}
-        autoOpenAssignmentId={location.state?.initialAssignmentId}
+        autoOpenAssignmentId={location.state?.openAssignmentId || location.state?.initialAssignmentId}
         focusAssignmentId={location.state?.focusAssignmentId}
-        autoOpenTab={location.state?.initialTab}
+        autoOpenTab={location.state?.initialTab || "doubts"}
         autoOpenTimestamp={location.state?.timestamp}
         hasMoreOlder={hasMoreOlderMessages}
         isLoadingOlder={loadingOlderMessages}
