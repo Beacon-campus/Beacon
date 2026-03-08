@@ -356,12 +356,12 @@ export default function ProfileLayout() {
                 {/* Go Back Button */}
                 <button
                   onClick={() => setActiveSection("profile")}
-                  className="flex items-center gap-3 px-5 py-2.5 bg-primary text-white rounded-xl shadow-md hover:bg-black transition-all hover:scale-105 active:scale-95 mb-4"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all font-medium mb-4 group w-fit"
                 >
-                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-white">
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current group-hover:-translate-x-1 transition-transform">
                     <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
                   </svg>
-                  <span className="font-bold text-sm">Go back</span>
+                  <span className="text-sm">Go back</span>
                 </button>
 
                 <h1 className="text-2xl font-bold text-primary">{sections.find((s) => s.key === activeSection)?.label}</h1>
@@ -454,8 +454,8 @@ export default function ProfileLayout() {
                 onClick={() => setActiveSection(item.key)}
                 className={`w-full flex items-center gap-3 py-4 px-5 text-sm font-medium transition-all duration-200 text-left group
                   ${activeSection === item.key 
-                    ? "bg-gray-50/80 text-primary border-l-4 border-l-primary" 
-                    : "bg-white text-gray-600 hover:bg-gray-50/50 border-l-4 border-l-transparent"}
+                    ? "bg-green-50 text-green-700 border-l-4 border-l-green-500" 
+                    : "bg-white text-gray-500 hover:bg-gray-50/50 hover:text-gray-800 border-l-4 border-l-transparent"}
                   border-b border-black/5 last:border-b-0
                 `}
               >
@@ -593,11 +593,11 @@ export default function ProfileLayout() {
 // --- Helper Component for Guidelines ---
 function Section({ title, items }) {
   return (
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-      <h2 className="font-bold text-primary mb-2">{title}</h2>
-      <ul className="list-disc pl-5 space-y-1 text-gray-600">
+    <div className="py-4 border-b border-black/5 last:border-b-0">
+      <h2 className="font-bold text-gray-700 mb-4">{title}</h2>
+      <ul className="list-disc pl-5 space-y-3 text-gray-600 text-[15px]">
         {items.map((item, i) => (
-          <li key={i}>{item}</li>
+          <li key={i} className="pl-1 leading-relaxed">{item}</li>
         ))}
       </ul>
     </div>
