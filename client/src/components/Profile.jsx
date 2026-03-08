@@ -207,7 +207,7 @@ export default function ProfileLayout() {
         <div className="flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden relative">
 
           {activeSection === "profile" && (
-            <div className="relative h-full overflow-y-auto soft-scrollbar bg-gray-50/30">
+            <div className="relative h-full overflow-y-auto no-scrollbar bg-gray-50/30">
 
               {/* Decorative Header Banner */}
               <div className={`h-40 bg-gradient-to-r ${bannerGradient} relative shrink-0 transition-colors duration-500`}>
@@ -294,7 +294,7 @@ export default function ProfileLayout() {
                   </div>
 
                   {/* Academic Info Row */}
-                  <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className={`md:col-span-2 grid grid-cols-2 ${user.role === 'student' ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
 
                     {/* Course */}
                     <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:border-blue-100 block group relative overflow-hidden">
@@ -363,7 +363,7 @@ export default function ProfileLayout() {
                 <h1 className="text-2xl font-bold text-primary">{sections.find((s) => s.key === activeSection)?.label}</h1>
               </div>
 
-              <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
+              <div className="flex-1 overflow-y-auto no-scrollbar pr-2">
                 {/* === CONTENT SWITCHER === */}
                 {activeSection === "guidelines" ? (
                   <div className="space-y-6 text-gray-700 text-sm leading-7">
@@ -416,7 +416,7 @@ export default function ProfileLayout() {
         </div>
 
         {/* ================= RIGHT PANEL (Navigation with Icons) ================= */}
-        <div className="w-1/3 max-w-xs p-4 h-full overflow-y-auto soft-scrollbar">
+        <div className="w-1/3 max-w-xs p-4 h-full overflow-y-auto no-scrollbar">
           <div className="border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden">
             {sections.map((item) => (
               <button

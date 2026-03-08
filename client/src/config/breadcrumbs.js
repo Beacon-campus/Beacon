@@ -23,7 +23,7 @@ export const BREADCRUMB_CONFIG = {
       classrooms: "Class Rooms", // teacher
       groups: "Groups",
       "study-materials": "Study Material",
-      "publish-assignment": "Publish Assignment",
+      "publish-assignment": "Assignments",
       "upload-materials": "Upload Materials",
     },
   },
