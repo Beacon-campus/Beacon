@@ -29,14 +29,15 @@ const BUBBLE_COLORS = {
     gray: { bg: "bg-[#F3F4F6]", border: "border-[#E5E7EB]", fade: "from-[#F3F4F6] via-[#F3F4F6]/90" },
 };
 
-export default function SharedNoteBubble({ message, isMe, timeString, isSeen, showReadReceipt = true }) {
+export default function SharedNoteBubble({ message, isMe, timeString, isSeen, showReadReceipt = true, onOpenDoubt, createdAt }) {
     const { noteData } = message;
     const { addNote } = useNotes();
     const [isExpanded, setIsExpanded] = useState(false);
 
     if (!noteData) return <div className="text-red-500 text-xs">Invalid Note Data</div>;
 
-    const colorStyle = BUBBLE_COLORS[noteData.color] || BUBBLE_COLORS.default;
+    const colorStyle = isMe ? { bg: "bg-[#F0FDF4]", border: "border-[#d1e6d8]" } : (BUBBLE_COLORS[noteData.color] || BUBBLE_COLORS.default);
+    const tailRadius = isMe ? "rounded-bl-[20px] rounded-tl-[20px] rounded-tr-[20px] rounded-br-[4px]" : "rounded-br-[20px] rounded-tr-[20px] rounded-tl-[20px] rounded-bl-[4px]";
 
     const handleSave = async (e) => {
         e.stopPropagation();
@@ -75,9 +76,9 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
     };
 
     return (
-        <div className={`flex flex-col gap-1 w-[300px] rounded-xl overflow-hidden border ${colorStyle.bg} ${colorStyle.border} ${!isMe ? 'shadow-sm' : ''}`}>
+        <div className={`flex flex-col w-[300px] overflow-hidden border ${colorStyle.bg} ${colorStyle.border} ${!isMe ? 'shadow-sm' : ''} ${tailRadius}`}>
             {/* Header */}
-            <div className="flex items-center gap-3 p-3 bg-opacity-50 border-b border-gray-100/50">
+            <div className="flex items-center gap-3 p-3 bg-white/30 border-b border-black/5">
                 <div className="p-1.5 rounded-lg shrink-0">
                     <NoteIcon />
                 </div>
@@ -90,46 +91,11 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
             </div>
 
             {/* Preview Content */}
-            <div className="p-3 text-xs text-gray-600 h-[140px] overflow-hidden relative group cursor-pointer" onClick={() => setIsExpanded(true)}>
-                <div className="line-clamp-6 prose prose-xs">
+            <div className="p-4 text-xs font-medium text-[#1F2937] flex flex-col gap-4 cursor-pointer" onClick={() => setIsExpanded(true)}>
+                <div className="line-clamp-6 prose prose-xs max-w-none text-[#1F2937] font-medium">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {noteData.content}
                     </ReactMarkdown>
-                </div>
-                {/* Blur Fade - Stronger and taller to cover text behind icons */}
-                <div className={`absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t ${colorStyle.fade} to-transparent pointer-events-none`} />
-
-                {/* Icons Layer - Positioned at bottom */}
-                <div className={`absolute bottom-3 left-3 right-3 flex ${isMe ? 'justify-end' : 'justify-start'} gap-3 z-10`}>
-
-                    {/* View (Eye) */}
-                    <button
-                        onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
-                        className="text-slate-500 hover:text-slate-800 transition-colors p-1"
-                        title="View"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    </button>
-
-                    {/* Save (Bookmark) - Only for Receivers */}
-                    {!isMe && (
-                        <button
-                            onClick={handleSave}
-                            className="text-slate-500 hover:text-blue-600 transition-colors p-1"
-                            title="Save to Notes"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        </button>
-                    )}
-
-                    {/* Download */}
-                    <button
-                        onClick={handleDownload}
-                        className="text-slate-500 hover:text-green-600 transition-colors p-1"
-                        title="Download"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    </button>
                 </div>
             </div>
 
@@ -162,10 +128,61 @@ export default function SharedNoteBubble({ message, isMe, timeString, isSeen, sh
                 </div>
             )}
 
-            {/* MESSAGE FOOTER - Time & Read Receipt */}
-            <div className={`px-3 pb-2 pt-1 flex items-center justify-end gap-1 text-[10px] ${isMe ? "text-gray-400/80" : "text-gray-400"}`}>
-                <span>{timeString}</span>
-                {isMe && showReadReceipt && <LightbulbIcon isSeen={isSeen} />}
+            {/* MESSAGE FOOTER - Time, Read Receipt, and optionally Check Queries */}
+            <div className="border-t border-black/5 flex items-center justify-between px-3 py-2.5 bg-white/10">
+                {onOpenDoubt ? (
+                    <>
+                        <div className="flex items-center gap-4">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onOpenDoubt(message); }} 
+                                className="text-[10px] font-black tracking-wide text-gray-700 hover:text-black transition-colors"
+                            >
+                                Check Queries
+                            </button>
+                            <div className="flex items-center gap-3">
+                                <button onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }} className="text-slate-500 hover:text-slate-800 transition-colors" title="View">
+                                    <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                </button>
+                                {!isMe && (
+                                    <button onClick={handleSave} className="text-slate-500 hover:text-blue-600 transition-colors" title="Save to Notes">
+                                        <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                                    </button>
+                                )}
+                                <button onClick={handleDownload} className="text-slate-500 hover:text-green-600 transition-colors" title="Download">
+                                    <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            {createdAt && (
+                                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                                    {new Date(createdAt).toLocaleDateString()}
+                                </span>
+                            )}
+                            {showReadReceipt && isMe && <LightbulbIcon isSeen={isSeen} />}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="flex items-center gap-3">
+                            <button onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }} className="text-slate-500 hover:text-slate-800 transition-colors" title="View">
+                                <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                            {!isMe && (
+                                <button onClick={handleSave} className="text-slate-500 hover:text-blue-600 transition-colors" title="Save to Notes">
+                                    <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                                </button>
+                            )}
+                            <button onClick={handleDownload} className="text-slate-500 hover:text-green-600 transition-colors" title="Download">
+                                <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 font-bold">
+                            <span>{timeString}</span>
+                            {showReadReceipt && isMe && <LightbulbIcon isSeen={isSeen} />}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

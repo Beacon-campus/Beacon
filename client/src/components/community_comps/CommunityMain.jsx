@@ -195,7 +195,7 @@ export default function Community({ role }) {
 
       {isClassView && (
         <>
-          <div className="shrink-0 h-[72px] bg-white border-b border-gray-100 flex items-center px-4 justify-between">
+          <div className="shrink-0 py-4 px-5 bg-white border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               {role === 'teacher' && (
                 <button onClick={() => setTeacherViewMode("list")} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1">
@@ -211,9 +211,9 @@ export default function Community({ role }) {
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">YOU ARE TEACHING {teacherSubjects}</span>
                 ) : (
                   <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 mt-0.5">
-                    <div className={`absolute top-1 bottom-1 w-[80px] bg-black rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />
-                    <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}>Official</button>
-                    <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-gray-700'}`}>Unofficial</button>
+                    <div className={`absolute top-1 bottom-1 w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />
+                    <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
+                    <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
                   </div>
                 )}
               </div>

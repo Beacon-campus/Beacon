@@ -248,7 +248,7 @@ export default function OfficialChannel({
                     {!isMe && (
                         <div className="w-8 shrink-0 flex items-start">
                             {!isConsecutive && (
-                                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-bold text-xs overflow-hidden border border-gray-100 mt-1 shadow-sm">
+                                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white font-bold text-xs overflow-hidden border border-gray-100 mt-0 shadow-sm">
                                     <img 
                                       src={getAvatarUrl(post.teacherId?.profile?.avatar || 1)} 
                                       className="w-full h-full object-cover" 
@@ -267,50 +267,52 @@ export default function OfficialChannel({
                            </span>
                        )}
                        
-                       <div className={`p-4 shadow-sm relative ${bubbleRadius} ${isMe ? "bg-black text-white text-right" : "bg-white text-gray-800 border border-gray-100 text-left"}`}>
-                           {post.type === 'note' ? (
-                               <SharedNoteBubble message={post} isMe={isMe} />
-                           ) : post.type === "image" ? (
-                               <img
-                                 src={post.noteData?.url}
-                                 alt={post.noteData?.name || "Shared image"}
-                                 className="rounded-lg max-w-[300px] w-full object-cover border border-gray-200 cursor-zoom-in"
-                                 onClick={() => setImagePreview({ url: post.noteData?.url, name: post.noteData?.name || "Shared image" })}
-                               />
-                           ) : post.type === "file" ? (
-                               <div className="flex flex-col gap-2 text-xs">
-                                  <p className="font-semibold break-all">{post.noteData?.name || "Shared file"}</p>
-                                  <div className="flex items-center gap-3">
-                                      <button
-                                        type="button"
-                                        onClick={() => window.open(post.noteData?.previewUrl || post.noteData?.url, "_blank")}
-                                        className="underline"
-                                      >
-                                        View
-                                      </button>
-                                      <a href={post.noteData?.downloadUrl || post.noteData?.url} download={post.noteData?.name || "file"} className="underline">Download</a>
-                                  </div>
-                               </div>
-                           ) : (
-                               <div className="text-sm leading-relaxed whitespace-pre-wrap">{post.content}</div>
-                           )}
-                           
-                           <div className={`mt-3 flex items-center justify-between border-t pt-2 gap-4 ${isMe ? "justify-end border-white/10" : "justify-between border-gray-100"}`}>
-                               <div className="flex items-center gap-3">
-                                   <button 
-                                      onClick={() => onOpenDoubt(post)} 
-                                      className={`text-[10px] font-black tracking-wide px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm ${
-                                          isMe ? "text-black bg-white hover:bg-gray-200" : "text-blue-600 bg-blue-50 hover:bg-blue-100"
-                                      }`}
-                                   >
-                                       Check Queries
-                                   </button>
-                                   <span className="text-[9px] font-bold uppercase tracking-widest opacity-50">
-                                       {new Date(post.createdAt).toLocaleDateString()}
-                                   </span>
+                       {post.type === 'note' ? (
+                           <SharedNoteBubble message={post} isMe={isMe} onOpenDoubt={onOpenDoubt} createdAt={post.createdAt} showReadReceipt={false} />
+                       ) : (
+                           <div className={`p-4 shadow-sm relative ${bubbleRadius} ${isMe ? "bg-black text-white text-right" : "bg-white text-gray-800 border border-gray-100 text-left"}`}>
+                               {post.type === "image" ? (
+                                   <img
+                                     src={post.noteData?.url}
+                                     alt={post.noteData?.name || "Shared image"}
+                                     className="rounded-lg max-w-[300px] w-full object-cover border border-gray-200 cursor-zoom-in"
+                                     onClick={() => setImagePreview({ url: post.noteData?.url, name: post.noteData?.name || "Shared image" })}
+                                   />
+                               ) : post.type === "file" ? (
+                                   <div className="flex flex-col gap-2 text-xs">
+                                      <p className="font-semibold break-all">{post.noteData?.name || "Shared file"}</p>
+                                      <div className="flex items-center gap-3">
+                                          <button
+                                            type="button"
+                                            onClick={() => window.open(post.noteData?.previewUrl || post.noteData?.url, "_blank")}
+                                            className="underline"
+                                          >
+                                            View
+                                          </button>
+                                          <a href={post.noteData?.downloadUrl || post.noteData?.url} download={post.noteData?.name || "file"} className="underline">Download</a>
+                                      </div>
+                                   </div>
+                               ) : (
+                                   <div className="text-sm leading-relaxed whitespace-pre-wrap">{post.content}</div>
+                               )}
+                               
+                               <div className={`mt-3 flex items-center justify-between border-t pt-2 gap-4 ${isMe ? "justify-end border-white/10" : "justify-between border-gray-100"}`}>
+                                   <div className="flex items-center gap-3">
+                                       <button 
+                                          onClick={() => onOpenDoubt(post)} 
+                                          className={`text-[10px] font-black tracking-wide px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm ${
+                                              isMe ? "text-black bg-white hover:bg-gray-200" : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                          }`}
+                                       >
+                                           Check Queries
+                                       </button>
+                                       <span className="text-[9px] font-bold uppercase tracking-widest opacity-50">
+                                           {new Date(post.createdAt).toLocaleDateString()}
+                                       </span>
+                                   </div>
                                </div>
                            </div>
-                       </div>
+                       )}
                     </div>
                  </div>
                )
