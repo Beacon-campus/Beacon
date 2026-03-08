@@ -75,7 +75,7 @@ const MessageItem = ({
     const showProfile = isCommunity && !isMe;
 
     return (
-        <div className={`flex w-full ${isCommunity && isConsecutive ? "mt-0.5" : "mt-2"} ${isMe ? "justify-end" : "justify-start"} items-start gap-2`}>
+        <div className={`flex w-full ${isMe ? "justify-end" : "justify-start"} items-start gap-2`}>
             {showProfile && (
                 <div className="w-7 flex flex-col shrink-0">
                     {!isConsecutive && (

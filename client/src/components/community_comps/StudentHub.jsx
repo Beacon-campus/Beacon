@@ -187,7 +187,7 @@ export default function StudentHub({
                     {showScrollButton && (
                         <button onClick={scrollToBottom} className="absolute top-14 right-1/2 translate-x-1/2 bg-black text-white p-2 rounded-full shadow-lg z-20 animate-in fade-in zoom-in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></button>
                     )}
-                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto space-y-4 pb-4 px-4 pt-4 soft-scrollbar" onScroll={handleScroll}>
+                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto pb-4 px-4 pt-4 no-scrollbar" onScroll={handleScroll}>
                         {isLoadingOlder && (
                             <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
                                 Loading older messages...
@@ -203,7 +203,7 @@ export default function StudentHub({
                             const isConsecutive = prevMsg && prevSenderId === currentSenderId;
                             const isLastInStack = !nextMsg || nextSenderId !== currentSenderId;
                             return (
-                                <div key={msg._id || idx} data-message-date={msg?.createdAt || msg?.sentAt || ""}>
+                                <div key={msg._id || idx} data-message-date={msg?.createdAt || msg?.sentAt || ""} className={`${!isConsecutive && idx !== 0 ? 'mt-6' : 'mt-1'}`}>
                                     <MessageItem msg={msg} currentUser={currentUser} onDelete={onDelete} isConsecutive={isConsecutive} isLastInStack={isLastInStack} index={idx} total={chatMessages.length} isCommunity={true} showReadReceipt={false} />
                                 </div>
                             );

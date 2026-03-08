@@ -64,7 +64,7 @@ export default function Groups() {
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-2 soft-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
                     {projects.length === 0 ? (
                         <div className="text-center py-12 opacity-30">
                             <div className="w-12 h-12 rounded-full bg-gray-200 mx-auto mb-3 flex items-center justify-center text-xl">📁</div>

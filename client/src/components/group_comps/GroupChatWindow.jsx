@@ -216,7 +216,7 @@ export default function GroupChatWindow({
                     {dateBadgeText}
                 </div>
             )}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col soft-scrollbar" onScroll={handleScroll}>
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col no-scrollbar" onScroll={handleScroll}>
                 {isLoadingOlder && (
                     <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
                         Loading older messages...
@@ -239,7 +239,7 @@ export default function GroupChatWindow({
                         const isLastInStack = !nextMsg || nextSenderId !== currentSenderId;
 
                         return (
-                            <div key={msg._id || idx} data-message-date={msg?.createdAt || msg?.sentAt || ""}>
+                            <div key={msg._id || idx} data-message-date={msg?.createdAt || msg?.sentAt || ""} className={`${!isConsecutive && idx !== 0 ? 'mt-6' : 'mt-1'}`}>
                                 <MessageItem
                                     msg={msg}
                                     currentUser={currentUser}
