@@ -107,9 +107,9 @@ const MessageItem = ({
                                     ? "p-0 border-none bg-transparent shadow-none"
                                     : (msg.type === 'image' || msg.type === 'file')
                                         ? "p-0 bg-transparent shadow-none"
-                                    : `px-[14px] py-[8px] min-h-[38px] flex flex-col justify-center rounded-[20px] ${isMe
+                                    : `px-[16px] py-[10px] min-h-[38px] flex flex-col justify-center rounded-[20px] ${isMe
                                         ? `bg-[#F0FDF4] text-[#0F172A] ${!isConsecutive ? 'rounded-br-[2px]' : ''}`
-                                        : `bg-[#F3F4F6] border-none text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
+                                        : `bg-[#F3F4F6] shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-black/5 text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
                                     }`
                             }
                         ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' ? "group-hover:shadow-md" : ""}
@@ -160,7 +160,7 @@ const MessageItem = ({
                                 </a>
                             </div>
                         ) : (
-                            <div className="flex flex-col min-w-[65px]">
+                            <div className="flex flex-col">
                                 {msg.assignmentTitle && (
                                     <div className="text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">
                                         Assignment - {msg.assignmentTitle}
@@ -170,17 +170,28 @@ const MessageItem = ({
                                     <img src={msg.gifUrl} alt="GIF" className="rounded-lg mb-2 max-w-[200px] w-full object-cover" />
                                 )}
                                 {msg.text && (
-                                    <p className="text-[14.5px] leading-[1.6] whitespace-pre-wrap break-words m-0 relative z-10">{msg.text || msg.content?.text}</p>
+                                    <div className="flex items-end gap-[8px]">
+                                        <p className="text-[14.5px] leading-[1.6] whitespace-pre-wrap break-words m-0 relative z-10 text-left pt-[2px] w-full">{msg.text || msg.content?.text}</p>
+                                        
+                                        <div className={`flex items-center justify-end gap-[3px] opacity-60 select-none shrink-0 mb-[-2px] min-w-max`}>
+                                            <span className="text-[10px] text-[#9CA3AF] font-medium tracking-wide translate-y-[0.5px]">
+                                                {timeString}
+                                            </span>
+                                            {isMe && showReadReceipt && (
+                                                <LightbulbIcon isSeen={msg.readBy && msg.readBy.filter(id => id !== currentUser?._id).length > 0} />
+                                            )}
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         )}
 
-                        {/* IN-BUBBLE TIMESTAMP & RECEIPT */}
-                        {timeString && !msg.isDeleted && msg.type !== 'note' && (
-                            <div className={`flex items-center gap-1 opacity-70 select-none ${
-                                (msg.type === 'image' || msg.type === 'file') ? 'justify-end mt-1 w-full text-gray-500' : 'justify-end mt-1 -mb-1 -mr-1'
+                        {/* TIMESTAMP FOR NON-TEXT MESSAGES OR MEDIA (FALLBACK) */}
+                        {(!msg.text || msg.type === 'image' || msg.type === 'file' || msg.type === 'assignment') && timeString && !msg.isDeleted && msg.type !== 'note' && (
+                            <div className={`flex items-center gap-1 opacity-60 select-none ${
+                                (msg.type === 'image' || msg.type === 'file') ? 'justify-end mt-1.5 w-full text-[#9CA3AF]' : 'justify-end mt-1 -mb-1 -mr-1'
                             }`}>
-                                <span className="text-[10px] sm:text-[11px] font-medium tracking-wide">
+                                <span className="text-[10px] font-medium tracking-wide text-[#9CA3AF] translate-y-[0.5px]">
                                     {timeString}
                                 </span>
                                 {isMe && showReadReceipt && (
