@@ -112,8 +112,40 @@ const MessageItem = ({
                                         : `bg-[#F3F4F6] shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-black/5 text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
                                     }`
                             }
-                        ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' && msg.type !== 'assignment' ? "group-hover:shadow-md" : ""}
+                        ${!msg.isDeleted && msg.type !== 'note' && msg.type !== 'image' && msg.type !== 'file' && msg.type !== 'assignment' ? "group-hover/bubble:shadow-md" : ""}
                         `}>
+                        {/* THE INSIDE DROPDOWN MENU */}
+                        {!msg.isDeleted && !disableDeleteActions && (!isCommunity || isMe) && (
+                            <div className="absolute top-1.5 right-1.5 z-[20] opacity-0 group-hover/bubble:opacity-100 transition-opacity flex flex-col items-end">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+                                    className="p-1 rounded-full bg-white/10 hover:bg-gray-200/50 text-gray-400 hover:text-black transition-colors"
+                                >
+                                    <ChevronDown />
+                                </button>
+
+                                {showMenu && (
+                                    <div ref={menuRef} className={`absolute top-full mt-1 w-36 bg-white rounded-xl shadow-2xl border border-gray-100/50 overflow-hidden animate-in zoom-in-95 duration-100 origin-top-right z-[100]
+                                            ${isNearBottom ? "bottom-full top-auto mb-1 origin-bottom-right" : ""}
+                                            `}>
+                                        {isMe && (
+                                            <button
+                                                onClick={() => onDelete(msg._id, "everyone")}
+                                                className="w-full text-left px-4 py-2.5 text-[11px] text-gray-600 hover:text-red-600 hover:bg-red-50 font-bold border-b border-gray-50 flex items-center gap-2 transition-colors">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                                Delete for everyone
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => onDelete(msg._id, "me")}
+                                            className="w-full text-left px-4 py-2.5 text-[11px] text-gray-600 hover:bg-gray-50 font-bold flex items-center gap-2 transition-colors">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            Delete for me
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         {/* CONTENT RENDERER */}
                         {msg.isDeleted ? (
                             <span className="flex items-center gap-1.5 text-xs font-medium">
@@ -219,39 +251,7 @@ const MessageItem = ({
                         )}
                     </div>
 
-                    {/* THE OUTSIDE DROPDOWN MENU */}
-                    {!msg.isDeleted && !disableDeleteActions && (!isCommunity || isMe) && (
-                        <div className={`absolute top-0 h-full flex items-start px-2 opacity-0 group-hover/bubble:opacity-100 transition-opacity
-                                ${isMe ? "right-[100%] flex-row-reverse" : "left-[100%] flex-row"}
-                                `}>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
-                                className="p-1 rounded-full hover:bg-gray-200 text-gray-400 hover:text-black transition-colors mt-0.5"
-                            >
-                                <ChevronDown />
-                            </button>
 
-                            {showMenu && (
-                                <div ref={menuRef} className={`absolute z-[100] w-36 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-100 
-                                        ${isMe ? "right-2" : "left-2"}
-                                        ${isNearBottom ? "bottom-full mb-1 origin-bottom" : "top-8 origin-top"}
-                                        `}>
-                                    {isMe && (
-                                        <button
-                                            onClick={() => onDelete(msg._id, "everyone")}
-                                            className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 font-medium border-b border-gray-50">
-                                            Delete for everyone
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => onDelete(msg._id, "me")}
-                                        className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 font-medium">
-                                        Delete for me
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
             </div>
 
