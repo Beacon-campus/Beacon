@@ -207,9 +207,16 @@ export default function OfficialChannel({
             </div>
          )}
          {announcements.length === 0 ? (
-            <div className="text-center text-gray-400 mt-10 opacity-60">
-                <div className="w-12 h-12 rounded-2xl border-2 border-dashed border-gray-400 flex items-center justify-center text-xl font-black mx-auto mb-2">📢</div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mt-2">No official announcements yet.</p>
+            <div className="absolute inset-0 z-0 flex flex-col items-center justify-center p-10 text-center select-none gap-6">
+                <div className="text-[80px] opacity-60 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-default">
+                    📢
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                    <h2 className="text-2xl font-[600] text-gray-500 uppercase tracking-tighter">Announcements</h2>
+                    <p className="text-sm font-[500] text-gray-400 uppercase tracking-widest max-w-[250px] leading-relaxed">
+                        No official announcements yet.
+                    </p>
+                </div>
             </div>
          ) : (
             announcements.map((post, idx) => {
