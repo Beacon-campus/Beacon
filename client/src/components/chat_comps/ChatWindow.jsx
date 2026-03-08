@@ -420,9 +420,9 @@ export default function ChatWindow({
                       <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors md:hidden">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
-                      <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-50">
-                        <button onClick={(e) => { e.stopPropagation(); onUnfriend(other); }} className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 font-medium rounded-xl flex items-center gap-2 transition-colors">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                      <div className="absolute right-0 top-full mt-2 w-40 dropdown-menu-glass rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-[100] overflow-hidden">
+                        <button onClick={(e) => { e.stopPropagation(); onUnfriend(other); }} className="w-full text-left px-4 py-3 text-xs text-red-600 hover:bg-red-50 font-bold flex items-center gap-3 transition-colors">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                           Unfriend
                         </button>
                       </div>
@@ -444,7 +444,7 @@ export default function ChatWindow({
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
               </button>
             )}
-            <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
+            <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto soft-scrollbar p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
               {isLoadingOlder && (
                 <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-1">
                   Loading older messages...
@@ -536,17 +536,20 @@ export default function ChatWindow({
                   </div>
 
                   {/* INPUT AREA */}
-                  <input 
-                    type="text" 
-                    value={newMessage} 
-                    onChange={handleInputChange} 
-                    onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} 
-                    placeholder="Type a message..." 
-                    className={`flex-1 bg-transparent px-2 outline-none text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || isOverLimit ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} 
-                  />
-                  
-                  {/* CHAR COUNT */}
-                  <div className={`absolute -top-5 right-2 text-[10px] font-bold pointer-events-none transition-colors ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>{newMessage.length} / {MAX_CHAR_COUNT}</div>
+                  <div className="flex-1 relative flex items-center min-w-0">
+                    <input 
+                      type="text" 
+                      value={newMessage} 
+                      onChange={handleInputChange} 
+                      onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} 
+                      placeholder="Type a message..." 
+                      className={`w-full bg-transparent pl-2 pr-14 outline-none text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || isOverLimit ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} 
+                    />
+                    {/* CHAR COUNT */}
+                    <div className={`absolute right-2 text-[9px] font-bold pointer-events-none transition-colors ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
+                      {newMessage.length}/{MAX_CHAR_COUNT}
+                    </div>
+                  </div>
                   
                   {/* SEND BUTTON */}
                   <button onClick={handleSend} disabled={isSendDisabled} className={`p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${isSendDisabled ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}>
