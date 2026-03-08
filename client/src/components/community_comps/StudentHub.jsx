@@ -253,7 +253,17 @@ export default function StudentHub({
                         </div>
                         <input value={chatInput} onChange={handleInputChange} onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} className={`flex-1 bg-gray-100 rounded-full px-4 py-3 pr-20 text-sm focus:outline-none focus:ring-2 transition-all ${emojiError || languageError || chatInput.length > MAX_CHAR_COUNT ? "focus:ring-red-500 bg-red-50" : "focus:ring-black/5"}`} placeholder="Message class group..." />
                         <div className={`absolute bottom-3 right-16 text-[10px] font-bold pointer-events-none transition-colors ${chatInput.length > MAX_CHAR_COUNT ? "text-red-500" : "text-gray-400"}`}>{chatInput.length} / {MAX_CHAR_COUNT}</div>
-                        <button onClick={handleSend} disabled={isSendDisabled} className="w-10 h-10 rounded-full bg-black flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"><img src={SendIcon} className="w-5 h-5 invert" alt="Send" /></button>
+                        <button 
+                            onClick={handleSend} 
+                            disabled={isSendDisabled} 
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                                isSendDisabled 
+                                ? "bg-gray-200 cursor-not-allowed" 
+                                : "bg-[#0F172A] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 shadow-lg shadow-[#0F172A]/20"
+                            }`}
+                        >
+                            <img src={SendIcon} className={`w-5 h-5 invert ${isSendDisabled ? 'opacity-40' : 'opacity-100'}`} alt="Send" />
+                        </button>
                     </div>
                 </div>
             </div>

@@ -44,7 +44,7 @@ export default function UserListItem({
         >
             {/* Optional Select Checkbox Circle */}
             {onClick && isSelected !== undefined && onActionClick === undefined && (
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? "bg-black border-black" : "border-gray-200"
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? "bg-[#0F172A] border-[#0F172A]" : "border-gray-200"
                     }`}>
                     {isSelected && <div className="w-2 h-2 bg-white rounded-full" />}
                 </div>

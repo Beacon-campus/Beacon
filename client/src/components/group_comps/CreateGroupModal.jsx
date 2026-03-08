@@ -107,7 +107,7 @@ export default function CreateGroupModal({ isOpen, onClose }) {
                     <label className="text-[10px] font-black text-gray-800 uppercase tracking-widest">Add Teammates ({teammates.length})</label>
                     <div className="flex gap-2 w-1/2">
                         <input type="text" value={regnoInput} onKeyDown={handleManualAdd} onChange={e => setRegnoInput(e.target.value)} placeholder="Manual Reg No." className="flex-1 bg-gray-100 border-none rounded-xl px-3 py-2 text-xs focus:ring-0" />
-                        <button onClick={handleManualAdd} className="bg-black text-white px-3 py-2 rounded-xl text-xs font-black">+</button>
+                        <button onClick={handleManualAdd} className="bg-[#0F172A] text-white px-3 py-2 rounded-xl text-xs font-black">+</button>
                     </div>
                 </div>
 
@@ -134,8 +134,8 @@ export default function CreateGroupModal({ isOpen, onClose }) {
 
             <div className="p-8 pt-4 shrink-0 bg-gray-50/50">
                 <div className="flex gap-3">
-                    <button type="button" onClick={onClose} className="flex-1 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Discard</button>
-                    <button type="button" onClick={handleCreate} disabled={loading || teammates.length === 0} className="flex-1 py-4 bg-black text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-black/10 transition-all hover:scale-[1.02] disabled:opacity-20">
+                    <button type="button" onClick={onClose} className="flex-1 py-4 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-800 transition-colors">Discard</button>
+                    <button type="button" onClick={handleCreate} disabled={loading || teammates.length === 0} className="flex-1 py-4 bg-[#0F172A] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-[#0F172A]/10 transition-all hover:scale-[1.02] disabled:opacity-20 disabled:hover:scale-100">
                         {loading ? "Launching..." : "Confirm Group"}
                     </button>
                 </div>

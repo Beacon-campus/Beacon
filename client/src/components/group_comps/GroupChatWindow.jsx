@@ -305,7 +305,17 @@ export default function GroupChatWindow({
                         </div>
 
                         <input type="text" value={newMessage} disabled={isGroupExpired} onChange={(e) => setNewMessage(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()} placeholder={isGroupExpired ? "Group expired" : "Message team..."} className="flex-1 bg-gray-50 border border-transparent rounded-xl px-5 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed" />
-                        <button onClick={handleSend} disabled={isGroupExpired || (!newMessage.trim() && !selectedGif && !selectedAttachment) || isUploadingAttachment} className="bg-black text-white px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-20">Send</button>
+                        <button 
+                            onClick={handleSend} 
+                            disabled={isGroupExpired || (!newMessage.trim() && !selectedGif && !selectedAttachment) || isUploadingAttachment} 
+                            className={`px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 ${
+                                (isGroupExpired || (!newMessage.trim() && !selectedGif && !selectedAttachment) || isUploadingAttachment) 
+                                ? "bg-gray-200 text-gray-400 shadow-none cursor-not-allowed" 
+                                : "bg-[#0F172A] text-white shadow-lg shadow-[#0F172A]/20 hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
+                            }`}
+                        >
+                            Send
+                        </button>
                     </div>
                     {isGroupExpired && (
                         <p className="text-xs text-red-500 font-semibold">Group deadline has passed. Messaging is disabled.</p>

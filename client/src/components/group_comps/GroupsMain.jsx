@@ -58,9 +58,9 @@ export default function Groups() {
                     <h2 className="text-lg font-black text-gray-800 uppercase tracking-tighter">Projects</h2>
                     <button
                         onClick={() => setShowCreate(true)}
-                        className="w-9 h-9 bg-black text-white rounded-xl flex items-center justify-center font-black shadow-lg shadow-black/10 hover:scale-105 active:scale-95 transition-all"
+                        className="group/plus w-9 h-9 bg-transparent border-2 border-[#0F172A] text-[#0F172A] hover:bg-[#0F172A] hover:text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
                     >
-                        +
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover/plus:rotate-90"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
                 </div>
 
@@ -80,22 +80,22 @@ export default function Groups() {
                                 <div
                                     key={p._id}
                                     onClick={() => setActiveGroupId(p._id)}
-                                    className={`p-4 rounded-2xl cursor-pointer transition-all border-2 group ${isSelected
-                                            ? "bg-white border-black shadow-md"
-                                            : "hover:bg-white border-transparent hover:border-gray-200"
+                                    className={`p-4 cursor-pointer transition-all border border-transparent ${isSelected
+                                            ? "bg-[#F0FDF4] border-[#059669] shadow-sm font-medium rounded-2xl"
+                                            : "hover:bg-gray-50 border-b border-b-gray-100"
                                         }`}
                                 >
-                                    <div className="flex justify-between items-start mb-1.5">
-                                        <h4 className={`text-sm font-black truncate flex-1 ${isSelected ? "text-black" : "text-gray-700"}`}>
+                                    <div className="flex justify-start items-center mb-1.5 gap-2">
+                                        <h4 className={`text-sm font-[600] truncate ${isSelected ? "text-[#1F2937]" : "text-gray-700"}`}>
                                             {p.name}
                                         </h4>
                                         {hasFaculty && (
-                                            <span className="shrink-0 ml-2 text-[7px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-black tracking-widest border border-indigo-100">
+                                            <span className="shrink-0 text-[7px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-black tracking-widest border border-indigo-100">
                                                 FACULTY
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest truncate">
+                                    <p className="text-[9px] font-medium text-gray-500 uppercase tracking-widest truncate">
                                         Goal: {p.goal}
                                     </p>
 
@@ -141,11 +141,11 @@ export default function Groups() {
                                         {activeGroup?.name}
                                     </h2>
                                     <div className="flex items-center gap-2 mt-0.5">
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                                             {activeGroup?.participants?.length} Members
                                         </span>
                                         <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                                             Goal: {activeGroup?.goal}
                                         </span>
                                     </div>

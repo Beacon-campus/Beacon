@@ -107,7 +107,7 @@ const MessageItem = ({
                                     ? "p-0 border-none bg-transparent shadow-none"
                                     : (msg.type === 'image' || msg.type === 'file' || msg.type === 'assignment')
                                         ? "p-0 bg-transparent shadow-none"
-                                    : `px-[16px] py-[10px] min-h-[38px] flex flex-col justify-center rounded-[20px] ${isMe
+                                    : `px-[14px] py-[8px] min-h-[36px] flex flex-col justify-center rounded-[20px] ${isMe
                                         ? `bg-[#F0FDF4] text-[#0F172A] ${!isConsecutive ? 'rounded-br-[2px]' : ''}`
                                         : `bg-[#F3F4F6] shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-black/5 text-gray-800 ${!isConsecutive ? 'rounded-bl-[2px]' : ''}`
                                     }`
