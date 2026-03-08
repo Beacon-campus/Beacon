@@ -91,6 +91,6 @@ export const updateSessionTitle = async (sessionId, userId, title) => {
     return await BotSession.findOneAndUpdate(
       { _id: sessionId, userId },
       { title: title, lastActive: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
 };

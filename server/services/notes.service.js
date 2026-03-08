@@ -12,7 +12,7 @@ export const updateNoteService = async (id, uid, updates) => {
     return await Note.findOneAndUpdate(
         { _id: id, userId: uid },
         { $set: updates },
-        { new: true }
+        { returnDocument: 'after' }
     );
 };
 

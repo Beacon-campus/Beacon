@@ -916,18 +916,18 @@ export default function TeacherPublishAssignment() {
                     <button
                       onClick={() => setViewSubmission(row)}
                       disabled={!row.submitted}
-                      className={`px-3 py-1.5 border rounded-lg text-xs font-medium transition-colors ${row.submitted ? "bg-white border-blue-300 text-blue-600 hover:bg-blue-50" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${row.submitted ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-gray-50 text-gray-300 cursor-not-allowed"
                         }`}
                     >
                       view
                     </button>
-                    <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-gray-300">
+                    <div className="flex items-center gap-1 bg-[#F9FAFB] px-2 py-1 rounded-lg border border-gray-200">
                       <input
                         type="number"
                         min="0"
                         max={selectedAssignment?.totalMarks}
                         placeholder="--"
-                        className="w-10 text-center outline-none text-sm font-bold"
+                        className="w-10 text-center outline-none bg-transparent text-sm font-bold text-gray-800"
                         value={gradeDrafts[row.studentId] ?? ""}
                         onChange={(e) => handleGradeInputChange(row.studentId, e.target.value)}
                         disabled={!row.submitted}
@@ -937,7 +937,7 @@ export default function TeacherPublishAssignment() {
                     <button
                       onClick={() => handleSaveGrade(row.studentId)}
                       disabled={!row.submitted || savingGradeId === row.studentId}
-                      className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                      className="px-4 py-1.5 bg-[#0F172A] rounded-lg text-xs font-bold text-white hover:bg-slate-800 disabled:opacity-50 transition-colors shadow-sm"
                     >
                       {savingGradeId === row.studentId ? "Saving..." : "save"}
                     </button>
@@ -947,9 +947,9 @@ export default function TeacherPublishAssignment() {
             )}
           </div>
 
-          <div className="w-1/3 bg-red-50 rounded-2xl p-4 border border-red-100 flex flex-col">
-            <h3 className="text-sm font-bold text-red-800 mb-1">Student doubts</h3>
-            <p className="text-[10px] text-red-400 mb-4 leading-tight">
+          <div className="w-1/3 bg-[#F9FAFB] rounded-2xl p-4 border border-gray-100 flex flex-col">
+            <h3 className="text-sm font-bold text-gray-800 mb-1">Student doubts</h3>
+            <p className="text-[10px] text-gray-400 mb-4 leading-tight">
               *Select a doubt to reply specifically, or send a broadcast message to all.
             </p>
 
@@ -988,7 +988,7 @@ export default function TeacherPublishAssignment() {
                     allBroadcasts.map((bcast, idx) => (
                       <div key={idx} className="w-full text-left border border-primary/20 bg-primary/5 rounded-lg p-3 flex flex-col gap-2">
                         <div className="flex items-center justify-between gap-2 w-full">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#0F172A] px-2 py-0.5 text-[10px] font-bold text-white whitespace-nowrap">
                             Broadcast Message
                           </span>
                           <span className="text-[10px] text-gray-400">
@@ -1035,7 +1035,7 @@ export default function TeacherPublishAssignment() {
                       <div className="flex items-center justify-between gap-2 w-full">
                         <p className="text-xs font-bold text-gray-800 truncate">{d.studentName}</p>
                         {(d.replies || []).filter(r => r.mode === 'private').length > 0 && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-bold text-gray-600 whitespace-nowrap">
                             ↩ Replied ({(d.replies || []).filter(r => r.mode === 'private').length})
                           </span>
                         )}
@@ -1043,10 +1043,10 @@ export default function TeacherPublishAssignment() {
                       <p className="text-sm text-gray-700 bg-gray-50/50 p-2 rounded border border-gray-100">{d.text}</p>
 
                       {(d.replies || []).filter(r => r.mode === 'private').length > 0 && (
-                        <div className="flex flex-col gap-1 w-full pl-2 border-l-2 border-red-200 mt-1">
+                        <div className="flex flex-col gap-1 w-full pl-2 border-l-2 border-gray-200 mt-1">
                           {d.replies.filter(r => r.mode === 'private').map((reply, idx) => (
-                            <div key={idx} className="bg-red-50/50 rounded p-2 text-[11px] text-gray-600 border border-red-50">
-                              <span className="font-bold text-red-700 capitalize mr-1">
+                            <div key={idx} className="bg-gray-50/50 rounded p-2 text-[11px] text-gray-600 border border-gray-100">
+                              <span className="font-bold text-gray-700 capitalize mr-1">
                                 [Private]
                               </span>
                               {reply.text}
@@ -1060,9 +1060,9 @@ export default function TeacherPublishAssignment() {
               )}
             </div>
 
-            <div className="pt-3 border-t border-red-200 mt-4">
+            <div className="pt-3 border-t border-gray-200 mt-4">
               <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center bg-white rounded-full px-3 py-1 border border-red-200">
+                <div className="flex-1 flex items-center bg-white rounded-full px-3 py-1 border border-gray-200">
                   <input
                     type="text"
                     placeholder={replyMode === "broadcast" ? "Type a broadcast message to all students..." : (selectedDoubtId ? "Type private reply..." : "Select a doubt to reply")}
@@ -1075,7 +1075,7 @@ export default function TeacherPublishAssignment() {
                 <button
                   onClick={handleReplyDoubt}
                   disabled={sendingReply || (!selectedDoubtId && replyMode === 'private')}
-                  className="w-10 h-10 rounded-full bg-black disabled:bg-gray-400 flex items-center justify-center shadow-md"
+                  className="w-10 h-10 rounded-full bg-[#0F172A] disabled:bg-gray-400 flex items-center justify-center shadow-md active:scale-95 transition-transform"
                 >
                   <svg viewBox="0 0 512.308 512.308" className="w-5 h-5 fill-current text-white">
                     <g>

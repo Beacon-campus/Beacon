@@ -90,6 +90,6 @@ export const updateClassroomDescription = async (id, description) => {
   return await mongoose.model("Classroom").findByIdAndUpdate(
     id,
     { description },
-    { new: true }
+    { returnDocument: 'after' }
   );
 };

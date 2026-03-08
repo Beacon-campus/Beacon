@@ -243,7 +243,7 @@ export const syncClassroomsForUser = async (user, classroomsToSync) => {
         },
         $addToSet: { participants: { $each: room.allParticipantIds } },
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
   }
 };

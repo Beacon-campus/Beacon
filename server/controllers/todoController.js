@@ -68,7 +68,7 @@ export const updateTodo = async (req, res) => {
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
       { $set: req.body },
-      { new: true } // Return the updated document
+      { returnDocument: 'after' } // Return the updated document
     );
 
     if (!updatedTodo) return res.status(404).json({ error: "Task not found" });

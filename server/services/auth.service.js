@@ -135,7 +135,7 @@ export const syncEmailWithFirebase = async (uid) => {
       email: newEmail,
       $set: { "profile.email": newEmail }
     },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!updatedUser) {

@@ -16,7 +16,7 @@ export const updateTodoService = async (id, uid, updates) => {
   const updatedTodo = await Todo.findOneAndUpdate(
     { _id: id, userId: uid },
     { $set: updates },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (updatedTodo && updatedTodo.completed === true) {

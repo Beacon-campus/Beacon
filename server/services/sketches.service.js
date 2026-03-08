@@ -8,6 +8,6 @@ export const saveSketchService = async (uid, elements, appState) => {
   return await Sketch.findOneAndUpdate(
     { userId: uid },
     { $set: { elements, appState } },
-    { new: true, upsert: true }
+    { returnDocument: 'after', upsert: true }
   );
 };

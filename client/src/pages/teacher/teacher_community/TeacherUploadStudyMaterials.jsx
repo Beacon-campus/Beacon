@@ -194,8 +194,8 @@ export default function TeacherUploadStudyMaterials() {
               <p className="text-sm text-gray-500 mt-1">
                 Sem {cls.metadata?.semester} • {cls.metadata?.shift}
               </p>
-              <p className="text-xs text-gray-400 mt-2">
-                {(cls.subjects || []).length} subject(s) assigned
+              <p className="text-xs text-gray-400 mt-2 font-medium">
+                {(cls.subjects || []).length} {((cls.subjects || []).length) === 1 ? 'subject' : 'subjects'} assigned
               </p>
             </button>
           ))}
@@ -210,14 +210,17 @@ export default function TeacherUploadStudyMaterials() {
   if (!selectedSubject) {
     return (
       <div className="p-6 space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4 mb-2">
           <button
             onClick={() => setSelectedClassroomId(null)}
-            className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50"
+            className="group flex items-center gap-2 px-4 py-2 hover:bg-gray-100/80 text-gray-500 hover:text-gray-900 rounded-xl transition-all active:scale-[0.98]"
           >
-            Back
+            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current transition-transform group-hover:-translate-x-1">
+              <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
+            </svg>
+            <span className="font-semibold text-sm">Go back</span>
           </button>
-          <h2 className="text-lg font-semibold text-primary">{selectedClassroom.name}</h2>
+          <h2 className="text-xl font-bold text-gray-800 tracking-tight">{selectedClassroom.name}</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
           {(selectedClassroom.subjects || []).map((sub) => (
@@ -226,10 +229,10 @@ export default function TeacherUploadStudyMaterials() {
               onClick={() => setSelectedSubjectId(sub._id)}
               className="group relative border border-gray-100 rounded-2xl p-6 bg-white hover:bg-[#F8FAFC] hover:border-gray-200 text-left transition-all duration-200 shadow-sm hover:shadow active:scale-[0.98] flex flex-col"
             >
-              <div className="absolute top-4 right-4 bg-[#F0FDF4] text-[#15803D] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+              <div className="absolute top-4 right-4 bg-[#F0FDF4] text-[#15803D] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flexItemsCenter justify-center leading-none">
                 {(sub.uploads || []).length} upload{(sub.uploads || []).length !== 1 && 's'}
               </div>
-              <p className="font-[600] text-lg text-gray-800 tracking-tight pr-16">{sub.name}</p>
+              <p className="font-bold text-lg text-gray-800 tracking-tight pr-20">{sub.name}</p>
               <p className="text-sm font-medium text-gray-400 mt-1 uppercase tracking-widest">{sub.code}</p>
             </button>
           ))}

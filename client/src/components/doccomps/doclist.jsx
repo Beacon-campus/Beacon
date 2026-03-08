@@ -27,14 +27,14 @@ export default function DocList({
           <span className="font-semibold text-sm">Go back</span>
         </button>
 
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-bold text-gray-800 tracking-tight">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-lg font-bold text-gray-800 tracking-tight">
             {subject?.name || "Subject"}
           </h2>
           {classroom?.name && (
             <>
-              <span className="text-gray-300">/</span>
-              <p className="text-sm font-medium text-gray-400">
+              <span className="text-gray-300 font-medium">/</span>
+              <p className="text-sm font-medium text-gray-400 tracking-tight">
                 {classroom.name}
               </p>
             </>
