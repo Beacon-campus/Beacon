@@ -216,7 +216,7 @@ export default function GroupChatWindow({
                     {dateBadgeText}
                 </div>
             )}
-            <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto space-y-4 pb-4 px-4 pt-4 soft-scrollbar" onScroll={handleScroll}>
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col soft-scrollbar" onScroll={handleScroll}>
                 {isLoadingOlder && (
                     <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
                         Loading older messages...

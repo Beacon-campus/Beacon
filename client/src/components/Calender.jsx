@@ -655,7 +655,7 @@ export default function Calendar() {
             {loading ? (
               <div className="flex items-center justify-center h-full text-gray-400">Loading events...</div>
             ) : upcomingEvents.length > 0 ? (
-              <div className="flex-1 overflow-y-auto soft-scrollbar pr-2 min-h-0 flex-1">
+              <div className="flex flex-col gap-2 overflow-y-auto pr-1 soft-scrollbar min-h-0 flex-1">
                 {upcomingEvents.map((event, i) => {
                   const eventDate = new Date(event.date);
                   eventDate.setHours(0, 0, 0, 0);
