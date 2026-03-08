@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import SendIcon from "../../assets/send.svg";
 
 export default function AssignmentModal({
@@ -25,10 +26,10 @@ export default function AssignmentModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-        <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl relative z-[1000]">
           <div className="z-10 shrink-0 border-b border-gray-100 bg-white p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -82,11 +83,11 @@ export default function AssignmentModal({
               {assignment?.type === "quiz" && role === "student" && (
                 <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-5 shadow-sm">
                   <div className="mb-3 text-[13px] font-bold text-gray-700 uppercase tracking-wide">Quiz Assignment</div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setShowQuizRules(true)}
-                      className={`flex-1 rounded-xl border-2 px-3 py-2 text-xs font-bold transition-colors ${quizRulesAccepted ? "border-green-500 text-green-700 bg-green-50" : "border-gray-200 bg-transparent text-gray-600 hover:bg-gray-100"}`}
+                      className={`shrink-0 rounded-xl border-2 px-3 py-2 text-xs font-bold transition-colors ${quizRulesAccepted ? "border-green-500 text-green-700 bg-green-50" : "border-gray-200 bg-transparent text-gray-600 hover:bg-gray-100"}`}
                     >
                       {quizRulesAccepted ? "Rules Accepted ✓" : "Read Rules"}
                     </button>
@@ -214,7 +215,7 @@ export default function AssignmentModal({
       </div>
 
       {showQuizRules && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <h3 className="mb-3 text-xl font-bold text-gray-800">Quiz Rules</h3>
             <div className="mb-5 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
@@ -243,6 +244,7 @@ export default function AssignmentModal({
           </div>
         </div>
       )}
-    </>
+    </>,
+    document.body
   );
 }
