@@ -118,14 +118,16 @@ export default function Groups() {
             {/* MAIN CONTENT: Chat Area */}
             <div className="flex-1 flex flex-col bg-white">
                 {!activeGroupId ? (
-                    <div className="flex-1 flex flex-col items-center justify-center p-10 opacity-20 text-center select-none">
-                        <div className="w-24 h-24 rounded-[40px] border-4 border-dashed border-gray-400 mb-6 flex items-center justify-center text-4xl font-black">
+                    <div className="flex-1 flex flex-col items-center justify-center p-10 text-center select-none gap-6">
+                        <div className="text-[80px] opacity-60 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-default">
                             🚀
                         </div>
-                        <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter">Mission Control</h2>
-                        <p className="text-xs font-bold uppercase tracking-widest mt-2 max-w-[200px] leading-relaxed">
-                            Pick a project to sync with your team.
-                        </p>
+                        <div className="flex flex-col items-center gap-2">
+                            <h2 className="text-2xl font-[600] text-gray-500 uppercase tracking-tighter">Mission Control</h2>
+                            <p className="text-sm font-[500] text-gray-400 uppercase tracking-widest max-w-[250px] leading-relaxed">
+                                Pick a project to sync with your team.
+                            </p>
+                        </div>
                     </div>
                 ) : (
                     <>
