@@ -68,9 +68,26 @@ export default function Login() {
   const [capsLock, setCapsLock] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [renderStatus, setRenderStatus] = useState("loading");
+  const [dockerStatus, setDockerStatus] = useState("loading");
 
   // Controls the Onboarding Flow State
   const [onboardingStage, setOnboardingStage] = useState(null);
+
+  const renderHealthUrl = `${(import.meta.env.VITE_API_BASE_URL || "").replace(/\/api$/, "")}/health`;
+  const dockerHealthUrl = `${(import.meta.env.VITE_DOCKER_BASE_URL || "").replace(/\/+$/, "")}/health`;
+
+  const READY_STATUSES = new Set([200, 401, 403, 429, 502, 503]);
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const StatusChip = ({ label, status }) => (
+    <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700">
+      {status === "loading" && <span className="h-2.5 w-2.5 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin" />}
+      {status === "up" && <span className="h-2.5 w-2.5 rounded-full bg-green-500" />}
+      {status === "down" && <span className="h-2.5 w-2.5 rounded-full bg-red-400" />}
+      <span>{label}</span>
+    </div>
+  );
 
   /* ================= ONBOARDING CHECK ================= */
   useEffect(() => {
@@ -96,6 +113,42 @@ export default function Login() {
       navigate(destination, { replace: true });
     }
   }, [user, loading, navigate, submitting]);
+
+  /* ================= SERVICE HEALTH PING ================= */
+  useEffect(() => {
+    let cancelled = false;
+
+    const ping = async (url, setter) => {
+      if (!url || url === "/health") {
+        if (!cancelled) setter("down");
+        return;
+      }
+      try {
+        const response = await fetch(url, { method: "GET" });
+        if (!cancelled) setter(READY_STATUSES.has(response.status) ? "up" : "down");
+      } catch {
+        if (!cancelled) setter("down");
+      }
+    };
+
+    const checkServices = async () => {
+      if (!cancelled) {
+        setRenderStatus((prev) => (prev === "up" ? prev : "loading"));
+        setDockerStatus((prev) => (prev === "up" ? prev : "loading"));
+      }
+      await ping(renderHealthUrl, setRenderStatus);
+      await wait(250);
+      await ping(dockerHealthUrl, setDockerStatus);
+    };
+
+    checkServices();
+    const intervalId = setInterval(checkServices, 10000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [renderHealthUrl, dockerHealthUrl]);
 
   /* ================= HANDLERS ================= */
   const handleLogout = async () => {
@@ -299,6 +352,10 @@ export default function Login() {
             <p className="text-sm text-gray-500 font-medium max-w-[90%]">
               Your digital campus for learning, collaboration, and AI tools
             </p>
+            <div className="mt-1 flex items-center justify-center gap-2">
+              <StatusChip label="Render" status={renderStatus} />
+              <StatusChip label="Docker" status={dockerStatus} />
+            </div>
           </div>
 
           {/* Form */}
