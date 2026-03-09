@@ -9,7 +9,37 @@ const funStatusMessages = [
   "Leonardo da Vinci is currently using your whiteboard...",
   "Waking up the study bots from their digital nap...",
   "Brewing coffee for the Docker containers...",
-  "A Wise man once said..."
+  "A Wise man once said...",
+  "Sharpening pencils for your assignments...",
+  "Convincing the database to remember everything...",
+  "Checking if your professor posted a surprise quiz...",
+  "Organizing your digital desk...",
+  "Counting unread messages from your classmates...",
+  "Your AI study buddy is stretching before helping...",
+  "Aligning the whiteboard markers...",
+  "Looking for motivation in the syllabus...",
+  "Loading your brain cells into RAM...",
+  "Dusting off the lecture notes...",
+  "Syncing brains across the campus network...",
+  "Reading the fine print of your assignment deadlines...",
+  "Preparing a seat in the front row...",
+  "Teaching the server how to pass exams...",
+  "Searching the library for lost ideas...",
+  "Charging the productivity batteries...",
+  "Waiting for inspiration to connect...",
+  "Checking if the group project is still alive...",
+  "Opening 37 browser tabs for research...",
+  "Making sure your notes are still where you left them...",
+  "Your classmates are probably procrastinating too...",
+  "Finding where you saved that one important note...",
+  "The AI bot is putting on its thinking hat...",
+  "Compiling knowledge...",
+  "Making sure the campus WiFi gods are happy...",
+  "Polishing your dashboard for maximum productivity...",
+  "The study bots are forming a study group...",
+  "Verifying that coffee levels are optimal...",
+  "Looking for that one missing semicolon...",
+  "Reassuring the database that exams will be okay..."
 ];
 
 const studyQuotes = [
@@ -32,6 +62,8 @@ export default function ServerWakeupModal({ children }) {
   const [messageIndex, setMessageIndex] = useState(0);
   const [messageVisible, setMessageVisible] = useState(true);
   const [selectedQuote, setSelectedQuote] = useState(studyQuotes[0]);
+  const [nodeProbeStatus, setNodeProbeStatus] = useState("loading");
+  const [dockerProbeStatus, setDockerProbeStatus] = useState("loading");
 
   const nodeApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const dockerBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
@@ -87,6 +119,17 @@ export default function ServerWakeupModal({ children }) {
       });
       console.log("[ServerWakeupModal] nodeReady:", nodeReady);
       console.log("[ServerWakeupModal] dockerReady:", dockerReady);
+      if (nodeReady) {
+        console.log("render-node: ok");
+      }
+      if (dockerReady) {
+        console.log("render-docker: ok");
+      }
+
+      if (!cancelled) {
+        setNodeProbeStatus(nodeReady ? "up" : "down");
+        setDockerProbeStatus(dockerReady ? "up" : "down");
+      }
 
       if (!cancelled && nodeReady && dockerReady) {
         setIsAwake(true);
@@ -119,6 +162,7 @@ export default function ServerWakeupModal({ children }) {
   }, [isWaking]);
 
   const currentMessage = useMemo(() => funStatusMessages[messageIndex], [messageIndex]);
+  const bothServicesReady = nodeProbeStatus === "up" && dockerProbeStatus === "up";
 
   if (!isWaking) return children;
 
@@ -151,6 +195,33 @@ export default function ServerWakeupModal({ children }) {
         >
           Skip
         </button>
+      </div>
+
+      <div className="fixed bottom-5 right-5 z-20 flex flex-col items-end gap-1.5 text-xs font-semibold font-mono text-slate-700">
+        <div className="flex items-center gap-2">
+          <span>Render Node</span>
+          {nodeProbeStatus === "loading" && (
+            <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 border-t-slate-700 animate-spin" />
+          )}
+          {nodeProbeStatus === "up" && <span className="text-green-600">✓</span>}
+          {nodeProbeStatus === "down" && <span className="text-red-500">•</span>}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span>Render Docker</span>
+          {dockerProbeStatus === "loading" && (
+            <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 border-t-slate-700 animate-spin" />
+          )}
+          {dockerProbeStatus === "up" && <span className="text-green-600">✓</span>}
+          {dockerProbeStatus === "down" && <span className="text-red-500">•</span>}
+        </div>
+
+        {bothServicesReady && (
+          <div className="mt-1 flex items-center gap-2 text-green-700">
+            <span>Green Light</span>
+            <span>✓</span>
+          </div>
+        )}
       </div>
     </div>
   );
