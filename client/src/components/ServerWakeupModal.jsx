@@ -53,7 +53,7 @@ const studyQuotes = [
 ];
 
 const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
-const WAKE_INTERVAL_MS = 3500;
+const WAKE_INTERVAL_MS = 5000;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
 
@@ -65,8 +65,10 @@ export default function ServerWakeupModal({ children }) {
   const [nodeProbeStatus, setNodeProbeStatus] = useState("loading");
   const [dockerProbeStatus, setDockerProbeStatus] = useState("loading");
 
-  const nodeApiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const dockerBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
+  const nodeApiBaseUrl =
+    import.meta.env.VITE_API_BASE_URL || "https://streak-api-qs2h.onrender.com/api";
+  const dockerBaseUrl =
+    import.meta.env.VITE_DOCKER_BASE_URL || "https://streak-api-docker.onrender.com";
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * studyQuotes.length);
@@ -74,28 +76,51 @@ export default function ServerWakeupModal({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!nodeApiBaseUrl || !dockerBaseUrl || isAwake) {
+    if (isAwake) {
       return;
     }
 
     let cancelled = false;
 
+    const fetchWithTimeout = async (url, options = {}, timeoutMs = 8000) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { method: "GET", signal: controller.signal, ...options });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
     const pingServers = async () => {
       if (isAwake) return;
 
-      const nodeBaseUrl = import.meta.env.VITE_API_BASE_URL;
-      const dockerServiceBaseUrl = import.meta.env.VITE_DOCKER_BASE_URL;
-      if (!nodeBaseUrl || !dockerServiceBaseUrl) return;
+      const nodeUrl = `${nodeApiBaseUrl.replace(/\/api$/, "")}/health`;
+      const dockerUrl = `${dockerBaseUrl.replace(/\/+$/, "")}/health`;
+      const shouldPingNode = nodeProbeStatus !== "up";
+      const shouldPingDocker = dockerProbeStatus !== "up";
 
-      const nodeUrl = `${nodeBaseUrl.replace(/\/api$/, "")}/health`;
-      const dockerUrl = `${dockerServiceBaseUrl.replace(/\/+$/, "")}/health`;
+      if (!shouldPingNode && !shouldPingDocker) {
+        if (!cancelled) {
+          setIsAwake(true);
+        }
+        return;
+      }
 
-      const results = await Promise.allSettled([
-        fetch(nodeUrl, { method: "GET" }),
-        fetch(dockerUrl, { method: "GET" }),
+      if (!cancelled) {
+        if (shouldPingNode) setNodeProbeStatus("loading");
+        if (shouldPingDocker) setDockerProbeStatus("loading");
+      }
+
+      const [nodeResult, dockerResult] = await Promise.allSettled([
+        shouldPingNode
+          ? fetchWithTimeout(nodeUrl)
+          : Promise.resolve({ status: 200 }),
+        shouldPingDocker
+          ? fetchWithTimeout(dockerUrl)
+          : Promise.resolve({ status: 200 }),
       ]);
 
-      const [nodeResult, dockerResult] = results;
       console.log("[ServerWakeupModal] Ping URLs:", { nodeUrl, dockerUrl });
       console.log("[ServerWakeupModal] Ping raw results:", {
         nodeResult,
@@ -143,7 +168,7 @@ export default function ServerWakeupModal({ children }) {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [nodeApiBaseUrl, dockerBaseUrl, isAwake]);
+  }, [nodeApiBaseUrl, dockerBaseUrl, isAwake, nodeProbeStatus, dockerProbeStatus]);
 
   const isWaking = !isAwake;
 
@@ -203,8 +228,8 @@ export default function ServerWakeupModal({ children }) {
           {nodeProbeStatus === "loading" && (
             <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 border-t-slate-700 animate-spin" />
           )}
-          {nodeProbeStatus === "up" && <span className="text-green-600">✓</span>}
-          {nodeProbeStatus === "down" && <span className="text-red-500">•</span>}
+          {nodeProbeStatus === "up" && <span className="text-green-600">{"\u2713"}</span>}
+          {nodeProbeStatus === "down" && <span className="text-red-500">x</span>}
         </div>
 
         <div className="flex items-center gap-2">
@@ -212,14 +237,14 @@ export default function ServerWakeupModal({ children }) {
           {dockerProbeStatus === "loading" && (
             <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 border-t-slate-700 animate-spin" />
           )}
-          {dockerProbeStatus === "up" && <span className="text-green-600">✓</span>}
-          {dockerProbeStatus === "down" && <span className="text-red-500">•</span>}
+          {dockerProbeStatus === "up" && <span className="text-green-600">{"\u2713"}</span>}
+          {dockerProbeStatus === "down" && <span className="text-red-500">x</span>}
         </div>
 
         {bothServicesReady && (
           <div className="mt-1 flex items-center gap-2 text-green-700">
             <span>Green Light</span>
-            <span>✓</span>
+            <span>{"\u2713"}</span>
           </div>
         )}
       </div>
