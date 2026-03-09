@@ -144,19 +144,6 @@ export default function AdminLayout() {
                   )}
                 </NavLink>
 
-                <NavLink to="/admin/transfer-user" className={getLinkClass}>
-                  {({ isActive }) => (
-                    <>
-                      <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                        <svg viewBox="0 0 24 24" className={getIconClass(isActive)}>
-                          <path d="m20.707 5.293-3-3a1 1 0 0 0-1.414 1.414L17.586 5H4a1 1 0 1 0 0 2h13.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.414ZM3.293 18.707l3 3a1 1 0 0 0 1.414-1.414L6.414 19H20a1 1 0 1 0 0-2H6.414l1.293-1.293a1 1 0 1 0-1.414-1.414l-3 3a1 1 0 0 0 0 1.414Z" />
-                        </svg>
-                      </div>
-                      <span className={`whitespace-nowrap transition-all duration-200 ${collapsed ? "hidden opacity-0 w-0" : "block opacity-100"}`}>Transfer User</span>
-                    </>
-                  )}
-                </NavLink>
-
                 <NavLink to="/admin/classroom-management" className={getLinkClass}>
                   {({ isActive }) => (
                     <>

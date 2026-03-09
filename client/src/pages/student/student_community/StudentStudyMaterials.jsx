@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import DocLayout from "../../../components/doccomps/doclayout";
 import { auth } from "../../../firebase/firebase";
-import { server } from "../../../main";
+import apiClient from "../../../services/apiClient";
+import { getOrFetchPageCache } from "../../../services/pageCache.service";
 
 export default function StudentStudyMaterials() {
   const [classrooms, setClassrooms] = useState([]);
@@ -14,11 +14,16 @@ export default function StudentStudyMaterials() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) return;
-        const { data } = await axios.get(`${server}/classroom/study-materials/student`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userKey = auth.currentUser?.uid || "guest";
+        const data = await getOrFetchPageCache(
+          "student:study-materials",
+          userKey,
+          async () => {
+            const response = await apiClient.get("/classroom/study-materials/student");
+            return response.data || [];
+          },
+          { ttlMs: 120_000 }
+        );
         setClassrooms(data || []);
       } catch (error) {
         console.error("Failed to fetch student study materials:", error);

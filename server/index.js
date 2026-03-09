@@ -96,7 +96,14 @@ app.use(
     },
   })
 );
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Public health check route (must stay above API rate limiter)
 app.get("/health", (_, res) => res.status(200).send("OK"));

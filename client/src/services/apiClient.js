@@ -8,6 +8,7 @@ if (!apiBaseUrl) {
 
 const apiClient = axios.create({
   baseURL: apiBaseUrl,
+  withCredentials: true,
 });
 
 apiClient.interceptors.request.use(

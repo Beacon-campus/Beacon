@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import apiClient from "../../services/apiClient";
 import toast from "react-hot-toast";
+import { auth } from "../../firebase/firebase";
+import { getOrFetchPageCache } from "../../services/pageCache.service";
 
 import UserModal from "../../components/admin/UserModal";
 
@@ -25,10 +27,19 @@ export default function UserManagement() {
         user: null,
     });
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (force = false) => {
         try {
             setLoading(true);
-            const { data } = await apiClient.get(`/admin/users`);
+            const userKey = auth.currentUser?.uid || "guest";
+            const data = await getOrFetchPageCache(
+                "admin:users",
+                userKey,
+                async () => {
+                    const response = await apiClient.get(`/admin/users`);
+                    return response.data || [];
+                },
+                { force, ttlMs: 120_000 }
+            );
             setUsers(data);
         } catch (error) {
             console.error("Failed to fetch users:", error);
@@ -285,7 +296,7 @@ export default function UserManagement() {
                 mode={modalState.mode}
                 user={modalState.user}
                 onClose={() => setModalState({ ...modalState, isOpen: false })}
-                onRefresh={fetchUsers}
+                onRefresh={() => fetchUsers(true)}
             />
 
         </div>

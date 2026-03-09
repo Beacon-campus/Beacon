@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { auth } from "../../firebase/firebase";
-import { server } from "../../main";
+import apiClient from "../../services/apiClient";
+import { getOrFetchPageCache } from "../../services/pageCache.service";
 
 const PAGE_SIZE = 20;
 
@@ -28,12 +29,10 @@ export default function ServerLogs() {
   const [total, setTotal] = useState(0);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (force = false) => {
     try {
       setLoading(true);
       setError("");
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error("Authentication required");
 
       const params = new URLSearchParams({
         page: String(page),
@@ -43,11 +42,17 @@ export default function ServerLogs() {
       if (category) params.set("category", category);
       if (status) params.set("status", status);
 
-      const res = await fetch(`${server}/admin/logs?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch logs");
-      const data = await res.json();
+      const userKey = auth.currentUser?.uid || "guest";
+      const cacheKey = `admin:logs:${params.toString()}`;
+      const data = await getOrFetchPageCache(
+        cacheKey,
+        userKey,
+        async () => {
+          const response = await apiClient.get(`/admin/logs?${params.toString()}`);
+          return response.data;
+        },
+        { force, ttlMs: 15_000 }
+      );
       setRows(data.items || []);
       setTotalPages(data.totalPages || 1);
       setTotal(data.total || 0);
@@ -68,7 +73,7 @@ export default function ServerLogs() {
       if (page !== 1) {
         setPage(1);
       } else {
-        fetchLogs();
+        fetchLogs(true);
       }
     }, 350);
     return () => clearTimeout(t);
@@ -77,7 +82,7 @@ export default function ServerLogs() {
 
   useEffect(() => {
     if (!autoRefresh) return;
-    const t = setInterval(fetchLogs, 15000);
+    const t = setInterval(() => fetchLogs(true), 15000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoRefresh, page, category, status, search]);
@@ -103,7 +108,7 @@ export default function ServerLogs() {
             {autoRefresh ? "Auto Refresh ON" : "Auto Refresh OFF"}
           </button>
           <button
-            onClick={fetchLogs}
+            onClick={() => fetchLogs(true)}
             className="px-3 py-2 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700"
           >
             Refresh

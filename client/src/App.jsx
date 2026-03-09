@@ -49,7 +49,6 @@ import AdminLayout from "./layouts/adminlayout/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import BulkUpload from "./pages/admin/BulkUpload";
-import TransferUser from "./pages/admin/TransferUser";
 import AdminCalendar from "./pages/admin/AdminCalendar";
 import ServerLogs from "./pages/admin/ServerLogs";
 import ClassroomManagement from "./pages/admin/ClassroomManagement";
@@ -167,7 +166,6 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="user-management" element={<UserManagement />} />
               <Route path="bulk-upload" element={<BulkUpload />} />
-              <Route path="transfer-user" element={<TransferUser />} />
               <Route path="classroom-management" element={<ClassroomManagement />} />
               <Route path="announcements" element={<AdminAnnouncements />} />
               <Route path="calendar" element={<AdminCalendar />} />

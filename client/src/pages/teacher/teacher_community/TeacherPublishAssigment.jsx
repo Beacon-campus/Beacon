@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
 import Modal from "../../../components/ui/Modal";
 import ImagePreviewModal from "../../../components/ui/ImagePreviewModal";
 import { useAuth } from "../../../context/AuthContext";
-import { auth } from "../../../firebase/firebase";
-import { server } from "../../../main";
+import apiClient from "../../../services/apiClient";
+import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import socket from "../../../services/socket.service";
 import { exportRowsToXlsx } from "../../../utils/excelExport";
 
@@ -116,12 +115,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
 
     setIsSubmitting(true);
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) throw new Error("Not authenticated");
-
-      await axios.post(`${server}/assignments`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await apiClient.post("/assignments", payload);
 
       toast.success("Assignment published.");
       onPublished?.();
@@ -321,6 +315,7 @@ export default function TeacherPublishAssignment() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useAuth();
+  const userCacheKey = currentUser?.uid || "guest";
 
   const initialOpenAssignmentId = location.state?.openAssignmentId || null;
 
@@ -377,12 +372,15 @@ export default function TeacherPublishAssignment() {
 
     const loadMyClassrooms = async () => {
       try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) return;
-
-        const { data } = await axios.get(`${server}/assignments/my-classrooms`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const data = await getOrFetchPageCache(
+          "teacher:assignments:my-classrooms",
+          userCacheKey,
+          async () => {
+            const response = await apiClient.get("/assignments/my-classrooms");
+            return response.data || [];
+          },
+          { ttlMs: 120_000 }
+        );
 
         if (cancelled) return;
 
@@ -409,7 +407,7 @@ export default function TeacherPublishAssignment() {
     return () => {
       cancelled = true;
     };
-  }, [currentUser]);
+  }, [currentUser, userCacheKey]);
 
   useEffect(() => {
     if (!classroomId) {
@@ -443,18 +441,19 @@ export default function TeacherPublishAssignment() {
     }
   };
 
-  const fetchAssignmentsForClass = async (classId) => {
+  const fetchAssignmentsForClass = async (classId, force = false) => {
     if (!classId) {
       setClassAssignments([]);
       return;
     }
     try {
       setLoadingAssignments(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      const { data } = await axios.get(`${server}/assignments/class/${classId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const data = await getOrFetchPageCache(
+        `teacher:assignments:class:${classId}`,
+        userCacheKey,
+        async () => (await apiClient.get(`/assignments/class/${classId}`)).data || [],
+        { ttlMs: 120_000, force }
+      );
       setClassAssignments(data || []);
 
       setSelectedAssignment((prev) => {
@@ -495,7 +494,7 @@ export default function TeacherPublishAssignment() {
     }
   }, [selectedClass?.id]);
 
-  const fetchSubmissionsForAssignment = async (assignmentId) => {
+  const fetchSubmissionsForAssignment = async (assignmentId, force = false) => {
     if (!assignmentId) {
       setSubmissions([]);
       setGradeDrafts({});
@@ -503,11 +502,12 @@ export default function TeacherPublishAssignment() {
     }
     try {
       setLoadingSubmissions(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      const { data } = await axios.get(`${server}/assignments/${assignmentId}/submissions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const data = await getOrFetchPageCache(
+        `teacher:assignments:submissions:${assignmentId}`,
+        userCacheKey,
+        async () => (await apiClient.get(`/assignments/${assignmentId}/submissions`)).data || [],
+        { ttlMs: 60_000, force }
+      );
       const rows = data || [];
       setSubmissions(rows);
       const drafts = {};
@@ -538,18 +538,19 @@ export default function TeacherPublishAssignment() {
     fetchDoubtsForAssignment(selectedAssignment._id);
   }, [selectedAssignment?._id]);
 
-  const fetchDoubtsForAssignment = async (assignmentId) => {
+  const fetchDoubtsForAssignment = async (assignmentId, force = false) => {
     if (!assignmentId) {
       setAssignmentDoubts([]);
       return;
     }
     try {
       setLoadingDoubts(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      const { data } = await axios.get(`${server}/assignments/${assignmentId}/doubts/teacher`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const data = await getOrFetchPageCache(
+        `teacher:assignments:doubts:${assignmentId}`,
+        userCacheKey,
+        async () => (await apiClient.get(`/assignments/${assignmentId}/doubts/teacher`)).data || [],
+        { ttlMs: 60_000, force }
+      );
       setAssignmentDoubts(data || []);
     } catch (error) {
       console.error("Failed to fetch assignment doubts", error);
@@ -590,20 +591,16 @@ export default function TeacherPublishAssignment() {
 
     try {
       setSendingReply(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-
       const targetDoubtId = replyMode === "broadcast" && !selectedDoubtId ? "broadcast" : selectedDoubtId;
 
-      await axios.post(
-        `${server}/assignments/${selectedAssignment._id}/doubts/${targetDoubtId}/reply`,
+      await apiClient.post(
+        `/assignments/${selectedAssignment._id}/doubts/${targetDoubtId}/reply`,
         { text: replyText.trim(), mode: replyMode },
-        { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(replyMode === "broadcast" ? "Broadcast reply sent." : "Private reply sent.");
       setReplyText("");
       setSelectedDoubtId(null);
-      fetchDoubtsForAssignment(selectedAssignment._id);
+      fetchDoubtsForAssignment(selectedAssignment._id, true);
     } catch (error) {
       toast.error(error?.response?.data?.error || "Failed to send reply");
     } finally {
@@ -630,13 +627,9 @@ export default function TeacherPublishAssignment() {
     }
     try {
       setSavingGradeId(studentId);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      await axios.patch(
-        `${server}/assignments/${selectedAssignment._id}/submissions/${studentId}`,
-        { score: Number(score) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await apiClient.patch(`/assignments/${selectedAssignment._id}/submissions/${studentId}`, {
+        score: Number(score),
+      });
       toast.success("Grade saved.");
       setSubmissions((prev) =>
         prev.map((row) => (row.studentId === studentId ? { ...row, score: Number(score) } : row))
@@ -1232,7 +1225,7 @@ export default function TeacherPublishAssignment() {
             classroomId={selectedClass?.id || classroomId}
             onClose={() => setShowPublishModal(false)}
             onPublished={() => {
-              if (selectedClass?.id) fetchAssignmentsForClass(selectedClass.id);
+              if (selectedClass?.id) fetchAssignmentsForClass(selectedClass.id, true);
               setShowPublishModal(false);
             }}
           />

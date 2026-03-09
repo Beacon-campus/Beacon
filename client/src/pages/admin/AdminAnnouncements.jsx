@@ -50,10 +50,10 @@ export default function AdminAnnouncements() {
     return { total, withFiles, imagePosts };
   }, [announcements]);
 
-  const loadAnnouncements = async (silent = false) => {
+  const loadAnnouncements = async (silent = false, force = false) => {
     try {
       if (!silent) setLoading(true);
-      const data = await fetchRecentUniversityAnnouncements(50);
+      const data = await fetchRecentUniversityAnnouncements(50, { force });
       setAnnouncements(data || []);
     } catch (error) {
       console.error(error);
@@ -127,7 +127,7 @@ export default function AdminAnnouncements() {
               <p className="text-sm text-slate-200 mt-2">Create campus-wide updates, share files, and keep students and teachers in sync.</p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => loadAnnouncements(false)} className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-sm font-bold">
+              <button onClick={() => loadAnnouncements(false, true)} className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-sm font-bold">
                 Refresh
               </button>
             </div>

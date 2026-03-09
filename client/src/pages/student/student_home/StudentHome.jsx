@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { auth } from "../../../firebase/firebase";
 import { useHomeData } from "../../../context/HomeDataContext";
 import { useNavigate } from "react-router-dom";
 import socket from "../../../services/socket.service";
+import apiClient from "../../../services/apiClient";
+import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import WelcomeCard from "../../../components/shared/home_widgets/WelcomeCard";
 import EventWidget from "../../../components/shared/home_widgets/EventWidget";
 import NotificationsWidget from "../../../components/shared/home_widgets/NotificationsWidget";
@@ -59,6 +60,7 @@ export default function StudentHome() {
 
     // Todo Animation State
     const [animatingIds, setAnimatingIds] = useState([]);
+    const userCacheKey = user?.uid || "guest";
 
     const homeNotifications = useMemo(() => {
         const pendingFriendCount = user?.friendRequests?.received?.length || 0;
@@ -156,34 +158,16 @@ export default function StudentHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
-            // Check localStorage first
-            const storedQuote = localStorage.getItem("userQuote");
-            if (storedQuote) {
-                try {
-                    setQuote(JSON.parse(storedQuote));
-                    return; // Skip fetch if found
-                } catch (e) {
-                    console.error("Error parsing stored quote", e);
-                    localStorage.removeItem("userQuote");
-                }
-            }
-
             try {
-                const token = await auth.currentUser?.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/quotes/random`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setQuote(data);
-                    // Save to localStorage
-                    localStorage.setItem("userQuote", JSON.stringify(data));
-                } else {
-                    setQuote({
-                        text: "The beautiful thing about learning is that no one can take it away from you.",
-                        author: "B.B. King"
-                    });
-                }
+                const data = await getOrFetchPageCache(
+                    "student:home:quote",
+                    userCacheKey,
+                    async () => {
+                        const response = await apiClient.get("/quotes/random");
+                        return response.data;
+                    }
+                );
+                setQuote(data);
             } catch (err) {
                 console.error("Failed to fetch quote:", err);
                 setQuote({
@@ -193,25 +177,26 @@ export default function StudentHome() {
             }
         };
         fetchQuote();
-    }, []);
+    }, [userCacheKey]);
 
     // 2. Fetch Upcoming Event
     useEffect(() => {
         const fetchNextEvent = async () => {
-            if (!user || !auth.currentUser) return;
+            if (!user) return;
             try {
-                const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/calendar/current`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.upcomingEvents && data.upcomingEvents.length > 0) {
-                        setNextEvent(data.upcomingEvents[0]);
-                    } else {
-                        setNextEvent(null);
-                    }
+                const data = await getOrFetchPageCache(
+                    "student:home:calendar-current",
+                    userCacheKey,
+                    async () => {
+                        const response = await apiClient.get("/calendar/current");
+                        return response.data;
+                    },
+                    { ttlMs: 60_000 }
+                );
+                if (data?.upcomingEvents?.length > 0) {
+                    setNextEvent(data.upcomingEvents[0]);
+                } else {
+                    setNextEvent(null);
                 }
             } catch (err) {
                 console.error("Failed to fetch event:", err);
@@ -220,7 +205,7 @@ export default function StudentHome() {
             }
         };
         fetchNextEvent();
-    }, [user]);
+    }, [user, userCacheKey]);
 
     useEffect(() => {
         const onNewAnnouncement = (item) => {
@@ -240,7 +225,7 @@ export default function StudentHome() {
 
     useEffect(() => {
         const onNewNotification = async () => {
-            if (!user || !auth.currentUser) return;
+            if (!user) return;
             try {
                 await fetchNotifications(true, 8);
             } catch {

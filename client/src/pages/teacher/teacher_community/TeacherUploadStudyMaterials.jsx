@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import DocLayout from "../../../components/doccomps/doclayout";
 import { auth } from "../../../firebase/firebase";
-import { server } from "../../../main";
+import apiClient from "../../../services/apiClient";
+import { getOrFetchPageCache, setPageCache } from "../../../services/pageCache.service";
 import { uploadAttachment } from "../../../utils/attachmentUpload";
 
 export default function TeacherUploadStudyMaterials() {
@@ -16,11 +16,16 @@ export default function TeacherUploadStudyMaterials() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) return;
-        const { data } = await axios.get(`${server}/classroom/study-materials/teacher`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userKey = auth.currentUser?.uid || "guest";
+        const data = await getOrFetchPageCache(
+          "teacher:study-materials",
+          userKey,
+          async () => {
+            const response = await apiClient.get("/classroom/study-materials/teacher");
+            return response.data || [];
+          },
+          { ttlMs: 120_000 }
+        );
         setClassrooms(data || []);
       } catch (error) {
         console.error("Failed to fetch teacher study materials:", error);
@@ -47,8 +52,6 @@ export default function TeacherUploadStudyMaterials() {
     if (!selectedClassroom || !subject) return;
     try {
       setUploading(true);
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
 
       const uploaded = await uploadAttachment(file, "study_material");
       const payload = {
@@ -66,16 +69,15 @@ export default function TeacherUploadStudyMaterials() {
         size: uploaded.size || file.size || 0,
       };
 
-      const { data } = await axios.post(
-        `${server}/classroom/study-materials/${selectedClassroom._id}/subjects/${subject._id}/uploads`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const { data } = await apiClient.post(
+        `/classroom/study-materials/${selectedClassroom._id}/subjects/${subject._id}/uploads`,
+        payload
       );
 
       const createdUpload = data?.upload;
       if (createdUpload) {
-        setClassrooms((prev) =>
-          prev.map((cls) =>
+        setClassrooms((prev) => {
+          const next = prev.map((cls) =>
             cls._id !== selectedClassroom._id
               ? cls
               : {
@@ -86,8 +88,10 @@ export default function TeacherUploadStudyMaterials() {
                       : { ...sub, uploads: [...(sub.uploads || []), createdUpload] }
                   ),
                 }
-          )
-        );
+          );
+          setPageCache("teacher:study-materials", auth.currentUser?.uid || "guest", next, 120_000);
+          return next;
+        });
       }
 
       toast.success("Material uploaded");
@@ -103,17 +107,13 @@ export default function TeacherUploadStudyMaterials() {
   const handleRenameUpload = async (file, newName) => {
     if (!selectedClassroom || !selectedSubject) return;
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-
-      await axios.patch(
-        `${server}/classroom/study-materials/${selectedClassroom._id}/subjects/${selectedSubject._id}/uploads/${file._id}`,
-        { name: newName },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await apiClient.patch(
+        `/classroom/study-materials/${selectedClassroom._id}/subjects/${selectedSubject._id}/uploads/${file._id}`,
+        { name: newName }
       );
 
-      setClassrooms((prev) =>
-        prev.map((cls) =>
+      setClassrooms((prev) => {
+        const next = prev.map((cls) =>
           cls._id !== selectedClassroom._id
             ? cls
             : {
@@ -129,8 +129,10 @@ export default function TeacherUploadStudyMaterials() {
                       }
                 ),
               }
-        )
-      );
+        );
+        setPageCache("teacher:study-materials", auth.currentUser?.uid || "guest", next, 120_000);
+        return next;
+      });
       toast.success("Display name updated");
     } catch (error) {
       console.error("Rename upload failed:", error);
@@ -142,16 +144,12 @@ export default function TeacherUploadStudyMaterials() {
   const handleDeleteUpload = async (file) => {
     if (!selectedClassroom || !selectedSubject) return;
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-
-      await axios.delete(
-        `${server}/classroom/study-materials/${selectedClassroom._id}/subjects/${selectedSubject._id}/uploads/${file._id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      await apiClient.delete(
+        `/classroom/study-materials/${selectedClassroom._id}/subjects/${selectedSubject._id}/uploads/${file._id}`
       );
 
-      setClassrooms((prev) =>
-        prev.map((cls) =>
+      setClassrooms((prev) => {
+        const next = prev.map((cls) =>
           cls._id !== selectedClassroom._id
             ? cls
             : {
@@ -165,8 +163,10 @@ export default function TeacherUploadStudyMaterials() {
                       }
                 ),
               }
-        )
-      );
+        );
+        setPageCache("teacher:study-materials", auth.currentUser?.uid || "guest", next, 120_000);
+        return next;
+      });
       toast.success("Material deleted");
     } catch (error) {
       console.error("Delete upload failed:", error);

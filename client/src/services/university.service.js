@@ -1,36 +1,48 @@
-import axios from "axios";
+import apiClient from "./apiClient";
+import { clearPageCacheByPrefix, getOrFetchPageCache } from "./pageCache.service";
 import { auth } from "../firebase/firebase";
-import { server } from "../main";
 
-async function getAuthHeaders() {
-  const token = await auth.currentUser?.getIdToken();
-  return { Authorization: `Bearer ${token}` };
+function getUserKey() {
+  return auth.currentUser?.uid || "guest";
 }
 
-export async function fetchRecentUniversityAnnouncements(limit = 8) {
-  const headers = await getAuthHeaders();
-  const { data } = await axios.get(`${server}/university/announcements/recent?limit=${limit}`, { headers });
-  return data;
+export async function fetchRecentUniversityAnnouncements(limit = 8, options = {}) {
+  const { force = false } = options;
+  const userKey = getUserKey();
+  return getOrFetchPageCache(
+    `university:recent:${limit}`,
+    userKey,
+    async () => {
+      const { data } = await apiClient.get(`/university/announcements/recent?limit=${limit}`);
+      return data;
+    },
+    { ttlMs: 60_000, force }
+  );
 }
 
 export async function createUniversityAnnouncement({ message, attachment, isPinned = false }) {
-  const headers = await getAuthHeaders();
-  const { data } = await axios.post(
-    `${server}/university/announcements`,
-    { message, attachment, isPinned },
-    { headers }
-  );
+  const userKey = getUserKey();
+  const { data } = await apiClient.post("/university/announcements", { message, attachment, isPinned });
+  clearPageCacheByPrefix("university:recent:", userKey);
+  clearPageCacheByPrefix("home:announcements:", userKey);
   return data;
 }
 
-export async function fetchAdminDashboardOverview() {
-  const headers = await getAuthHeaders();
-  const { data } = await axios.get(`${server}/admin/dashboard/overview`, { headers });
-  return data;
+export async function fetchAdminDashboardOverview(options = {}) {
+  const { force = false } = options;
+  const userKey = getUserKey();
+  return getOrFetchPageCache(
+    "admin:dashboard:overview",
+    userKey,
+    async () => {
+      const { data } = await apiClient.get("/admin/dashboard/overview");
+      return data;
+    },
+    { ttlMs: 30_000, force }
+  );
 }
 
 export async function fetchAdminDashboardTimeline(limit = 60) {
-  const headers = await getAuthHeaders();
-  const { data } = await axios.get(`${server}/admin/dashboard/timeline?limit=${limit}`, { headers });
+  const { data } = await apiClient.get(`/admin/dashboard/timeline?limit=${limit}`);
   return data?.points || [];
 }

@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import { auth } from "../../../firebase/firebase";
-import { server } from "../../../main";
+import apiClient from "../../../services/apiClient";
 import { useAuth } from "../../../context/AuthContext";
 
 export default function QuizActive() {
@@ -25,13 +24,7 @@ export default function QuizActive() {
     if (hasFlaggedCheatRef.current) return;
     hasFlaggedCheatRef.current = true;
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      await axios.post(
-        `${server}/assignments/${assignmentId}/flag-cheat`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await apiClient.post(`/assignments/${assignmentId}/flag-cheat`, {});
     } catch (error) {
       console.error("Failed to record cheat flag", error);
     }
@@ -55,12 +48,7 @@ export default function QuizActive() {
 
     const fetchDetails = async () => {
       try {
-        const token = await auth.currentUser?.getIdToken();
-        if (!token) return;
-
-        const res = await axios.get(`${server}/assignments/${assignmentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiClient.get(`/assignments/${assignmentId}`);
         const assignmentData = res.data;
         setAssignment(assignmentData);
 
@@ -72,9 +60,7 @@ export default function QuizActive() {
 
         setTimeRemaining(assignmentData?.duration ? assignmentData.duration * 60 : 600);
 
-        const subRes = await axios.get(`${server}/assignments/my-submissions`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const subRes = await apiClient.get("/assignments/my-submissions");
         if (Array.isArray(subRes.data) && subRes.data.includes(assignmentId)) {
           setSubmitted(true);
         }
@@ -148,13 +134,7 @@ export default function QuizActive() {
         await document.documentElement.msRequestFullscreen();
       }
 
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-      await axios.post(
-        `${server}/assignments/${assignmentId}/start`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await apiClient.post(`/assignments/${assignmentId}/start`, {});
 
       sessionStorage.setItem(`quiz_active_${assignmentId}`, "true");
       setStarted(true);
@@ -169,19 +149,15 @@ export default function QuizActive() {
     setSubmitting(true);
 
     try {
-      const token = await auth.currentUser?.getIdToken();
-      if (!token) return;
-
-      await axios.post(
-        `${server}/assignments/${assignmentId}/submit-quiz`,
+      await apiClient.post(
+        `/assignments/${assignmentId}/submit-quiz`,
         {
           assignmentId,
           answers,
           isCheated: false,
           submittedAt: new Date(),
           autoSubmit: auto,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
 
       sessionStorage.removeItem(`quiz_active_${assignmentId}`);

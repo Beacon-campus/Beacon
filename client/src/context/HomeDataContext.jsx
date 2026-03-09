@@ -15,6 +15,10 @@ import {
   deleteNoteApi,
 } from "../services/note.service";
 import { fetchRecentUniversityAnnouncements } from "../services/university.service";
+import {
+  getOrFetchPageCache,
+  setPageCache,
+} from "../services/pageCache.service";
 
 const HomeDataContext = createContext(null);
 
@@ -32,6 +36,7 @@ const normalizeNotificationType = (rawType = "") => {
 
 export function HomeDataProvider({ children }) {
   const { user } = useAuth();
+  const userCacheKey = user?.uid || "guest";
   const [todos, setTodos] = useState([]);
   const [notes, setNotes] = useState([]);
   const [universityAnnouncements, setUniversityAnnouncements] = useState([]);
@@ -56,7 +61,12 @@ export function HomeDataProvider({ children }) {
 
       setTodoLoading(true);
       try {
-        const data = await fetchTodosApi();
+        const data = await getOrFetchPageCache(
+          "home:todos",
+          userCacheKey,
+          fetchTodosApi,
+          { force }
+        );
         const mapped = (data || []).map((t) => ({ ...t, id: t._id }));
         setTodos(mapped);
         return mapped;
@@ -64,7 +74,7 @@ export function HomeDataProvider({ children }) {
         setTodoLoading(false);
       }
     },
-    [user, todos]
+    [user, todos, userCacheKey]
   );
 
   const fetchNotes = useCallback(
@@ -74,7 +84,12 @@ export function HomeDataProvider({ children }) {
 
       setNoteLoading(true);
       try {
-        const data = await fetchNotesApi();
+        const data = await getOrFetchPageCache(
+          "home:notes",
+          userCacheKey,
+          fetchNotesApi,
+          { force }
+        );
         const mapped = (data || []).map((n) => ({ ...n, id: n._id }));
         setNotes(mapped);
         return mapped;
@@ -82,7 +97,7 @@ export function HomeDataProvider({ children }) {
         setNoteLoading(false);
       }
     },
-    [user, notes]
+    [user, notes, userCacheKey]
   );
 
   const fetchUniversityAnnouncements = useCallback(
@@ -90,7 +105,12 @@ export function HomeDataProvider({ children }) {
       if (!user) return [];
       if (!force && universityAnnouncements.length > 0) return universityAnnouncements;
 
-      const data = await fetchRecentUniversityAnnouncements(limit);
+      const data = await getOrFetchPageCache(
+        `home:announcements:${limit}`,
+        userCacheKey,
+        () => fetchRecentUniversityAnnouncements(limit),
+        { force, ttlMs: 60_000 }
+      );
       const normalized = (data || []).map((item) => ({
         ...item,
         text: item.message,
@@ -99,7 +119,7 @@ export function HomeDataProvider({ children }) {
       setUniversityAnnouncements(normalized);
       return normalized;
     },
-    [user, universityAnnouncements]
+    [user, universityAnnouncements, userCacheKey]
   );
 
   const fetchNotifications = useCallback(
@@ -107,7 +127,15 @@ export function HomeDataProvider({ children }) {
       if (!user) return [];
       if (!force && notifications.length > 0) return notifications;
 
-      const { data } = await apiClient.get("/notifications");
+      const data = await getOrFetchPageCache(
+        `home:notifications:${limit}`,
+        userCacheKey,
+        async () => {
+          const response = await apiClient.get("/notifications");
+          return response.data || [];
+        },
+        { force, ttlMs: 60_000 }
+      );
       const latest = (data || [])
         .sort(
           (a, b) =>
@@ -126,7 +154,7 @@ export function HomeDataProvider({ children }) {
       setNotifications(latest);
       return latest;
     },
-    [user, notifications]
+    [user, notifications, userCacheKey]
   );
 
   const fetchAllHomeData = useCallback(
@@ -171,17 +199,23 @@ export function HomeDataProvider({ children }) {
   const addTodo = useCallback(async (todoData) => {
     const newTodo = await createTodo(todoData);
     const mapped = { ...newTodo, id: newTodo._id };
-    setTodos((prev) => [mapped, ...prev]);
+    setTodos((prev) => {
+      const next = [mapped, ...prev];
+      setPageCache("home:todos", userCacheKey, next);
+      return next;
+    });
     return mapped;
-  }, []);
+  }, [userCacheKey]);
 
   const updateTodo = useCallback(async (id, updates) => {
     const updated = await updateTodoApi(id, updates);
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updated, id: updated._id } : t))
-    );
+    setTodos((prev) => {
+      const next = prev.map((t) => (t.id === id ? { ...t, ...updated, id: updated._id } : t));
+      setPageCache("home:todos", userCacheKey, next);
+      return next;
+    });
     return updated;
-  }, []);
+  }, [userCacheKey]);
 
   const toggleTodoComplete = useCallback(
     async (id, currentStatus) => {
@@ -201,26 +235,42 @@ export function HomeDataProvider({ children }) {
 
   const deleteTodo = useCallback(async (id) => {
     await deleteTodoApi(id);
-    setTodos((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+    setTodos((prev) => {
+      const next = prev.filter((t) => t.id !== id);
+      setPageCache("home:todos", userCacheKey, next);
+      return next;
+    });
+  }, [userCacheKey]);
 
   const addNote = useCallback(async (noteData) => {
     const newNote = await createNote(noteData);
     const mapped = { ...newNote, id: newNote._id };
-    setNotes((prev) => [mapped, ...prev]);
+    setNotes((prev) => {
+      const next = [mapped, ...prev];
+      setPageCache("home:notes", userCacheKey, next);
+      return next;
+    });
     toast.success("Note added");
     return mapped;
-  }, []);
+  }, [userCacheKey]);
 
   const updateNote = useCallback(async (id, updates) => {
-    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...updates } : n)));
+    setNotes((prev) => {
+      const next = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
+      setPageCache("home:notes", userCacheKey, next);
+      return next;
+    });
     await updateNoteApi(id, updates);
-  }, []);
+  }, [userCacheKey]);
 
   const deleteNote = useCallback(
     async (id) => {
       const oldNotes = [...notes];
-      setNotes((prev) => prev.filter((n) => n.id !== id));
+      setNotes((prev) => {
+        const next = prev.filter((n) => n.id !== id);
+        setPageCache("home:notes", userCacheKey, next);
+        return next;
+      });
       try {
         await deleteNoteApi(id);
         toast.success("Note deleted");
@@ -229,7 +279,7 @@ export function HomeDataProvider({ children }) {
         throw error;
       }
     },
-    [notes]
+    [notes, userCacheKey]
   );
 
   const value = useMemo(

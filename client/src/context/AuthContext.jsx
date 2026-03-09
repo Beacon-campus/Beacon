@@ -2,7 +2,9 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
-import { server } from "../main";
+import apiClient from "../services/apiClient";
+import { clearAllPageCache } from "../services/pageCache.service";
+import { prefetchSessionPageCaches } from "../services/sessionPrefetch.service";
 
 const AuthContext = createContext(null);
 
@@ -25,20 +27,11 @@ export function AuthProvider({ children }) {
         await wait(200);
       }
 
-      const token = await firebaseUser.getIdToken();
-      const response = await fetch(`${server}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        // Debug log to ensure we got data
-        console.log("✅ Mongo Profile Fetched:", data);
-        return data;
-      }
-      console.error("❌ Mongo Fetch Failed:", response.status);
-      return null;
+      const { data } = await apiClient.get("/me");
+      console.log("Mongo Profile Fetched:", data);
+      return data;
     } catch (error) {
-      console.error("❌ Mongo Network Error:", error);
+      console.error("Mongo profile fetch failed:", error);
       return null;
     }
   };
@@ -47,6 +40,7 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       try {
         if (!fbUser) {
+          clearAllPageCache();
           setUser(null);
           setLoading(false);
           return;
@@ -79,11 +73,7 @@ export function AuthProvider({ children }) {
             // Sync MongoDB
           try {
             await wait(200);
-            const token = await fbUser.getIdToken();
-            await fetch(`${server}/sync-email`, {
-              method: "PUT",
-                headers: { Authorization: `Bearer ${token}` }
-              });
+            await apiClient.put("/sync-email");
               console.log("✅ MongoDB email sync triggered");
             } catch (err) {
               console.error("❌ MongoDB sync failed:", err);
@@ -125,6 +115,12 @@ export function AuthProvider({ children }) {
           ...mongoData,
           ...firestoreFlags,
         });
+
+        // Warm per-session page caches right after login.
+        prefetchSessionPageCaches({
+          uid: fbUser.uid,
+          role: firestoreFlags.role || mongoData?.role || "student",
+        }).catch(() => {});
       } catch (err) {
         console.error("AuthContext error:", err);
         setUser(null);
@@ -163,11 +159,7 @@ export function AuthProvider({ children }) {
           // Sync MongoDB
           try {
             await wait(200);
-            const token = await auth.currentUser.getIdToken();
-            await fetch(`${server}/sync-email`, {
-              method: "PUT",
-              headers: { Authorization: `Bearer ${token}` }
-            });
+            await apiClient.put("/sync-email");
             console.log("✅ MongoDB email sync triggered");
           } catch (err) {
             console.error("❌ MongoDB sync failed:", err);
@@ -206,3 +198,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

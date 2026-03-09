@@ -1,15 +1,12 @@
-import { auth } from "../firebase/firebase";
-import { server } from "../main";
+import apiClient from "./apiClient";
+import { clearAllPageCache } from "./pageCache.service";
 
 export async function notifyServerLogout() {
   try {
-    const token = await auth.currentUser?.getIdToken?.();
-    if (!token) return;
-    await fetch(`${server}/logout`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await apiClient.post("/logout");
   } catch {
     // Ignore logout logging failures on client side.
+  } finally {
+    clearAllPageCache();
   }
 }

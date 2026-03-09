@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import apiClient from "../../services/apiClient";
 import toast from "react-hot-toast";
+import { auth } from "../../firebase/firebase";
+import { getOrFetchPageCache } from "../../services/pageCache.service";
 
 export default function ClassroomManagement() {
     const [classrooms, setClassrooms] = useState([]);
@@ -33,17 +35,28 @@ export default function ClassroomManagement() {
     const [subjectModal, setSubjectModal] = useState({ isOpen: false, classroomId: null, code: '', name: '' });
     const [teacherModal, setTeacherModal] = useState({ isOpen: false, classroomId: null, subjectId: null, selectedTeacherIds: [] });
 
-    const fetchData = async () => {
+    const fetchData = async (force = false) => {
         try {
             setLoading(true);
+            const userKey = auth.currentUser?.uid || "guest";
 
-            const [clsRes, usersRes] = await Promise.all([
-                apiClient.get(`/admin/classrooms`),
-                apiClient.get(`/admin/users`)
+            const [classroomsData, usersData] = await Promise.all([
+                getOrFetchPageCache(
+                    "admin:classrooms",
+                    userKey,
+                    async () => (await apiClient.get(`/admin/classrooms`)).data || [],
+                    { force, ttlMs: 120_000 }
+                ),
+                getOrFetchPageCache(
+                    "admin:users",
+                    userKey,
+                    async () => (await apiClient.get(`/admin/users`)).data || [],
+                    { force, ttlMs: 120_000 }
+                )
             ]);
 
-            setClassrooms(clsRes.data);
-            setTeachers(usersRes.data.filter(u => u.role === "teacher"));
+            setClassrooms(classroomsData);
+            setTeachers(usersData.filter(u => u.role === "teacher"));
         } catch (error) {
             console.error("Failed to fetch data:", error);
             toast.error("Failed to load dashboard data");
@@ -111,7 +124,7 @@ export default function ClassroomManagement() {
         try {
             await apiClient.post(`/admin/classrooms/bulk`, { course: formData.course });
             toast.success("Network mapped completely!");
-            fetchData();
+            fetchData(true);
             setIsAddModalOpen(false);
             setFormData({ name: "", course: "", semester: 1, shift: "Morning" });
         } catch (error) {
@@ -131,7 +144,7 @@ export default function ClassroomManagement() {
             if (classrooms.find(c => c._id === expandedClassroom)?.course === courseName) {
                 setExpandedClassroom(null);
             }
-            fetchData();
+            fetchData(true);
         } catch (error) {
             toast.error(error.response?.data?.error || "Failed to delete course network.");
         }
@@ -143,7 +156,7 @@ export default function ClassroomManagement() {
         try {
             await apiClient.post(`/admin/classrooms`, formData);
             toast.success("Classroom generated!");
-            fetchData();
+            fetchData(true);
             setIsAddSingleModalOpen(false);
             // Reset to defaults but keep the course context if they want to add another
             setFormData(prev => ({ name: "", course: prev.course, semester: 1, shift: "Morning" }));
@@ -161,7 +174,7 @@ export default function ClassroomManagement() {
             await apiClient.delete(`/admin/classrooms/${id}`);
             toast.success("Classroom demolished.");
             if (expandedClassroom === id) setExpandedClassroom(null);
-            fetchData();
+            fetchData(true);
         } catch (error) {
             toast.error(error.response?.data?.error || "Failed to delete classroom.");
         }
@@ -176,7 +189,7 @@ export default function ClassroomManagement() {
             );
             toast.success("Subject added!");
             setSubjectModal({ isOpen: false, classroomId: null, code: '', name: '' });
-            fetchData();
+            fetchData(true);
         } catch (err) {
             toast.error(err.response?.data?.error || "Failed to add subject");
         } finally {
@@ -193,7 +206,7 @@ export default function ClassroomManagement() {
             );
             toast.success("Teachers assigned to subject!");
             setTeacherModal({ isOpen: false, classroomId: null, subjectId: null, selectedTeacherIds: [] });
-            fetchData();
+            fetchData(true);
         } catch (err) {
             toast.error(err.response?.data?.error || "Failed to assign teachers");
         } finally {

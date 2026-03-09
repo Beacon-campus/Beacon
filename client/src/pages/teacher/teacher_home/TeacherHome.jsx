@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { auth } from "../../../firebase/firebase";
 import { useHomeData } from "../../../context/HomeDataContext";
 import { useNavigate } from "react-router-dom";
 import socket from "../../../services/socket.service";
+import apiClient from "../../../services/apiClient";
+import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import WelcomeCard from "../../../components/shared/home_widgets/WelcomeCard";
 import EventWidget from "../../../components/shared/home_widgets/EventWidget";
 import NotificationsWidget from "../../../components/shared/home_widgets/NotificationsWidget";
@@ -36,6 +37,7 @@ const getTodoDateInfo = (dateStr) => {
 
 export default function TeacherHome() {
     const { user } = useAuth();
+    const userCacheKey = user?.uid || "guest";
     const navigate = useNavigate();
     const [quote, setQuote] = useState({ text: "Loading inspiration...", author: "" });
     const {
@@ -141,33 +143,16 @@ export default function TeacherHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
-            // Check localStorage first
-            const storedQuote = localStorage.getItem("userQuote");
-            if (storedQuote) {
-                try {
-                    setQuote(JSON.parse(storedQuote));
-                    return;
-                } catch {
-                    localStorage.removeItem("userQuote");
-                }
-            }
-
             try {
-                const token = await auth.currentUser?.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/quotes/random`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    setQuote(data);
-                    localStorage.setItem("userQuote", JSON.stringify(data));
-                } else {
-                    setQuote({
-                        text: "The art of teaching is the art of assisting discovery.",
-                        author: "Mark Van Doren"
-                    });
-                }
+                const data = await getOrFetchPageCache(
+                    "teacher:home:quote",
+                    userCacheKey,
+                    async () => {
+                        const response = await apiClient.get("/quotes/random");
+                        return response.data;
+                    }
+                );
+                setQuote(data);
             } catch (err) {
                 console.error("Failed to fetch quote:", err);
                 setQuote({
@@ -177,25 +162,26 @@ export default function TeacherHome() {
             }
         };
         fetchQuote();
-    }, []);
+    }, [userCacheKey]);
 
     // 2. Fetch Upcoming Event (Same logic as Student)
     useEffect(() => {
         const fetchNextEvent = async () => {
-            if (!user || !auth.currentUser) return;
+            if (!user) return;
             try {
-                const token = await auth.currentUser.getIdToken();
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/calendar/current`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.upcomingEvents && data.upcomingEvents.length > 0) {
-                        setNextEvent(data.upcomingEvents[0]);
-                    } else {
-                        setNextEvent(null);
-                    }
+                const data = await getOrFetchPageCache(
+                    "teacher:home:calendar-current",
+                    userCacheKey,
+                    async () => {
+                        const response = await apiClient.get("/calendar/current");
+                        return response.data;
+                    },
+                    { ttlMs: 60_000 }
+                );
+                if (data?.upcomingEvents?.length > 0) {
+                    setNextEvent(data.upcomingEvents[0]);
+                } else {
+                    setNextEvent(null);
                 }
             } catch (err) {
                 console.error("Failed to fetch event:", err);
@@ -204,7 +190,7 @@ export default function TeacherHome() {
             }
         };
         fetchNextEvent();
-    }, [user]);
+    }, [user, userCacheKey]);
 
     useEffect(() => {
         const onNewAnnouncement = (item) => {
@@ -224,7 +210,7 @@ export default function TeacherHome() {
 
     useEffect(() => {
         const onNewNotification = async () => {
-            if (!user || !auth.currentUser) return;
+            if (!user) return;
             try {
                 await fetchNotifications(true, 8);
             } catch {

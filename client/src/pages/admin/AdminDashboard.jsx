@@ -134,11 +134,11 @@ export default function AdminDashboard() {
   const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async (silent = false) => {
+  const refresh = async (silent = false, force = false) => {
     try {
       if (!silent) setLoading(true);
       const [overviewData, points] = await Promise.all([
-        fetchAdminDashboardOverview(),
+        fetchAdminDashboardOverview({ force }),
         fetchAdminDashboardTimeline(120),
       ]);
       setOverview(overviewData);
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     refresh(false);
-    const timer = setInterval(() => refresh(true), 30000);
+    const timer = setInterval(() => refresh(true, true), 30000);
     return () => clearInterval(timer);
   }, []);
 
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-black text-slate-800">System Health Dashboard</h1>
             <p className="text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
           </div>
-          <button onClick={() => refresh(false)} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-bold">
+          <button onClick={() => refresh(false, true)} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-bold">
             Refresh
           </button>
         </div>
