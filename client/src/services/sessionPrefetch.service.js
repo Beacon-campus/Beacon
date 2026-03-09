@@ -44,16 +44,23 @@ async function prefetchCommon(userKey) {
 }
 
 async function prefetchStudent(userKey) {
-  const studyMaterials = await safeGet("/classroom/study-materials/student");
+  const [studyMaterials, botHistory] = await Promise.all([
+    safeGet("/classroom/study-materials/student"),
+    safeGet("/bot/history"),
+  ]);
   if (studyMaterials) {
     setPageCache("student:study-materials", userKey, studyMaterials, 120_000);
+  }
+  if (botHistory) {
+    setPageCache("bot:history:student", userKey, botHistory, 60_000);
   }
 }
 
 async function prefetchTeacher(userKey) {
-  const [studyMaterials, classrooms] = await Promise.all([
+  const [studyMaterials, classrooms, botHistory] = await Promise.all([
     safeGet("/classroom/study-materials/teacher"),
     safeGet("/assignments/my-classrooms"),
+    safeGet("/bot/history"),
   ]);
 
   if (studyMaterials) {
@@ -61,6 +68,9 @@ async function prefetchTeacher(userKey) {
   }
   if (classrooms) {
     setPageCache("teacher:assignments:my-classrooms", userKey, classrooms, 120_000);
+  }
+  if (botHistory) {
+    setPageCache("bot:history:teacher", userKey, botHistory, 60_000);
   }
 }
 

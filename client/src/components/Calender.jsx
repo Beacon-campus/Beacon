@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../services/apiClient";
+import { getOrFetchPageCache } from "../services/pageCache.service";
 import jsPDF from "jspdf";
 import Modal from "./ui/Modal";
 import { exportRowsToXlsx } from "../utils/excelExport";
@@ -28,6 +29,7 @@ const GlitchText = ({ text, className = "" }) => (
 
 export default function Calendar() {
   const { user } = useAuth();
+  const userCacheKey = user?.uid || "guest";
   const [now, setNow] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [blink, setBlink] = useState(false);
@@ -73,11 +75,16 @@ export default function Calendar() {
     return `${y}-${m}-${d}`;
   };
 
-  const fetchCalendarAndTodos = useCallback(async () => {
+  const fetchCalendarAndTodos = useCallback(async (force = false) => {
     if (!user) return;
 
     try {
-      const { data } = await apiClient.get("/calendar/current");
+      const data = await getOrFetchPageCache(
+        "calendar:current",
+        userCacheKey,
+        async () => (await apiClient.get("/calendar/current")).data,
+        { ttlMs: 60_000, force }
+      );
       setCalendarData(data);
       setUpcomingEvents(Array.isArray(data?.upcomingEvents) ? data.upcomingEvents : []);
     } catch (err) {
@@ -85,7 +92,12 @@ export default function Calendar() {
     }
 
     try {
-      const { data: payload } = await apiClient.get("/todos");
+      const payload = await getOrFetchPageCache(
+        "calendar:todos",
+        userCacheKey,
+        async () => (await apiClient.get("/todos")).data,
+        { ttlMs: 60_000, force }
+      );
       const todos = Array.isArray(payload) ? payload : Array.isArray(payload?.todos) ? payload.todos : [];
       const currentUid = user?.uid;
       const scopedTodos = currentUid
@@ -99,7 +111,7 @@ export default function Calendar() {
     } catch (err) {
       console.error("Failed to fetch todos", err);
     }
-  }, [user]);
+  }, [user, userCacheKey]);
 
 
   // --- Clock Logic ---
@@ -124,7 +136,12 @@ export default function Calendar() {
 
         if (course && semester && shift) {
           const query = new URLSearchParams({ course, semester, shift });
-          const { data: schedule } = await apiClient.get(`/timetable/weekly?${query}`);
+          const schedule = await getOrFetchPageCache(
+            `calendar:timetable:${course}:${semester}:${shift}`,
+            userCacheKey,
+            async () => (await apiClient.get(`/timetable/weekly?${query}`)).data || [],
+            { ttlMs: 60_000 }
+          );
           setFullSchedule(schedule || []);
         } else {
           setTimetableState("error");
@@ -136,16 +153,16 @@ export default function Calendar() {
       }
     };
     fetchData();
-  }, [user, fetchCalendarAndTodos]);
+  }, [user, fetchCalendarAndTodos, userCacheKey]);
 
   useEffect(() => {
     if (!showCalendar) return;
-    fetchCalendarAndTodos().catch(() => { });
+    fetchCalendarAndTodos(true).catch(() => { });
   }, [showCalendar, fetchCalendarAndTodos]);
 
   useEffect(() => {
     const handleTodosChanged = () => {
-      fetchCalendarAndTodos().catch(() => { });
+      fetchCalendarAndTodos(true).catch(() => { });
     };
     window.addEventListener("todos:changed", handleTodosChanged);
     return () => window.removeEventListener("todos:changed", handleTodosChanged);
@@ -154,8 +171,8 @@ export default function Calendar() {
   useEffect(() => {
     if (!showCalendar) return;
     const intervalId = setInterval(() => {
-      fetchCalendarAndTodos().catch(() => { });
-    }, 5000);
+      fetchCalendarAndTodos(true).catch(() => { });
+    }, 60000);
     return () => clearInterval(intervalId);
   }, [showCalendar, fetchCalendarAndTodos]);
 

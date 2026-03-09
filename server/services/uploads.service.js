@@ -141,7 +141,7 @@ export function getBaseUrl(req) {
   return normalized;
 }
 
-export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto") {
+export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto", options = {}) {
   const normalizedPublicId = String(publicId || "").replace(/\\/g, "/");
   const assetFolder = path.posix.dirname(normalizedPublicId);
 
@@ -150,7 +150,7 @@ export async function uploadBufferToCloudinary(publicId, buffer, contentType, re
       {
         public_id: normalizedPublicId,
         asset_folder: assetFolder && assetFolder !== "." ? assetFolder : undefined,
-        overwrite: false,
+        overwrite: Boolean(options.overwrite),
         resource_type: resourceType,
         folder: undefined,
         use_filename: false,

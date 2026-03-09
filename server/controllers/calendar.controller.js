@@ -3,6 +3,9 @@ import {
   downloadCalendarImage,
   buildCloudinaryImageUrl,
 } from "../services/calendar.service.js";
+import AcademicCalendar from "../models/AcademicCalendar.js";
+import User from "../models/User.js";
+import { isCloudinaryConfigured, uploadBufferToCloudinary } from "../services/uploads.service.js";
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "";
 const DEFAULT_ODD_PUBLIC_ID = process.env.CALENDAR_ODD_PUBLIC_ID || "calendar/odd-sem";
@@ -11,9 +14,36 @@ const DEFAULT_EVEN_PUBLIC_ID = process.env.CALENDAR_EVEN_PUBLIC_ID || "calendar/
 const normalizeCandidates = (list) =>
   [...new Set((list || []).filter((value) => typeof value === "string" && value.trim().length > 0))];
 
+const getDefaultAcademicYear = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  if (month >= 6) {
+    return `${year}-${year + 1}`;
+  }
+  return `${year - 1}-${year}`;
+};
+
+const parseDataUrl = (dataUrl) => {
+  const parsed = String(dataUrl || "").match(/^data:([^;]+);base64,(.+)$/);
+  if (!parsed) return null;
+  const mimeType = parsed[1];
+  const buffer = Buffer.from(parsed[2], "base64");
+  return { mimeType, buffer };
+};
+
+const ensureAdmin = async (uid) => {
+  const me = await User.findOne({ firebaseUid: uid }).lean();
+  return Boolean(me && me.role === "admin");
+};
+
 export const getCurrentCalendar = async (req, res) => {
   try {
-    const calendar = await getAcademicCalendarByYear("2025-2026");
+    const requestedYear = String(req.query.academicYear || "").trim();
+    const academicYear = requestedYear || getDefaultAcademicYear();
+    const calendar =
+      (await getAcademicCalendarByYear(academicYear)) ||
+      (requestedYear ? null : await getAcademicCalendarByYear("2025-2026"));
 
     if (!calendar) {
       return res.status(404).json({ error: "Calendar not found" });
@@ -35,25 +65,25 @@ export const getCurrentCalendar = async (req, res) => {
     const evenDirectUrl = buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
 
     const oddSemUrlCandidates = normalizeCandidates([
+      calendar.oddSemUrl,
       oddProxyUrl,
       oddDirectUrl,
       process.env.CALENDAR_ODD_URL,
       process.env.CALENDAR_ODD_FALLBACK_URL,
-      calendar.oddSemUrl,
     ]);
 
     const evenSemUrlCandidates = normalizeCandidates([
+      calendar.evenSemUrl,
       evenProxyUrl,
       evenDirectUrl,
       process.env.CALENDAR_EVEN_URL,
       process.env.CALENDAR_EVEN_FALLBACK_URL,
-      calendar.evenSemUrl,
     ]);
 
     res.json({
       academicYear: calendar.academicYear,
-      oddSemUrl: oddDirectUrl || calendar.oddSemUrl,
-      evenSemUrl: evenDirectUrl || calendar.evenSemUrl,
+      oddSemUrl: calendar.oddSemUrl || oddDirectUrl,
+      evenSemUrl: calendar.evenSemUrl || evenDirectUrl,
       oddSemUrlCandidates,
       evenSemUrlCandidates,
       events: Array.isArray(calendar.events) ? calendar.events : [],
@@ -105,8 +135,82 @@ export const getCalendarImage = async (req, res) => {
 
 export const updateImagePaths = async (req, res) => {
   try {
-    return res.status(501).json({
-      error: "Not implemented yet. Configure CALENDAR_ODD_PUBLIC_ID and CALENDAR_EVEN_PUBLIC_ID in server/.env",
+    if (!req.user?.uid) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const isAdmin = await ensureAdmin(req.user.uid);
+    if (!isAdmin) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const {
+      academicYear: rawAcademicYear,
+      oddSemUrl,
+      evenSemUrl,
+      oddImageDataUrl,
+      evenImageDataUrl,
+      events,
+    } = req.body || {};
+
+    const academicYear = String(rawAcademicYear || getDefaultAcademicYear()).trim();
+    let nextOddUrl = String(oddSemUrl || "").trim();
+    let nextEvenUrl = String(evenSemUrl || "").trim();
+
+    if (oddImageDataUrl || evenImageDataUrl) {
+      if (!isCloudinaryConfigured) {
+        return res.status(500).json({ error: "Cloudinary is not configured on server" });
+      }
+    }
+
+    if (oddImageDataUrl) {
+      const parsed = parseDataUrl(oddImageDataUrl);
+      if (!parsed || !parsed.mimeType.startsWith("image/") || !parsed.buffer.length) {
+        return res.status(400).json({ error: "Invalid odd semester image payload" });
+      }
+      const uploaded = await uploadBufferToCloudinary(
+        DEFAULT_ODD_PUBLIC_ID,
+        parsed.buffer,
+        parsed.mimeType,
+        "image",
+        { overwrite: true }
+      );
+      nextOddUrl = uploaded?.secure_url || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_ODD_PUBLIC_ID);
+    }
+
+    if (evenImageDataUrl) {
+      const parsed = parseDataUrl(evenImageDataUrl);
+      if (!parsed || !parsed.mimeType.startsWith("image/") || !parsed.buffer.length) {
+        return res.status(400).json({ error: "Invalid even semester image payload" });
+      }
+      const uploaded = await uploadBufferToCloudinary(
+        DEFAULT_EVEN_PUBLIC_ID,
+        parsed.buffer,
+        parsed.mimeType,
+        "image",
+        { overwrite: true }
+      );
+      nextEvenUrl = uploaded?.secure_url || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
+    }
+
+    const updateDoc = {};
+    if (nextOddUrl) updateDoc.oddSemUrl = nextOddUrl;
+    if (nextEvenUrl) updateDoc.evenSemUrl = nextEvenUrl;
+    if (Array.isArray(events)) updateDoc.events = events;
+
+    const calendar = await AcademicCalendar.findOneAndUpdate(
+      { academicYear },
+      { $set: updateDoc, $setOnInsert: { academicYear } },
+      { new: true, upsert: true }
+    );
+
+    return res.json({
+      message: "Calendar updated successfully",
+      academicYear: calendar.academicYear,
+      oddSemUrl: calendar.oddSemUrl || "",
+      evenSemUrl: calendar.evenSemUrl || "",
+      events: Array.isArray(calendar.events) ? calendar.events : [],
+      updatedAt: calendar.updatedAt,
     });
   } catch (err) {
     console.error("Calendar image path update error:", err);

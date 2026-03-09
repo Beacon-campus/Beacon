@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import apiClient from "../../services/apiClient";
+import { clearPageCacheByPrefix, getOrFetchPageCache, setPageCache } from "../../services/pageCache.service";
 import ReactMarkdown from "react-markdown";
 
 // Helper to resolve profile images
@@ -48,6 +49,7 @@ export default function Bot() {
 
   const botType = user?.role === "teacher" ? "teacher" : "student";
   const botName = botType === "teacher" ? "Research Assistant" : "Study Bot";
+  const userCacheKey = user?.uid || "guest";
 
   /* ================= HELPERS ================= */
   const getDaysRemaining = () => {
@@ -69,10 +71,15 @@ export default function Bot() {
   }, [messages, loading]);
 
   /* ================= LOAD HISTORY ================= */
-  const fetchHistory = async () => {
+  const fetchHistory = async (force = false) => {
     if (!user) return;
     try {
-      const { data } = await apiClient.get(`/bot/history`);
+      const data = await getOrFetchPageCache(
+        `bot:history:${botType}`,
+        userCacheKey,
+        async () => (await apiClient.get(`/bot/history`)).data || [],
+        { force, ttlMs: 60_000 }
+      );
       if (Array.isArray(data)) {
         setHistory(data);
       }
@@ -83,7 +90,7 @@ export default function Bot() {
 
   useEffect(() => {
     fetchHistory();
-  }, [user]);
+  }, [user, botType, userCacheKey]);
 
   /* ================= LOAD SESSION ================= */
   const loadSession = async (id) => {
@@ -92,7 +99,12 @@ export default function Bot() {
 
     setLoading(true);
     try {
-      const { data } = await apiClient.get(`/bot/session/${id}`);
+      const data = await getOrFetchPageCache(
+        `bot:session:${id}`,
+        userCacheKey,
+        async () => (await apiClient.get(`/bot/session/${id}`)).data,
+        { ttlMs: 60_000 }
+      );
 
       setMessages(data.messages || []);
       setSessionId(data._id);
@@ -114,6 +126,8 @@ export default function Bot() {
 
     try {
       await apiClient.delete(`/bot/session/${id}`);
+      clearPageCacheByPrefix(`bot:session:${id}`, userCacheKey);
+      clearPageCacheByPrefix(`bot:history:${botType}`, userCacheKey);
       setHistory(prev => prev.filter(h => h._id !== id));
       if (sessionId === id) {
         setMessages([]);
@@ -143,14 +157,18 @@ export default function Bot() {
     }
 
     // Optimistic UI Update (Instant feedback)
-    setHistory(prev => prev.map(h => h._id === id ? { ...h, title: editValue } : h));
+    setHistory(prev => {
+      const next = prev.map(h => h._id === id ? { ...h, title: editValue } : h);
+      setPageCache(`bot:history:${botType}`, userCacheKey, next, 60_000);
+      return next;
+    });
     setEditingId(null);
 
     try {
       await apiClient.patch(`/bot/session/${id}/title`, { title: editValue });
     } catch (err) {
       console.error("Failed to rename", err);
-      fetchHistory(); // Revert on error
+      fetchHistory(true); // Revert on error
     }
   };
 
@@ -166,7 +184,13 @@ export default function Bot() {
     if (!input.trim() || loading) return;
 
     const userMessage = { role: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => {
+      const next = [...prev, userMessage];
+      if (sessionId) {
+        setPageCache(`bot:session:${sessionId}`, userCacheKey, { _id: sessionId, messages: next }, 60_000);
+      }
+      return next;
+    });
     setInput("");
     setLoading(true);
 
@@ -177,19 +201,37 @@ export default function Bot() {
         sessionId
       });
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", text: data.reply },
-      ]);
+      setMessages((prev) => {
+        const next = [...prev, { role: "bot", text: data.reply }];
+        const resolvedSessionId = sessionId || data.sessionId;
+        if (resolvedSessionId) {
+          setPageCache(
+            `bot:session:${resolvedSessionId}`,
+            userCacheKey,
+            {
+              _id: resolvedSessionId,
+              messages: next,
+              docSizeBytes: data.docSize || docSize,
+              lastActive: new Date().toISOString(),
+            },
+            60_000
+          );
+        }
+        return next;
+      });
 
       if (data.docSize) setDocSize(data.docSize);
       setLastActive(new Date());
 
       if (!sessionId && data.sessionId) {
         setSessionId(data.sessionId);
-        setHistory(prev => [{ _id: data.sessionId, title: data.title }, ...prev]);
+        setHistory(prev => {
+          const next = [{ _id: data.sessionId, title: data.title }, ...prev];
+          setPageCache(`bot:history:${botType}`, userCacheKey, next, 60_000);
+          return next;
+        });
       } else {
-        fetchHistory();
+        fetchHistory(true);
       }
 
     } catch (err) {

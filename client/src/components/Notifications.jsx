@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
-import { server } from "../main";
-import { auth } from "../firebase/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../services/apiClient";
+import { auth } from "../firebase/firebase";
+import { clearPageCacheByPrefix, getOrFetchPageCache } from "../services/pageCache.service";
 
 // Standard Icons
 const BellIcon = () => <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>;
@@ -16,6 +16,7 @@ import socket from "../services/socket.service";
 
 export default function Notifications() {
   const { user: currentUserInfo, refreshUser } = useAuth();
+  const userCacheKey = auth.currentUser?.uid || currentUserInfo?.uid || "guest";
   const [notifications, setNotifications] = useState([]);
   const [pendingFriendUsers, setPendingFriendUsers] = useState([]);
   const [filter, setFilter] = useState("all"); // "all" | "friend_request"
@@ -74,12 +75,12 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) return;
-      const token = await user.getIdToken();
-      const { data } = await axios.get(`${server}/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const data = await getOrFetchPageCache(
+        "notifications:list",
+        userCacheKey,
+        async () => (await apiClient.get("/notifications")).data || [],
+        { ttlMs: 60_000 }
+      );
       // Friend request records are derived from friendRequests, not notification history.
       const nonFriendNotifications = (data || []).filter(
         (n) => !["FRIEND_REQUEST", "FRIEND_REQUEST_RECEIVED"].includes(n.type)
@@ -94,8 +95,7 @@ export default function Notifications() {
 
   const fetchPendingFriendRequests = async () => {
     try {
-      const user = auth.currentUser;
-      if (!user || currentUserInfo?.role !== "student") {
+      if (!auth.currentUser || currentUserInfo?.role !== "student") {
         setPendingFriendUsers([]);
         return;
       }
@@ -106,11 +106,11 @@ export default function Notifications() {
         return;
       }
 
-      const token = await user.getIdToken();
-      const { data } = await axios.post(
-        `${server}/friends/get-users`,
-        { userIds: received },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const data = await getOrFetchPageCache(
+        `notifications:friend-requests:${received.join(",")}`,
+        userCacheKey,
+        async () => (await apiClient.post("/friends/get-users", { userIds: received })).data || [],
+        { ttlMs: 60_000 }
       );
 
       const byId = new Map((data || []).map((u) => [u._id?.toString(), u]));
@@ -126,12 +126,8 @@ export default function Notifications() {
 
   const deleteAllNotifications = async () => {
     try {
-      const user = auth.currentUser;
-      const token = await user.getIdToken();
-      await axios.delete(
-        `${server}/notifications/all`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await apiClient.delete("/notifications/all");
+      clearPageCacheByPrefix("notifications:", userCacheKey);
 
       setNotifications([]);
       toast.success("All notifications deleted");
@@ -141,24 +137,14 @@ export default function Notifications() {
   };
 
   const openDmWithUser = async (targetId) => {
-    const user = auth.currentUser;
-    const token = await user.getIdToken();
-    const { data } = await axios.post(
-      `${server}/chat/create-by-id`,
-      { targetId },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const { data } = await apiClient.post("/chat/create-by-id", { targetId });
     navigate(chatPath, { state: { activeChatId: data._id, timestamp: Date.now() } });
   };
 
   const handleAcceptRequest = async (requesterId, openChatAfter = false) => {
     try {
-      const user = auth.currentUser;
-      const token = await user.getIdToken();
-
-      await axios.post(`${server}/friends/accept`, { requesterId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post("/friends/accept", { requesterId });
+      clearPageCacheByPrefix("notifications:", userCacheKey);
       toast.success("Friend request accepted!");
       await refreshUser();
       await fetchPendingFriendRequests();
@@ -173,11 +159,8 @@ export default function Notifications() {
 
   const handleDeclineRequest = async (requesterId) => {
     try {
-      const user = auth.currentUser;
-      const token = await user.getIdToken();
-      await axios.post(`${server}/friends/decline`, { requesterId }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await apiClient.post("/friends/decline", { requesterId });
+      clearPageCacheByPrefix("notifications:", userCacheKey);
       toast.success("Request removed");
       await refreshUser();
       await fetchPendingFriendRequests();
@@ -479,13 +462,10 @@ export default function Notifications() {
                             onClick={async (e) => {
                               e.stopPropagation();
                               try {
-                                const user = auth.currentUser;
-                                const token = await user.getIdToken();
                                 // Create or Get Chat ID
-                                const { data } = await axios.post(`${server}/chat/create-by-id`,
-                                  { targetId: notif.relatedId },
-                                  { headers: { Authorization: `Bearer ${token}` } }
-                                );
+                                const { data } = await apiClient.post("/chat/create-by-id", {
+                                  targetId: notif.relatedId,
+                                });
 
                                 // Navigate with activeChatId
                                 navigate(chatPath, {

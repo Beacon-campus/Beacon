@@ -118,7 +118,7 @@ const apiLimiter = rateLimit({
 // Apply rate limiter to all api routes
 app.use("/api", apiLimiter);
 
-app.use(express.json({ limit: "5mb" }));
+app.use(express.json({ limit: "20mb" }));
 app.use(buildMetricsMiddleware());
 
 // CONNECT TO DATABASE
