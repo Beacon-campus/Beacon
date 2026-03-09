@@ -1,5 +1,6 @@
 import apiClient from "./apiClient";
 import { clearAllPageCache } from "./pageCache.service";
+import { resetFeature } from "./feature.service";
 
 export async function notifyServerLogout() {
   try {
@@ -8,5 +9,6 @@ export async function notifyServerLogout() {
     // Ignore logout logging failures on client side.
   } finally {
     clearAllPageCache();
+    resetFeature();
   }
 }

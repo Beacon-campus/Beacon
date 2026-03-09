@@ -1,9 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
+import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../services/apiClient";
 import ChangePasswordModal from "./ChangePasswordModal";
 import Modal from "./ui/Modal";
 import ProfileCard from "./ProfileCard"; // Import ProfileCard
+import FeatureList from "./FeatureList";
+import FeatureEventOverlay from "./FeatureEventOverlay";
+import {
+  getFeatureState,
+  registerFeatureTap,
+} from "../services/feature.service";
+import { FEATURE_EVENT_BY_NAME } from "../utils/feature.constants";
 
 // Helper to resolve profile images
 const getAvatarUrl = (id) => {
@@ -18,6 +26,11 @@ export default function ProfileLayout() {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Preview Modal State
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isFeatureEventOpen, setIsFeatureEventOpen] = useState(false);
+  const [activeFeatureEvent, setActiveFeatureEvent] = useState(null);
+  const [featureUnlocked, setFeatureUnlocked] = useState(
+    () => getFeatureState().unlocked
+  );
 
   // --- Theme State ---
   const [currentTheme, setCurrentTheme] = useState(() => localStorage.getItem('app-theme') || '#000000');
@@ -89,6 +102,18 @@ export default function ProfileLayout() {
   }, [user]);
 
   if (!user) return null;
+
+  const handleSectionNavigation = (sectionKey) => {
+    if (sectionKey === "credits") {
+      const result = registerFeatureTap();
+      setFeatureUnlocked(result.unlocked);
+      if (result.newlyUnlocked) {
+        toast.success("Easter Egg Unlocked");
+      }
+    }
+
+    setActiveSection(sectionKey);
+  };
 
   const handleNextAvatar = () => {
     const currentIndex = availableAvatars.indexOf(tempData.profileImageId);
@@ -379,12 +404,15 @@ export default function ProfileLayout() {
                 ) : activeSection === "credits" ? (
                   <div className="text-gray-700">
                     <p className="mb-4">Developed by:</p>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Charan R</li>
-                      <li>Denzil Deepak A</li>
-                      <li>Sahil Saini</li>
-                      <li>Duke Christy D</li>
-                    </ul>
+                    <FeatureList
+                      unlocked={featureUnlocked}
+                      onNameClick={(name) => {
+                        const eventKey = FEATURE_EVENT_BY_NAME[name];
+                        if (!eventKey) return;
+                        setActiveFeatureEvent(eventKey);
+                        setIsFeatureEventOpen(true);
+                      }}
+                    />
                   </div>
                 ) : activeSection === "security" ? (
                   <div className="space-y-6">
@@ -421,7 +449,7 @@ export default function ProfileLayout() {
             {sections.map((item) => (
               <button
                 key={item.key}
-                onClick={() => setActiveSection(item.key)}
+                onClick={() => handleSectionNavigation(item.key)}
                 className={`w-full flex items-center gap-3 py-4 px-5 text-sm font-medium transition-all duration-200 text-left group
                   ${activeSection === item.key 
                     ? "bg-green-50 text-green-700 border-l-4 border-l-green-500" 
@@ -437,6 +465,15 @@ export default function ProfileLayout() {
         </div>
 
       </div >
+
+      <FeatureEventOverlay
+        open={isFeatureEventOpen}
+        eventKey={activeFeatureEvent}
+        onClose={() => {
+          setIsFeatureEventOpen(false);
+          setActiveFeatureEvent(null);
+        }}
+      />
 
       {/* ================= EDIT MODAL ================= */}
       <Modal
