@@ -28,7 +28,6 @@ export function AuthProvider({ children }) {
       }
 
       const { data } = await apiClient.get("/me");
-      console.log("Mongo Profile Fetched:", data);
       return data;
     } catch (error) {
       console.error("Mongo profile fetch failed:", error);
