@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { auth } from "../../firebase/firebase";
 import socket from "../../services/socket.service";
 import axios from "axios";
@@ -47,6 +47,9 @@ export default function Community({ role }) {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showDoubtModal, setShowDoubtModal] = useState(false);
   const [activeAnnouncement, setActiveAnnouncement] = useState(null);
+  const [doubtInput, setDoubtInput] = useState("");
+  const [replyToComment, setReplyToComment] = useState(null);
+  const doubtInputRef = useRef(null);
   const [hubTypingUsers, setHubTypingUsers] = useState([]);
   const [teacherSubjects, setTeacherSubjects] = useState("...");
 
@@ -128,7 +131,29 @@ export default function Community({ role }) {
   const handleOpenDoubt = (announcement) => {
     setActiveAnnouncement(announcement);
     setShowDoubtModal(true);
+    setTimeout(() => doubtInputRef.current?.focus(), 100);
     fetchDoubts(announcement._id, true);
+  };
+
+  const handleSendDoubt = async () => {
+    if (!activeAnnouncement?._id || !doubtInput.trim()) return;
+    try {
+      const token = await auth.currentUser.getIdToken();
+      await axios.post(
+        `${server}/classroom/comment`,
+        {
+          announcementId: activeAnnouncement._id,
+          content: doubtInput,
+          replyTo: replyToComment?._id,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setDoubtInput("");
+      setReplyToComment(null);
+      fetchDoubts(activeAnnouncement._id, true);
+    } catch (error) {
+      console.error("Failed to send doubt", error);
+    }
   };
 
   const handleSendMessage = (text, gifUrl, attachment = null) => {
@@ -249,7 +274,18 @@ export default function Community({ role }) {
         </>
       )}
 
-      {showDoubtModal && <DoubtModal announcement={activeAnnouncement} doubts={doubts ? doubts[activeAnnouncement?._id] || [] : []} onClose={() => setShowDoubtModal(false)} />}
+      <DoubtModal
+        isOpen={showDoubtModal}
+        onClose={() => setShowDoubtModal(false)}
+        activeAnnouncement={activeAnnouncement}
+        doubts={doubts ? doubts[activeAnnouncement?._id] || [] : []}
+        replyToComment={replyToComment}
+        setReplyToComment={setReplyToComment}
+        doubtInput={doubtInput}
+        setDoubtInput={setDoubtInput}
+        onSendDoubt={handleSendDoubt}
+        doubtInputRef={doubtInputRef}
+      />
       {showInfoModal && activeClassroom && <ClassroomInfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} classroom={activeClassroom} isTeacher={role === 'teacher'} />}
     </div>
   );
