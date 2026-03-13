@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ExcelJS from "exceljs";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -24,7 +24,11 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
   const [assignmentType, setAssignmentType] = useState("offline");
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [deadlineDate, setDeadlineDate] = useState(null);
-  const [deadlineTime, setDeadlineTime] = useState("09:00");
+  const [deadlineHour, setDeadlineHour] = useState(9);
+  const [deadlineMinute, setDeadlineMinute] = useState(0);
+  const [showDeadlinePicker, setShowDeadlinePicker] = useState(false);
+  const [clockMode, setClockMode] = useState("hour"); // hour | minute
+  const clockRef = useRef(null);
   const [quizMode, setQuizMode] = useState("manual");
   const [questions, setQuestions] = useState([
     { id: 1, question: "", options: ["", "", "", ""], answer: "" },
@@ -85,19 +89,72 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
     return matched || value;
   };
 
-  const buildDeadlineISO = (dateValue, timeValue) => {
-    if (!dateValue || !timeValue) return "";
-    const [hours, minutes] = timeValue.split(":").map((part) => Number(part));
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return "";
+  const buildDeadlineISO = (dateValue, hourValue, minuteValue) => {
+    if (!dateValue && dateValue !== 0) return "";
+    if (hourValue === null || minuteValue === null) return "";
     const combined = new Date(dateValue);
-    combined.setHours(hours, minutes, 0, 0);
+    combined.setHours(hourValue, minuteValue, 0, 0);
     return combined.toISOString();
   };
 
   useEffect(() => {
-    const nextDeadline = buildDeadlineISO(deadlineDate, deadlineTime);
+    const nextDeadline = buildDeadlineISO(deadlineDate, deadlineHour, deadlineMinute);
     setFormData((prev) => ({ ...prev, deadline: nextDeadline }));
-  }, [deadlineDate, deadlineTime]);
+  }, [deadlineDate, deadlineHour, deadlineMinute]);
+
+  const isPm = deadlineHour >= 12;
+  const displayHour = ((deadlineHour + 11) % 12) + 1;
+
+  const setHourFrom12 = (hour12, nextIsPm) => {
+    const normalized = hour12 % 12;
+    const nextHour = (nextIsPm ? 12 : 0) + normalized;
+    setDeadlineHour(nextHour);
+  };
+
+  const updateClockValue = (event) => {
+    if (!clockRef.current) return;
+    const rect = clockRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = event.clientX - cx;
+    const dy = event.clientY - cy;
+    const radians = Math.atan2(dy, dx);
+    const degrees = (radians * 180) / Math.PI;
+    const normalized = (degrees + 90 + 360) % 360;
+
+    if (clockMode === "hour") {
+      const step = 30;
+      const index = Math.round(normalized / step) % 12;
+      const hour12 = index === 0 ? 12 : index;
+      setHourFrom12(hour12, isPm);
+    } else {
+      const step = 6;
+      const minute = Math.round(normalized / step) % 60;
+      setDeadlineMinute(minute);
+    }
+  };
+
+  const handleClockPointerDown = (event) => {
+    updateClockValue(event);
+    const handleMove = (moveEvent) => updateClockValue(moveEvent);
+    const handleUp = () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+  };
+
+  const formatDeadlineDisplay = () => {
+    if (!deadlineDate) return "Select date & time";
+    const dateLabel = deadlineDate.toLocaleDateString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    const minuteLabel = String(deadlineMinute).padStart(2, "0");
+    return `${dateLabel} • ${displayHour}:${minuteLabel} ${isPm ? "PM" : "AM"}`;
+  };
 
   const isHeaderRow = (cells) => {
     const combined = cells
@@ -432,21 +489,13 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
               <label className="block text-xs font-bold text-gray-500 mb-1">
                 Due Date <span className="text-red-500">*</span>
               </label>
-              <div className="custom-datepicker-wrapper">
-                <DatePicker
-                  selected={deadlineDate}
-                  onChange={(date) => setDeadlineDate(date)}
-                  dateFormat="MMM d, yyyy"
-                  placeholderText="Select due date"
-                  className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
-                  showIcon
-                  icon={
-                    <svg className="w-5 h-5 text-gray-400 absolute right-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  }
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowDeadlinePicker(true)}
+                className="w-full px-4 py-3 rounded-xl text-left text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
+              >
+                {formatDeadlineDisplay()}
+              </button>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1">
@@ -460,22 +509,6 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                 className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
                 placeholder="20"
               />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-500 mb-1">
-              Due Time <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="time"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
-              />
-              <svg className="w-5 h-5 text-gray-400 absolute right-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
             </div>
           </div>
         </div>
@@ -625,6 +658,161 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
           {isSubmitting ? "Publishing..." : "Assignments"}
         </button>
       </div>
+
+      <Modal
+        isOpen={showDeadlinePicker}
+        onClose={() => setShowDeadlinePicker(false)}
+        className="max-w-xl h-auto flex flex-col p-0"
+      >
+        <div className="bg-white px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+          <h3 className="text-lg font-bold text-primary">Set Deadline</h3>
+          <button onClick={() => setShowDeadlinePicker(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-5 grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-5">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+            <div className="custom-datepicker-wrapper">
+              <DatePicker
+                selected={deadlineDate}
+                onChange={(date) => setDeadlineDate(date)}
+                inline
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col items-center gap-4">
+            <div className="w-full">
+              <div className="text-xs font-semibold text-gray-400 mb-2">Select time</div>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setClockMode("hour")}
+                  className={`px-3 py-2 rounded-xl text-2xl font-bold tracking-wide ${clockMode === "hour"
+                    ? "bg-primary/15 text-primary border border-primary/30"
+                    : "bg-gray-100 text-gray-600 border border-gray-100"
+                    }`}
+                >
+                  {String(displayHour).padStart(2, "0")}
+                </button>
+                <span className="text-2xl font-bold text-gray-400">:</span>
+                <button
+                  type="button"
+                  onClick={() => setClockMode("minute")}
+                  className={`px-3 py-2 rounded-xl text-2xl font-bold tracking-wide ${clockMode === "minute"
+                    ? "bg-primary/15 text-primary border border-primary/30"
+                    : "bg-gray-100 text-gray-600 border border-gray-100"
+                    }`}
+                >
+                  {String(deadlineMinute).padStart(2, "0")}
+                </button>
+                <div className="ml-2 flex flex-col rounded-xl overflow-hidden border border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setHourFrom12(displayHour, false)}
+                    className={`px-3 py-1 text-xs font-bold ${!isPm ? "bg-primary/20 text-primary" : "bg-gray-50 text-gray-500"}`}
+                  >
+                    AM
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHourFrom12(displayHour, true)}
+                    className={`px-3 py-1 text-xs font-bold ${isPm ? "bg-primary/20 text-primary" : "bg-gray-50 text-gray-500"}`}
+                  >
+                    PM
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              ref={clockRef}
+              onPointerDown={handleClockPointerDown}
+              className="relative w-44 h-44 rounded-full bg-gray-50 border border-gray-200 shadow-inner cursor-pointer select-none"
+            >
+              {clockMode === "minute" && (
+                <div className="absolute inset-0">
+                  {Array.from({ length: 60 }, (_, i) => i).map((minute) => {
+                    const angle = (minute * 6) * (Math.PI / 180);
+                    const radius = 82;
+                    const x = 88 + radius * Math.sin(angle);
+                    const y = 88 - radius * Math.cos(angle);
+                    const isMajor = minute % 5 === 0;
+                    const isActive = minute === deadlineMinute;
+                    const sizeClass = isMajor ? "h-1 w-1" : "h-0.5 w-0.5";
+                    const colorClass = isActive
+                      ? "bg-primary"
+                      : isMajor
+                        ? "bg-gray-300"
+                        : "bg-gray-200";
+                    return (
+                      <div
+                        key={`tick-${minute}`}
+                        className={`absolute rounded-full ${sizeClass} ${colorClass} opacity-70`}
+                        style={{ left: x, top: y, transform: "translate(-50%, -50%)" }}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              <div className="absolute inset-0">
+                {(clockMode === "hour"
+                  ? [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                  : Array.from({ length: 60 }, (_, i) => i)
+                ).map((num, idx, arr) => {
+                  const step = 360 / arr.length;
+                  const angle = (idx * step) * (Math.PI / 180);
+                  const radius = clockMode === "hour" ? 70 : 64;
+                  const x = 88 + radius * Math.sin(angle);
+                  const y = 88 - radius * Math.cos(angle);
+                  const isSelected =
+                    clockMode === "hour"
+                      ? num === displayHour
+                      : num === deadlineMinute;
+                  const isMajorMinute = clockMode === "minute" ? num % 5 === 0 : false;
+                  if (clockMode === "minute" && !isMajorMinute && !isSelected) {
+                    return null;
+                  }
+                  return (
+                    <div
+                      key={`${clockMode}-${num}`}
+                      className={`absolute ${isSelected
+                        ? "bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        : "text-[10px] font-semibold text-gray-500"
+                        }`}
+                      style={{ left: x, top: y, transform: "translate(-50%, -50%)" }}
+                    >
+                      {num}
+                    </div>
+                  );
+                })}
+              </div>
+              <div
+                className="absolute left-1/2 top-1/2 h-16 w-0.5 bg-primary origin-bottom"
+                style={{
+                  transform: `translate(-50%, -100%) rotate(${clockMode === "hour"
+                    ? ((displayHour % 12) * 30)
+                    : (deadlineMinute * 6)}deg)`,
+                }}
+              />
+              <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
+              <div className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white ring-2 ring-primary" />
+            </div>
+            <p className="text-xs text-gray-500">
+              Drag on the clock to set {clockMode}.
+            </p>
+          </div>
+        </div>
+        <div className="px-5 pb-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setShowDeadlinePicker(false)}
+            className="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50"
+          >
+            Done
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
