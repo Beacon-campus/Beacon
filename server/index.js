@@ -106,7 +106,10 @@ app.use(
 );
 
 // Public health check route (must stay above API rate limiter)
-app.get("/health", (_, res) => res.status(200).send("OK"));
+// Allow any origin so wakeup checks aren't blocked by missing CLIENT_URL on deploy.
+app.get("/health", cors({ origin: "*", credentials: false }), (_, res) =>
+  res.status(200).send("OK")
+);
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

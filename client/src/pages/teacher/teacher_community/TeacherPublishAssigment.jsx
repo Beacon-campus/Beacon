@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import ExcelJS from "exceljs";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../../../components/todocomps/datepicker-custom.css";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import Modal from "../../../components/ui/Modal";
@@ -19,18 +23,15 @@ const EMPTY_FORM = {
 function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
   const [assignmentType, setAssignmentType] = useState("offline");
   const [formData, setFormData] = useState(EMPTY_FORM);
+  const [deadlineDate, setDeadlineDate] = useState(null);
+  const [deadlineTime, setDeadlineTime] = useState("09:00");
   const [quizMode, setQuizMode] = useState("manual");
   const [questions, setQuestions] = useState([
     { id: 1, question: "", options: ["", "", "", ""], answer: "" },
   ]);
   const [excelFile, setExcelFile] = useState(null);
+  const [excelErrors, setExcelErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const openNativeDateTimePicker = (event) => {
-    if (typeof event?.target?.showPicker === "function") {
-      event.target.showPicker();
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,15 +64,259 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
     setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
 
-  const handleExcelUpload = (e) => {
+  const parseCorrectOption = (rawValue, options) => {
+    if (!rawValue) return "";
+    const value = String(rawValue).trim();
+    if (!value) return "";
+
+    const upper = value.toUpperCase();
+    const letters = ["A", "B", "C", "D"];
+    if (letters.includes(upper)) {
+      return options[letters.indexOf(upper)] || "";
+    }
+
+    const numeric = Number(value);
+    if (!Number.isNaN(numeric) && numeric >= 1 && numeric <= 4) {
+      return options[numeric - 1] || "";
+    }
+
+    const normalizedValue = value.toLowerCase();
+    const matched = options.find((opt) => String(opt || "").trim().toLowerCase() === normalizedValue);
+    return matched || value;
+  };
+
+  const buildDeadlineISO = (dateValue, timeValue) => {
+    if (!dateValue || !timeValue) return "";
+    const [hours, minutes] = timeValue.split(":").map((part) => Number(part));
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return "";
+    const combined = new Date(dateValue);
+    combined.setHours(hours, minutes, 0, 0);
+    return combined.toISOString();
+  };
+
+  useEffect(() => {
+    const nextDeadline = buildDeadlineISO(deadlineDate, deadlineTime);
+    setFormData((prev) => ({ ...prev, deadline: nextDeadline }));
+  }, [deadlineDate, deadlineTime]);
+
+  const isHeaderRow = (cells) => {
+    const combined = cells
+      .map((cell) => String(cell || "").trim().toLowerCase())
+      .join(" ");
+    return combined.includes("question") || combined.includes("option") || combined.includes("correct");
+  };
+
+  const parseExcelQuestions = async (file) => {
+    const workbook = new ExcelJS.Workbook();
+    const buffer = await file.arrayBuffer();
+    await workbook.xlsx.load(buffer);
+    const sheet = workbook.worksheets[0];
+    if (!sheet) {
+      return { questions: [], errors: ["Excel file has no worksheets."] };
+    }
+
+    const rows = sheet.getSheetValues();
+    if (!rows || rows.length <= 1) {
+      return { questions: [], errors: ["Excel sheet is empty."] };
+    }
+
+    const getCell = (row, index) => String(row[index] ?? "").trim();
+
+    const parsed = [];
+    const errors = [];
+    const startRow = isHeaderRow(rows[1] || []) ? 2 : 1;
+
+    for (let i = startRow; i < rows.length; i += 1) {
+      const row = rows[i] || [];
+      if (row.length === 0) continue;
+
+      const question = getCell(row, 1);
+      const option1 = getCell(row, 2);
+      const option2 = getCell(row, 3);
+      const option3 = getCell(row, 4);
+      const option4 = getCell(row, 5);
+      const rawCorrect = getCell(row, 6);
+      const options = [option1, option2, option3, option4];
+      const answer = parseCorrectOption(rawCorrect, options);
+
+      if (!question && options.every((opt) => !opt) && !rawCorrect) continue;
+
+      if (!question) {
+        errors.push(`Row ${i} is missing a question.`);
+        continue;
+      }
+      if (options.some((opt) => !opt)) {
+        errors.push(`Row ${i} has empty options.`);
+        continue;
+      }
+      if (!answer) {
+        errors.push(`Row ${i} is missing a correct option.`);
+        continue;
+      }
+      if (!options.includes(answer)) {
+        errors.push(`Row ${i} correct option does not match any option.`);
+        continue;
+      }
+
+      parsed.push({
+        id: Date.now() + i,
+        question,
+        options,
+        answer,
+      });
+    }
+
+    if (!parsed.length && !errors.length) {
+      errors.push("No valid questions found in the sheet.");
+    }
+
+    return { questions: parsed, errors };
+  };
+
+  const parseCsvLine = (line) => {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+    let i = 0;
+
+    while (i < line.length) {
+      const char = line[i];
+      if (char === "\"") {
+        if (inQuotes && line[i + 1] === "\"") {
+          current += "\"";
+          i += 2;
+          continue;
+        }
+        inQuotes = !inQuotes;
+        i += 1;
+        continue;
+      }
+      if (char === "," && !inQuotes) {
+        result.push(current.trim());
+        current = "";
+        i += 1;
+        if (line[i] === " ") i += 1;
+        continue;
+      }
+      current += char;
+      i += 1;
+    }
+    result.push(current.trim());
+    return result;
+  };
+
+  const parseTextQuestions = (text) => {
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    if (!lines.length) {
+      return { questions: [], errors: ["Text file is empty."] };
+    }
+
+    const parsed = [];
+    const errors = [];
+    let startIndex = 0;
+    const firstRowCells = parseCsvLine(lines[0]);
+    if (isHeaderRow(firstRowCells)) {
+      startIndex = 1;
+    }
+
+    for (let i = startIndex; i < lines.length; i += 1) {
+      const cells = parseCsvLine(lines[i]);
+      const question = String(cells[0] || "").trim();
+      const option1 = String(cells[1] || "").trim();
+      const option2 = String(cells[2] || "").trim();
+      const option3 = String(cells[3] || "").trim();
+      const option4 = String(cells[4] || "").trim();
+      const rawCorrect = String(cells[5] || "").trim();
+      const options = [option1, option2, option3, option4];
+      const answer = parseCorrectOption(rawCorrect, options);
+
+      if (!question && options.every((opt) => !opt) && !rawCorrect) continue;
+
+      if (!question) {
+        errors.push(`Line ${i + 1} is missing a question.`);
+        continue;
+      }
+      if (options.some((opt) => !opt)) {
+        errors.push(`Line ${i + 1} has empty options.`);
+        continue;
+      }
+      if (!answer) {
+        errors.push(`Line ${i + 1} is missing a correct option.`);
+        continue;
+      }
+      if (!options.includes(answer)) {
+        errors.push(`Line ${i + 1} correct option does not match any option.`);
+        continue;
+      }
+
+      parsed.push({
+        id: Date.now() + i,
+        question,
+        options,
+        answer,
+      });
+    }
+
+    if (!parsed.length && !errors.length) {
+      errors.push("No valid questions found in the file.");
+    }
+
+    return { questions: parsed, errors };
+  };
+
+  const loadTextFile = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(reader.error || new Error("Failed to read file."));
+      reader.readAsText(file);
+    });
+
+  const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0] || null;
+    setExcelErrors([]);
     setExcelFile(file);
+    if (!file) return;
+
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "";
+      let parsedQuestions = [];
+      let errors = [];
+
+      if (ext === "xls" || ext === "xlsx") {
+        ({ questions: parsedQuestions, errors } = await parseExcelQuestions(file));
+      } else if (ext === "csv" || ext === "txt") {
+        const text = await loadTextFile(file);
+        ({ questions: parsedQuestions, errors } = parseTextQuestions(text));
+      } else {
+        errors = ["Unsupported file type. Please upload .xls, .xlsx, .csv, or .txt."];
+      }
+
+      setExcelErrors(errors);
+      if (parsedQuestions.length) {
+        setQuestions(parsedQuestions);
+        toast.success(`Loaded ${parsedQuestions.length} questions from Excel.`);
+      } else if (errors.length) {
+        toast.error("Excel format errors. Fix the file and re-upload.");
+      }
+    } catch (error) {
+      console.error("Excel parse failed", error);
+      setExcelErrors(["Failed to read Excel file. Please re-check the format."]);
+      toast.error("Could not read Excel file.");
+    }
   };
 
   const validateForm = () => {
     if (!classroomId) return "Please select a classroom first.";
-    if (!formData.title.trim() || !formData.deadline || !formData.totalMarks) {
-      return "Please fill Title, Deadline, and Total Marks.";
+    if (!formData.title.trim() || !formData.deadline) {
+      return "Please fill Title and Deadline.";
+    }
+    if (assignmentType !== "offline" && !formData.totalMarks) {
+      return "Please fill Total Marks for this assignment.";
     }
 
     if (assignmentType === "quiz") {
@@ -102,12 +347,12 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
       title: formData.title.trim(),
       instructions: formData.instructions?.trim() || "",
       deadline: formData.deadline,
-      totalMarks: Number(formData.totalMarks),
+      totalMarks: formData.totalMarks ? Number(formData.totalMarks) : null,
       content:
         assignmentType === "quiz"
           ? {
             quizMode,
-            questions: quizMode === "manual" ? questions : undefined,
+            questions: questions?.length ? questions : undefined,
             fileName: quizMode === "excel" && excelFile ? excelFile.name : undefined,
           }
           : {},
@@ -187,20 +432,25 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
               <label className="block text-xs font-bold text-gray-500 mb-1">
                 Due Date <span className="text-red-500">*</span>
               </label>
-              <input
-                type="datetime-local"
-                name="deadline"
-                value={formData.deadline}
-                onChange={handleInputChange}
-                onFocus={openNativeDateTimePicker}
-                onClick={openNativeDateTimePicker}
-                step="60"
-                className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
-              />
+              <div className="custom-datepicker-wrapper">
+                <DatePicker
+                  selected={deadlineDate}
+                  onChange={(date) => setDeadlineDate(date)}
+                  dateFormat="MMM d, yyyy"
+                  placeholderText="Select due date"
+                  className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
+                  showIcon
+                  icon={
+                    <svg className="w-5 h-5 text-gray-400 absolute right-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  }
+                />
+              </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1">
-                Total Marks <span className="text-red-500">*</span>
+                Total Marks {assignmentType === "offline" ? <span className="text-gray-400">(optional)</span> : <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
@@ -210,6 +460,22 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                 className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
                 placeholder="20"
               />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">
+              Due Time <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="time"
+                value={deadlineTime}
+                onChange={(e) => setDeadlineTime(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
+              />
+              <svg className="w-5 h-5 text-gray-400 absolute right-3 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
           </div>
         </div>
@@ -285,11 +551,64 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                 <input
                   type="file"
                   onChange={handleExcelUpload}
-                  accept=".xls,.xlsx"
+                  accept=".xls,.xlsx,.csv,.txt"
                   className="block w-full text-sm text-green-700"
                 />
                 {excelFile && (
                   <p className="mt-2 text-xs font-bold text-green-700">Selected: {excelFile.name}</p>
+                )}
+                <div className="mt-4 rounded-lg border border-green-100 bg-white/70 p-3 text-left text-[11px] text-green-800">
+                  <div className="font-bold mb-1">Format Guide</div>
+                  <div className="text-green-700">
+                    Format: [Question], [Option A], [Option B], [Option C], [Option D], [Correct Answer (A/B/C/D, 1/2/3/4, or exact text)]
+                  </div>
+                  <div className="mt-1 text-green-600">Headers are optional.</div>
+                </div>
+                {!!excelErrors.length && (
+                  <div className="mt-3 text-left text-xs text-red-600 space-y-1">
+                    {excelErrors.map((err, idx) => (
+                      <div key={idx}>• {err}</div>
+                    ))}
+                  </div>
+                )}
+                {!!questions.length && (
+                  <div className="mt-4 text-left">
+                    <p className="text-xs font-bold text-green-800">
+                      Parsed Questions: {questions.length}
+                    </p>
+                    <ul className="mt-2 space-y-2 text-xs text-gray-700 max-h-40 overflow-y-auto">
+                      {questions.map((q, idx) => (
+                        <li key={q.id} className="bg-white/70 border border-green-100 rounded-lg p-2">
+                          <div className="font-semibold">{idx + 1}. {q.question}</div>
+                          <div className="mt-1 text-[11px] text-gray-500">
+                            Options: {q.options.join(" | ")}
+                          </div>
+                          <div className="mt-1 text-[11px] text-green-700 font-semibold">
+                            Correct: {q.answer}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setQuizMode("manual")}
+                        className="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-green-700 border border-green-200"
+                      >
+                        Edit in Manual Entry
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuizMode("manual");
+                          addQuestion();
+                        }}
+                        className="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-gray-700 border border-gray-200"
+                      >
+                        Add One More Question
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             )}

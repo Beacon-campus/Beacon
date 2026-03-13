@@ -56,6 +56,7 @@ const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
 const WAKE_INTERVAL_MS = 5000;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
+const ENABLE_WAKEUP_DEBUG = import.meta.env.VITE_WAKEUP_DEBUG === "true";
 
 export default function ServerWakeupModal({ children }) {
   const [isAwake, setIsAwake] = useState(false);
@@ -121,34 +122,40 @@ export default function ServerWakeupModal({ children }) {
           : Promise.resolve({ status: 200 }),
       ]);
 
-      console.log("[ServerWakeupModal] Ping URLs:", { nodeUrl, dockerUrl });
-      console.log("[ServerWakeupModal] Ping raw results:", {
-        nodeResult,
-        dockerResult,
-      });
+      if (ENABLE_WAKEUP_DEBUG) {
+        console.log("[ServerWakeupModal] Ping URLs:", { nodeUrl, dockerUrl });
+        console.log("[ServerWakeupModal] Ping raw results:", {
+          nodeResult,
+          dockerResult,
+        });
+      }
       const nodeStatus =
         nodeResult.status === "fulfilled" ? nodeResult.value.status : null;
       const dockerStatus =
         dockerResult.status === "fulfilled" ? dockerResult.value.status : null;
-      console.log("[ServerWakeupModal] Node status code:", nodeStatus);
-      console.log("[ServerWakeupModal] Docker status code:", dockerStatus);
+      if (ENABLE_WAKEUP_DEBUG) {
+        console.log("[ServerWakeupModal] Node status code:", nodeStatus);
+        console.log("[ServerWakeupModal] Docker status code:", dockerStatus);
+      }
       const nodeReady =
         nodeResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(nodeResult.value.status);
       const dockerReady =
         dockerResult.status === "fulfilled" &&
         VALID_READY_STATUS.has(dockerResult.value.status);
-      console.log("[ServerWakeupModal] Ping readiness:", {
-        nodeReady,
-        dockerReady,
-      });
-      console.log("[ServerWakeupModal] nodeReady:", nodeReady);
-      console.log("[ServerWakeupModal] dockerReady:", dockerReady);
-      if (nodeReady) {
-        console.log("render-node: ok");
-      }
-      if (dockerReady) {
-        console.log("render-docker: ok");
+      if (ENABLE_WAKEUP_DEBUG) {
+        console.log("[ServerWakeupModal] Ping readiness:", {
+          nodeReady,
+          dockerReady,
+        });
+        console.log("[ServerWakeupModal] nodeReady:", nodeReady);
+        console.log("[ServerWakeupModal] dockerReady:", dockerReady);
+        if (nodeReady) {
+          console.log("render-node: ok");
+        }
+        if (dockerReady) {
+          console.log("render-docker: ok");
+        }
       }
 
       if (!cancelled) {
