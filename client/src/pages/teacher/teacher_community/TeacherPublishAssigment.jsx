@@ -7,6 +7,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import Modal from "../../../components/ui/Modal";
 import ImagePreviewModal from "../../../components/ui/ImagePreviewModal";
+import DocViewer from "../../../components/doccomps/docviewer";
 import { useAuth } from "../../../context/AuthContext";
 import apiClient from "../../../services/apiClient";
 import { getOrFetchPageCache } from "../../../services/pageCache.service";
@@ -840,6 +841,7 @@ export default function TeacherPublishAssignment() {
   const [savingGradeId, setSavingGradeId] = useState(null);
   const [viewSubmission, setViewSubmission] = useState(null);
   const [submissionImagePreview, setSubmissionImagePreview] = useState(null);
+  const [docPreviewFile, setDocPreviewFile] = useState(null);
   const [assignmentDoubts, setAssignmentDoubts] = useState([]);
   const [loadingDoubts, setLoadingDoubts] = useState(false);
   const [selectedDoubtId, setSelectedDoubtId] = useState(null);
@@ -871,6 +873,58 @@ export default function TeacherPublishAssignment() {
       normalized.includes(".webp") ||
       normalized.includes(".gif")
     );
+  };
+
+  const normalizeSubmissionFile = (value) => {
+    if (!value) return null;
+    if (typeof value === "object") return value;
+    if (typeof value !== "string") return null;
+
+    if (value.startsWith("data:")) {
+      const match = value.match(/^data:([^;]+);/);
+      const type = match ? match[1] : "application/octet-stream";
+      return {
+        name: "submission",
+        type,
+        url: value,
+        downloadUrl: value,
+        previewUrl: type === "application/pdf" ? value : null,
+        previewType: type === "application/pdf" ? type : null,
+      };
+    }
+
+    const name = decodeURIComponent(value.split("/").pop()?.split("?")[0] || "submission");
+    const lower = name.toLowerCase();
+    const type = lower.endsWith(".pdf")
+      ? "application/pdf"
+      : lower.endsWith(".doc")
+        ? "application/msword"
+        : lower.endsWith(".docx")
+          ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          : lower.endsWith(".ppt")
+            ? "application/vnd.ms-powerpoint"
+            : lower.endsWith(".pptx")
+              ? "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+              : lower.endsWith(".xls")
+                ? "application/vnd.ms-excel"
+                : lower.endsWith(".xlsx")
+                  ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  : lower.endsWith(".png")
+                    ? "image/png"
+                    : lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+                      ? "image/jpeg"
+                      : lower.endsWith(".webp")
+                        ? "image/webp"
+                        : "application/octet-stream";
+
+    return {
+      name,
+      type,
+      url: value,
+      downloadUrl: value,
+      previewUrl: type === "application/pdf" ? value : null,
+      previewType: type === "application/pdf" ? type : null,
+    };
   };
 
   useEffect(() => {
@@ -1232,21 +1286,52 @@ export default function TeacherPublishAssignment() {
             {selectedAssignment.type !== "quiz" ? (
               <div className="space-y-3">
                 <p className="text-sm text-gray-500">Submission Content</p>
-                {isImageSubmission(viewSubmission.file) ? (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <img
-                      src={viewSubmission.file}
-                      alt={`${viewSubmission.name}'s submission`}
-                      className="w-full max-h-[420px] object-contain rounded-lg border border-gray-200 cursor-zoom-in bg-white"
-                      onClick={() => setSubmissionImagePreview(viewSubmission.file)}
-                    />
-                    <p className="mt-2 text-xs text-gray-500">Tap image to open zoom preview.</p>
-                  </div>
-                ) : (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 whitespace-pre-wrap break-words">
-                    {viewSubmission.file || "No submission file/text found."}
-                  </div>
-                )}
+                {(() => {
+                  const fileMeta = normalizeSubmissionFile(viewSubmission.file);
+                  if (!fileMeta) {
+                    return (
+                      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 whitespace-pre-wrap break-words">
+                        No submission file/text found.
+                      </div>
+                    );
+                  }
+
+                  const imageUrl = fileMeta.previewUrl || fileMeta.url;
+                  const isImage = fileMeta.type?.startsWith("image/");
+                  return (
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm font-semibold text-gray-700 truncate">
+                          {fileMeta.name || "Submission"}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setDocPreviewFile(fileMeta)}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                          >
+                            View
+                          </button>
+                          <a
+                            href={fileMeta.downloadUrl || fileMeta.url}
+                            download={fileMeta.name || "submission"}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                          >
+                            Download
+                          </a>
+                        </div>
+                      </div>
+                      {isImage && imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={`${viewSubmission.name}'s submission`}
+                          className="w-full max-h-[360px] object-contain rounded-lg border border-gray-200 cursor-zoom-in bg-white"
+                          onClick={() => setSubmissionImagePreview(imageUrl)}
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             ) : questions.length === 0 ? (
               <p className="text-gray-500 italic">No quiz questions found for this assignment.</p>
@@ -1621,6 +1706,12 @@ export default function TeacherPublishAssignment() {
         imageUrl={submissionImagePreview}
         imageName="Student submission"
       />
+      {docPreviewFile && (
+        <DocViewer
+          file={docPreviewFile}
+          onClose={() => setDocPreviewFile(null)}
+        />
+      )}
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={handleBack}

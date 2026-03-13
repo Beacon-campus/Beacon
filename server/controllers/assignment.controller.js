@@ -61,8 +61,13 @@ export const createNewAssignment = async (req, res) => {
     }
 
     const { classroomId, type, title, instructions, deadline, totalMarks, content } = req.body;
-    if (!classroomId || !title || !deadline || totalMarks === undefined) {
-      return res.status(400).json({ error: "classroomId, title, deadline, totalMarks are required" });
+    const assignmentType = type || "offline";
+    const hasMarks = totalMarks !== undefined && totalMarks !== null && String(totalMarks).trim() !== "";
+    if (!classroomId || !title || !deadline) {
+      return res.status(400).json({ error: "classroomId, title, deadline are required" });
+    }
+    if (assignmentType !== "offline" && !hasMarks) {
+      return res.status(400).json({ error: "totalMarks are required for this assignment type" });
     }
 
     const classroom = await getClassroomById(classroomId);
@@ -80,11 +85,11 @@ export const createNewAssignment = async (req, res) => {
     const assignment = await createAssignment({
       classroomId: String(classroom._id),
       teacherId: me._id,
-      type: type || "offline",
+      type: assignmentType,
       title,
       instructions: instructions || "",
       deadline: new Date(deadline),
-      totalMarks: Number(totalMarks),
+      totalMarks: hasMarks ? Number(totalMarks) : null,
       content: content || {},
     });
 

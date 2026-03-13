@@ -346,30 +346,27 @@ export default function ChatWindow({
       setIsSubmitting(true);
       const user = auth.currentUser;
       const token = await user.getIdToken();
-      const reader = new FileReader();
-      reader.readAsDataURL(submissionFile);
-      reader.onloadend = async () => {
-        try {
-          const base64File = reader.result;
-          await axios.post(
-            `${server}/assignments/${selectedAssignment._id}/submit`,
-            { file: base64File },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setSubmittedAssignments((prev) => new Set(prev).add(selectedAssignment._id));
-          toast.success("Assignment submitted successfully");
-          setAssignmentModalOpen(false);
-          setSubmissionFile(null);
-        } catch (submitErr) {
-          console.error("Submission failed:", submitErr);
-          toast.error(submitErr?.response?.data?.error || "Failed to submit assignment.");
-        } finally {
-          setIsSubmitting(false);
-        }
-      };
-    } catch {
+      const uploaded = await uploadAttachment(
+        submissionFile,
+        "assignment_submission",
+        { assignmentId: selectedAssignment._id }
+      );
+
+      await axios.post(
+        `${server}/assignments/${selectedAssignment._id}/submit`,
+        { file: uploaded },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setSubmittedAssignments((prev) => new Set(prev).add(selectedAssignment._id));
+      toast.success("Assignment submitted successfully");
+      setAssignmentModalOpen(false);
+      setSubmissionFile(null);
+    } catch (submitErr) {
+      console.error("Submission failed:", submitErr);
+      toast.error(submitErr?.response?.data?.error || submitErr?.message || "Failed to submit assignment.");
+    } finally {
       setIsSubmitting(false);
-      toast.error("Failed to submit assignment.");
     }
   };
 

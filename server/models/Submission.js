@@ -4,9 +4,8 @@ const submissionSchema = new mongoose.Schema({
     assignmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Assignment", required: true },
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
-    // Using string for file path/url for now. 
-    // If multiple files, could be an array of objects { name, url }
-    file: { type: String }, // Not required for quiz
+    // Stored attachment metadata from uploads (or legacy string path).
+    file: { type: mongoose.Schema.Types.Mixed }, // Not required for quiz
 
     // Quiz Specifics
     isCheated: { type: Boolean, default: false },

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { ACCEPTED_ATTACHMENT_EXTENSIONS } from "../../utils/attachmentUpload";
 import { createPortal } from "react-dom";
 import SendIcon from "../../assets/send.svg";
 
@@ -121,7 +122,13 @@ export default function AssignmentModal({
                       </div>
                     </div>
                   )}
-                  <input type="file" ref={fileInputRef} className="hidden" onChange={onFileChange} />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept={ACCEPTED_ATTACHMENT_EXTENSIONS}
+                    onChange={onFileChange}
+                  />
                 </div>
               )}
             </div>

@@ -66,7 +66,7 @@ async function compressImageIfNeeded(file) {
   }
 }
 
-export async function uploadAttachment(file, scope = "dm") {
+export async function uploadAttachment(file, scope = "dm", options = {}) {
   validateAttachmentFile(file);
   const processedFile = await compressImageIfNeeded(file);
 
@@ -88,6 +88,9 @@ export async function uploadAttachment(file, scope = "dm") {
       fileSize: processedFile.size,
       dataUrl,
       scope,
+      classroomId: options.classroomId || null,
+      subjectId: options.subjectId || null,
+      assignmentId: options.assignmentId || null,
     },
     {
       headers: { Authorization: `Bearer ${token}` },
