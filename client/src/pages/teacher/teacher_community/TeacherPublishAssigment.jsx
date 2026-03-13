@@ -1402,8 +1402,10 @@ export default function TeacherPublishAssignment() {
     setStep(2);
   };
 
+  let stepContent = null;
+
   if (step === 0) {
-    return (
+    stepContent = (
       <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto">
         <h2 className="text-xl font-bold text-gray-700 mb-6">Select a Class to Manage Assignments</h2>
         {invalidClassroomId && (
@@ -1436,10 +1438,8 @@ export default function TeacherPublishAssignment() {
         )}
       </div>
     );
-  }
-
-  if (step === 2) {
-    return (
+  } else if (step === 2) {
+    stepContent = (
       <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm relative flex flex-col">
         {renderSubmissionModal()}
         <div className="flex items-center gap-4 mb-6 shrink-0">
@@ -1695,23 +1695,9 @@ export default function TeacherPublishAssignment() {
       </div>
 
     );
-  }
-
-  return (
-    <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm relative flex flex-col">
-      {renderSubmissionModal()}
-      <ImagePreviewModal
-        isOpen={!!submissionImagePreview}
-        onClose={() => setSubmissionImagePreview(null)}
-        imageUrl={submissionImagePreview}
-        imageName="Student submission"
-      />
-      {docPreviewFile && (
-        <DocViewer
-          file={docPreviewFile}
-          onClose={() => setDocPreviewFile(null)}
-        />
-      )}
+  } else {
+    stepContent = (
+      <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm relative flex flex-col">
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={handleBack}
@@ -1833,5 +1819,24 @@ export default function TeacherPublishAssignment() {
         </div>
       </Modal>
     </div>
+    );
+  }
+
+  return (
+    <>
+      <ImagePreviewModal
+        isOpen={!!submissionImagePreview}
+        onClose={() => setSubmissionImagePreview(null)}
+        imageUrl={submissionImagePreview}
+        imageName="Student submission"
+      />
+      {docPreviewFile && (
+        <DocViewer
+          file={docPreviewFile}
+          onClose={() => setDocPreviewFile(null)}
+        />
+      )}
+      {stepContent}
+    </>
   );
 }
