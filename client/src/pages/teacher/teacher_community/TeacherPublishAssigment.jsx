@@ -1176,13 +1176,16 @@ export default function TeacherPublishAssignment() {
       sheetName: "Submissions",
       fileName: `${selectedAssignment.title || "assignment"}-submissions.xlsx`,
       columns: [
-        { header: "Student", key: "Student", width: 28 },
+        { header: "Student Name", key: "Student Name", width: 28 },
         { header: "Reg No", key: "Reg No", width: 16 },
         { header: "Email", key: "Email", width: 30 },
-        { header: "Marks", key: "Marks", width: 12 },
-        { header: "Max Marks", key: "Max Marks", width: 12 },
-        { header: "Status", key: "Status", width: 16 },
+        { header: "Submitted", key: "Submitted", width: 12 },
         { header: "Submitted At", key: "Submitted At", width: 22 },
+        { header: "Attempts", key: "Attempts", width: 12 },
+        { header: "Score", key: "Score", width: 12 },
+        { header: "Total Marks", key: "Total Marks", width: 14 },
+        { header: "Correct Answers", key: "Correct Answers", width: 18 },
+        { header: "Cheated", key: "Cheated", width: 10 },
       ],
     });
   };
