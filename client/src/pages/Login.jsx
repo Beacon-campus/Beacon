@@ -70,18 +70,6 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const [renderStatus, setRenderStatus] = useState("loading");
   const [dockerStatus, setDockerStatus] = useState("loading");
-  const [showBadges, setShowBadges] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'r') {
-        e.preventDefault();
-        setShowBadges((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Controls the Onboarding Flow State
   const [onboardingStage, setOnboardingStage] = useState(null);
@@ -323,45 +311,41 @@ export default function Login() {
     );
   }
 
-  // 🟢 2. NEW FULL-SCREEN UNIFIED LOGIN
+  // 🟢 2. NEW SPLIT LOGIN LAYOUT
   return (
-    <div className="min-h-screen w-full flex font-sans text-primary overflow-hidden relative bg-[#f8fafc]">
-      {/* Mesh Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-100/60 via-amber-50/60 to-purple-100/60 opacity-80 mix-blend-multiply"></div>
-      
-      {/* Subtle Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+    <div className="h-screen w-full flex bg-white font-sans text-primary overflow-hidden">
 
-      <div className="relative w-full h-screen flex z-10">
+      {/* LEFT PANEL - Animation & Info */}
+      <div className="hidden lg:flex w-[60%] h-full flex-col items-center justify-center p-8 bg-white relative">
 
-      {/* Hidden Dev Badges (Ctrl+Shift+R) - Moved to absolute page bottom for safety */}
-      {showBadges && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 opacity-80 z-50">
-          <StatusChip label="Render" status={renderStatus} />
-          <StatusChip label="Docker" status={dockerStatus} />
+        <div className="relative z-10 max-w-4xl w-full flex flex-col items-center gap-6">
+
+          {/* Lottie Container (Top & Large) */}
+          <div className="w-full flex justify-center py-2">
+            <DotLottiePlayer
+              src={studentLottie}
+              loop
+              autoplay
+              className="w-full h-auto max-h-[600px] grayscale"
+            />
+          </div>
+
+          {/* Bottom text */}
+          <p className="text-black text-base leading-relaxed max-w-2xl font-medium text-center">
+            Welcome to your digital campus. Connect seamlessly with your classmates and teachers, manage your assignments with ease, and access powerful AI tools tailored to your studies. We've brought everything you need for a productive academic life—including real-time collaboration, instant resource sharing, and smart scheduling—into one intuitive, collaborative space suitable for everyone.
+          </p>
         </div>
-      )}
-
-      {/* LEFT COMPONENT - Illustration Pane */}
-      <div className="hidden lg:flex w-[55%] h-full flex-col items-center justify-center p-8 relative">
-        <div className="absolute top-[20%] right-[30%] w-64 h-64 bg-amber-400/20 blur-[80px] rounded-full pointer-events-none"></div>
-        <div className="absolute bottom-[20%] left-[40%] w-72 h-72 bg-[#7EF640]/20 blur-[80px] rounded-full pointer-events-none"></div>
-        <DotLottiePlayer
-          src={studentLottie}
-          loop
-          autoplay
-          className="w-full h-auto max-w-[700px] relative z-10 drop-shadow-xl"
-        />
       </div>
 
-      {/* RIGHT COMPONENT - Form Pane */}
-      <div className="w-full lg:w-[45%] h-full flex flex-col items-center justify-center py-10 px-8 relative overflow-y-auto">
-        <div className="w-full max-w-[420px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white p-8 space-y-8 relative backdrop-blur-sm">
+      {/* RIGHT PANEL - Form */}
+      <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-6 relative bg-white overflow-y-auto">
+
+        <div className="w-full max-w-sm space-y-8">
 
           {/* Header */}
-          <div className="text-center mb-8 flex flex-col items-center w-full">
-            <div className="flex flex-col items-center justify-center gap-3 group mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 md:w-16 md:h-16 overflow-visible">
+          <div className="text-center space-y-2 mb-8 flex flex-col items-center w-full">
+            <div className="flex items-center justify-center gap-3 group cursor-pointer mb-2 transition-transform duration-200 ease-in-out hover:scale-[1.02] active:scale-95">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 md:w-16 md:h-16 overflow-visible -mr-2">
                 <defs>
                   <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
                     <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
@@ -401,16 +385,17 @@ export default function Login() {
                   <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 whitespace-nowrap">
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 whitespace-nowrap">
                 Beacon
               </h1>
             </div>
-            <h2 className="text-xl font-semibold text-slate-800 mb-1">
-              Sign in to BCA Portal
-            </h2>
-            <p className="text-sm text-slate-600 font-medium max-w-[90%]">
-              Connect with BCA community
+            <p className="text-sm text-gray-500 font-medium max-w-[90%]">
+              Your digital campus for learning, collaboration, and AI tools
             </p>
+            <div className="mt-1 flex items-center justify-center gap-2">
+              <StatusChip label="Render" status={renderStatus} />
+              <StatusChip label="Docker" status={dockerStatus} />
+            </div>
           </div>
 
           {/* Form */}
@@ -418,8 +403,8 @@ export default function Login() {
 
             <div className="space-y-6">
               {/* Reg No Floating Label */}
-              <div>
-                <div className="relative group bg-slate-50 border border-slate-100 rounded-xl focus-within:border-[#7EF640] focus-within:ring-1 focus-within:ring-[#7EF640] transition-all">
+              <div className="mt-1">
+                <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
                   <input
                     type="text"
                     id="regno"
@@ -427,19 +412,20 @@ export default function Login() {
                     placeholder=" "
                     value={regno}
                     onChange={(e) => setRegno(e.target.value)}
-                    className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-800 text-base font-medium focus:ring-0 outline-none peer"
+                    className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer"
                   />
                   <label
                     htmlFor="regno"
-                    className="absolute text-slate-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
+                    className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
                   >
                     Registration Number
                   </label>
                 </div>
+                <p className="mt-1 text-xs text-gray-400">Use your institutional registration number</p>
               </div>
 
               {/* Password Floating Label */}
-              <div className="relative group bg-slate-50 border border-slate-100 rounded-xl focus-within:border-[#7EF640] focus-within:ring-1 focus-within:ring-[#7EF640] transition-all">
+              <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
                 <input
                   type={showPass ? "text" : "password"}
                   id="password"
@@ -449,11 +435,11 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
                   onBlur={() => setCapsLock(false)}
-                  className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-800 text-base font-medium focus:ring-0 outline-none peer pr-10"
+                  className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer pr-10"
                 />
                 <label
                   htmlFor="password"
-                  className="absolute text-slate-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
+                  className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
                 >
                   Password
                 </label>
@@ -462,30 +448,34 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute right-0 top-1/2 translate-y-0 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPass ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
 
                 {/* Caps Lock Warning */}
                 {capsLock && (
-                  <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-medium flex items-center gap-1">
+                  <p className="absolute -bottom-5 left-0 text-[10px] text-red-500 font-medium flex items-center gap-1">
                     <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span> Caps Lock is ON
                   </p>
                 )}
               </div>
 
               {/* Options Row */}
-              <div className="flex items-center pt-1">
+              <div className="flex items-center justify-between pt-1">
                 <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-[#7EF640] focus:ring-[#7EF640] transition-colors"
+                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary transition-colors"
                   />
                   <span className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Remember me</span>
                 </label>
+
+                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-primary hover:underline transition-all">
+                  Forgot password?
+                </button>
               </div>
             </div>
 
@@ -493,16 +483,10 @@ export default function Login() {
             <div className="space-y-4 pt-2">
               <button
                 disabled={submitting}
-                className="w-full h-12 rounded-full bg-slate-900 text-white font-medium hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_15px_rgba(251,191,36,0.35)] flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-xl bg-primary text-white font-semibold hover:-translate-y-[1px] hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
               >
                 {submitting ? "Signing In..." : "Sign In"}
               </button>
-
-              <div className="flex flex-col items-center gap-2 pt-1 pb-2">
-                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-slate-800 hover:underline transition-all">
-                  Forgot password?
-                </button>
-              </div>
 
               <div className="relative flex py-1 items-center">
                 <div className="flex-grow border-t border-gray-200"></div>
@@ -518,9 +502,9 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="group w-full h-12 rounded-full border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+                  className="group w-full h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
                 >
-                  <div className="w-5 h-5 transition-all"><GoogleIcon /></div>
+                  <div className="w-5 h-5 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all"><GoogleIcon /></div>
                   Sign in with Google
                 </button>
               </div>
@@ -528,8 +512,18 @@ export default function Login() {
 
           </form>
 
+          {/* Footer moved to Right Panel */}
+          <div className="flex items-center justify-center gap-4 pt-6">
+            <div className="flex -space-x-4 grayscale opacity-80">
+              <img src={profile1} alt="User 1" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+              <img src={profile5} alt="User 2" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+              <img src={profile9} alt="User 3" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+            </div>
+            <p className="text-xs font-medium text-gray-400 mt-2 text-center max-w-xs">
+              Used daily across campus by students and faculty to boost productivity
+            </p>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
