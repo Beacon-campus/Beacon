@@ -44,6 +44,33 @@ const MIME_TO_EXT = {
   "image/webp": "webp",
 };
 
+const normalizeMime = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .split(";")[0]
+    .trim();
+
+const resolveSafeName = (fileName, mime) => {
+  const normalizedMime = normalizeMime(mime);
+  const mappedExt = MIME_TO_EXT[normalizedMime] || "";
+  const rawName = String(fileName || "attachment").trim();
+  const hasExt = /\.[a-z0-9]{1,10}$/i.test(rawName);
+
+  if (!hasExt && mappedExt) {
+    return sanitizeFileName(`${rawName}.${mappedExt}`);
+  }
+
+  if (hasExt) {
+    const ext = rawName.split(".").pop()?.toLowerCase() || "";
+    if (ext === "bin" && mappedExt) {
+      return sanitizeFileName(rawName.replace(/\.bin$/i, `.${mappedExt}`));
+    }
+    return sanitizeFileName(rawName);
+  }
+
+  return sanitizeFileName(rawName);
+};
+
 const buildUrls = (objectPath, fileName) => {
   const encodedPath = encodeURIComponent(objectPath);
   return {
@@ -72,9 +99,10 @@ const buildAttachmentFromDataUrl = async ({
   const parsed = parseDataUrl(dataUrl);
   if (!parsed) return null;
   const { mime, base64 } = parsed;
+  const normalizedMime = normalizeMime(mime);
 
-  if (!ALLOWED_MIME_TYPES.has(mime)) {
-    throw new Error(`Unsupported mime type: ${mime}`);
+  if (!ALLOWED_MIME_TYPES.has(normalizedMime)) {
+    throw new Error(`Unsupported mime type: ${normalizedMime || mime}`);
   }
 
   const buffer = Buffer.from(base64, "base64");
@@ -83,8 +111,7 @@ const buildAttachmentFromDataUrl = async ({
     throw new Error(`File too large (${buffer.length} bytes)`);
   }
 
-  const ext = MIME_TO_EXT[mime] || "bin";
-  const safeName = sanitizeFileName(fileName || `attachment-${Date.now()}.${ext}`);
+  const safeName = resolveSafeName(fileName || `attachment-${Date.now()}`, normalizedMime);
   const objectPath = buildObjectPath({
     scope,
     safeName,
@@ -97,8 +124,8 @@ const buildAttachmentFromDataUrl = async ({
   await uploadBufferToCloudinary(
     objectPath,
     buffer,
-    mime,
-    getResourceTypeForMime(mime)
+    normalizedMime,
+    getResourceTypeForMime(normalizedMime)
   );
 
   const original = buildUrls(objectPath, safeName);
@@ -110,7 +137,7 @@ const buildAttachmentFromDataUrl = async ({
   let previewStatus = "none";
   let previewError = null;
 
-  if (OFFICE_MIME_TYPES.has(mime)) {
+  if (OFFICE_MIME_TYPES.has(normalizedMime)) {
     previewStatus = "processing";
     const previewResult = await generateOfficePreviewPdf(buffer);
     if (previewResult.ok && previewResult.buffer?.length) {
@@ -131,12 +158,12 @@ const buildAttachmentFromDataUrl = async ({
     previewPath = objectPath;
     previewUrl = original.url;
     previewDownloadUrl = original.downloadUrl;
-    previewType = mime;
+    previewType = normalizedMime;
     previewStatus = "ready";
-  } else if (mime.startsWith("image/")) {
+  } else if (normalizedMime.startsWith("image/")) {
     previewUrl = original.url;
     previewDownloadUrl = original.downloadUrl;
-    previewType = mime;
+    previewType = normalizedMime;
     previewStatus = "ready";
   } else {
     previewStatus = "unavailable";
@@ -144,7 +171,7 @@ const buildAttachmentFromDataUrl = async ({
 
   return {
     name: safeName,
-    type: mime,
+    type: normalizedMime,
     size: buffer.length,
     kind: mime.startsWith("image/") ? "image" : "file",
     scope,

@@ -10,15 +10,24 @@ export default function NotificationsWidget({
     const items = notifications || [];
     const activeItem = items[activeNotif] || null;
 
-    const getTypePalette = (type) => {
-        if (type === 'urgent') return { text: 'text-red-600', fill: 'bg-red-500' };
-        if (type === 'alert') return { text: 'text-amber-600', fill: 'bg-amber-500' };
-        if (type === 'friend_req') return { text: 'text-violet-600', fill: 'bg-violet-500' };
-        if (type === 'assignment') return { text: 'text-emerald-600', fill: 'bg-emerald-500' };
-        if (type === 'university') return { text: 'text-cyan-600', fill: 'bg-cyan-500' };
-        return { text: 'text-blue-600', fill: 'bg-blue-500' };
+    const getTypePalette = (item) => {
+        const raw = String(item?.rawType || "").toUpperCase();
+        const normalized = String(item?.type || "").toUpperCase();
+
+        if (raw.startsWith("FRIEND_") || normalized === "FRIEND_REQ") return { text: "text-violet-600", fill: "bg-violet-500" };
+        if (raw === "ASSIGNMENT_PUBLISHED") return { text: "text-indigo-600", fill: "bg-indigo-500" };
+        if (raw === "ASSIGNMENT_SUBMITTED") return { text: "text-emerald-600", fill: "bg-emerald-500" };
+        if (raw === "ASSIGNMENT_DOUBT") return { text: "text-amber-600", fill: "bg-amber-500" };
+        if (raw === "ASSIGNMENT_DOUBT_REPLY") return { text: "text-cyan-600", fill: "bg-cyan-500" };
+        if (raw.startsWith("ASSIGNMENT")) return { text: "text-indigo-600", fill: "bg-indigo-500" };
+        if (normalized === "GROUPED" || normalized === "ASSIGNMENT_GROUPED") return { text: "text-slate-600", fill: "bg-slate-500" };
+        if (normalized === "URGENT") return { text: "text-red-600", fill: "bg-red-500" };
+        if (normalized === "ALERT") return { text: "text-amber-600", fill: "bg-amber-500" };
+        if (normalized === "UNIVERSITY") return { text: "text-cyan-600", fill: "bg-cyan-500" };
+        if (normalized === "ASSIGNMENT") return { text: "text-indigo-600", fill: "bg-indigo-500" };
+        return { text: "text-blue-600", fill: "bg-blue-500" };
     };
-    const activePalette = getTypePalette(activeItem?.type);
+    const activePalette = getTypePalette(activeItem);
 
     return (
         <div className="premium-card p-6 flex-1 flex flex-col items-center justify-center gap-2 relative">

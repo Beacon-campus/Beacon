@@ -222,6 +222,59 @@ export default function ProfileLayout() {
 
   const bannerGradient = BANNER_COLORS[profileData.bannerColor] || BANNER_COLORS.default;
 
+  const openSourceAttributions = [
+    {
+      name: "LottieFiles (Hourglass animation)",
+      usage: "Server wake-up loading animation",
+      link: "https://lottiefiles.com",
+    },
+    {
+      name: "LottieFiles (Student login animation)",
+      usage: "Login screen animation",
+      link: "https://lottiefiles.com",
+    },
+    {
+      name: "@dotlottie/react-player",
+      usage: "DotLottie playback on Login",
+      link: "https://github.com/dotlottie/react-player",
+    },
+    {
+      name: "lottie-react",
+      usage: "Lottie JSON playback",
+      link: "https://github.com/LottieFiles/lottie-react",
+    },
+    {
+      name: "Excalidraw",
+      usage: "Whiteboard component",
+      link: "https://github.com/excalidraw/excalidraw",
+    },
+    {
+      name: "GIPHY API + React Components",
+      usage: "GIF search and embedding",
+      link: "https://developers.giphy.com",
+    },
+    {
+      name: "React Datepicker",
+      usage: "Date picker UI",
+      link: "https://github.com/Hacker0x01/react-datepicker",
+    },
+    {
+      name: "React Hot Toast",
+      usage: "Toast notifications",
+      link: "https://github.com/timolins/react-hot-toast",
+    },
+    {
+      name: "Recharts",
+      usage: "Charts in dashboards",
+      link: "https://recharts.org",
+    },
+    {
+      name: "Flaticon (icons)",
+      usage: "Some UI icons/illustrations",
+      link: "https://www.flaticon.com",
+    },
+  ];
+
   return (
     <div className="w-full h-full p-6">
 
@@ -430,6 +483,41 @@ export default function ProfileLayout() {
                           Change Password
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                ) : activeSection === "open" ? (
+                  <div className="space-y-6 text-gray-700 text-sm leading-7">
+                    <p className="font-medium">
+                      This project uses open-source libraries and third-party assets. Thanks to the
+                      creators and communities behind these tools.
+                    </p>
+
+                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                      <h3 className="text-sm font-bold text-gray-800 mb-3">Libraries & Assets</h3>
+                      <ul className="space-y-3">
+                        {openSourceAttributions.map((item) => (
+                          <li key={item.name} className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-gray-800">{item.name}</span>
+                              <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
+                              >
+                                Source
+                              </a>
+                            </div>
+                            <div className="text-xs text-gray-500">{item.usage}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="text-xs text-gray-500 italic">
+                      If any attribution is missing or incorrect, let us know and we will update it
+                      promptly.
                     </div>
                   </div>
 
