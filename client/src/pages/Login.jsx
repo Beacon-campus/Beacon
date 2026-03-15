@@ -321,18 +321,20 @@ export default function Login() {
         <div className="relative z-10 max-w-4xl w-full flex flex-col items-center gap-6">
 
           {/* Lottie Container (Top & Large) */}
-          <div className="w-full flex justify-center py-2">
+          <div className="w-full flex justify-center py-2 relative">
+            {/* Subtle brand glow behind lottie to tie the design together */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-amber-400/20 blur-[80px] rounded-full pointer-events-none"></div>
             <DotLottiePlayer
               src={studentLottie}
               loop
               autoplay
-              className="w-full h-auto max-h-[600px] grayscale"
+              className="w-full h-auto max-h-[600px] relative z-10"
             />
           </div>
 
           {/* Bottom text */}
-          <p className="text-black text-base leading-relaxed max-w-2xl font-medium text-center">
-            Welcome to your digital campus. Connect seamlessly with your classmates and teachers, manage your assignments with ease, and access powerful AI tools tailored to your studies. We've brought everything you need for a productive academic life—including real-time collaboration, instant resource sharing, and smart scheduling—into one intuitive, collaborative space suitable for everyone.
+          <p className="text-slate-600 text-xl leading-relaxed max-w-lg font-medium text-center">
+            Welcome to your digital campus.
           </p>
         </div>
       </div>
@@ -392,10 +394,6 @@ export default function Login() {
             <p className="text-sm text-gray-500 font-medium max-w-[90%]">
               Your digital campus for learning, collaboration, and AI tools
             </p>
-            <div className="mt-1 flex items-center justify-center gap-2">
-              <StatusChip label="Render" status={renderStatus} />
-              <StatusChip label="Docker" status={dockerStatus} />
-            </div>
           </div>
 
           {/* Form */}
@@ -403,8 +401,8 @@ export default function Login() {
 
             <div className="space-y-6">
               {/* Reg No Floating Label */}
-              <div className="mt-1">
-                <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
+              <div>
+                <div className="relative group bg-slate-50 border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
                   <input
                     type="text"
                     id="regno"
@@ -412,20 +410,20 @@ export default function Login() {
                     placeholder=" "
                     value={regno}
                     onChange={(e) => setRegno(e.target.value)}
-                    className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer"
+                    className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer"
                   />
                   <label
                     htmlFor="regno"
-                    className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
+                    className="absolute text-gray-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
                   >
                     Registration Number
                   </label>
                 </div>
-                <p className="mt-1 text-xs text-gray-400">Use your institutional registration number</p>
+                <p className="mt-1 ml-1 text-xs text-gray-400">Use your institutional registration number</p>
               </div>
 
               {/* Password Floating Label */}
-              <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
+              <div className="relative group bg-slate-50 border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
                 <input
                   type={showPass ? "text" : "password"}
                   id="password"
@@ -435,11 +433,11 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
                   onBlur={() => setCapsLock(false)}
-                  className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer pr-10"
+                  className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer pr-10"
                 />
                 <label
                   htmlFor="password"
-                  className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
+                  className="absolute text-gray-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
                 >
                   Password
                 </label>
@@ -448,14 +446,14 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-0 top-1/2 translate-y-0 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPass ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
 
                 {/* Caps Lock Warning */}
                 {capsLock && (
-                  <p className="absolute -bottom-5 left-0 text-[10px] text-red-500 font-medium flex items-center gap-1">
+                  <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-medium flex items-center gap-1">
                     <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span> Caps Lock is ON
                   </p>
                 )}
@@ -468,12 +466,12 @@ export default function Login() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary transition-colors"
+                    className="w-4 h-4 rounded border-gray-300 text-slate-800 focus:ring-slate-800 transition-colors"
                   />
                   <span className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Remember me</span>
                 </label>
 
-                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-primary hover:underline transition-all">
+                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-slate-800 hover:text-slate-600 hover:underline transition-all">
                   Forgot password?
                 </button>
               </div>
@@ -483,7 +481,7 @@ export default function Login() {
             <div className="space-y-4 pt-2">
               <button
                 disabled={submitting}
-                className="w-full h-12 rounded-xl bg-primary text-white font-semibold hover:-translate-y-[1px] hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-xl bg-slate-900 text-white font-semibold hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
               >
                 {submitting ? "Signing In..." : "Sign In"}
               </button>
@@ -504,7 +502,7 @@ export default function Login() {
                   onClick={handleGoogleLogin}
                   className="group w-full h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
                 >
-                  <div className="w-5 h-5 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all"><GoogleIcon /></div>
+                  <div className="w-5 h-5 transition-all"><GoogleIcon /></div>
                   Sign in with Google
                 </button>
               </div>
@@ -514,7 +512,7 @@ export default function Login() {
 
           {/* Footer moved to Right Panel */}
           <div className="flex items-center justify-center gap-4 pt-6">
-            <div className="flex -space-x-4 grayscale opacity-80">
+            <div className="flex -space-x-4">
               <img src={profile1} alt="User 1" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               <img src={profile5} alt="User 2" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               <img src={profile9} alt="User 3" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
