@@ -127,31 +127,42 @@ export default function StudentLayout() {
 
               {/* HEADER: Logo Area */}
               <div 
-                className={`flex items-center ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 p-6"} mb-2 cursor-pointer transition-opacity`}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 p-6"} mb-2 transition-opacity`}
               >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className={`w-8 h-8 text-primary transition-all duration-500 ${isHovered ? "drop-shadow-[0_0_12px_rgba(59,130,246,0.8)] scale-110 text-blue-600" : ""}`}>
-                    {/* Base */}
-                    <path d="M8.5 22l-1-12h9l-1 12H8.5z" opacity="0.9"/>
-                    {/* Balcony */}
-                    <path d="M6 10h12v-2H6v2z" />
-                    {/* Glass room (Light source) */}
-                    <path d="M9 8h6V5H9v3z" fill={isHovered ? "#60A5FA" : "currentColor"} className="transition-colors duration-500" />
-                    {/* Roof */}
-                    <path d="M12 2L8 5h8l-4-3z" />
-                    {/* Beams */}
-                    {isHovered && (
-                      <g className="animate-pulse">
-                        <path d="M9 6.5L0 3v7l9-3.5zM15 6.5L24 3v7l-9-3.5z" fill="#93C5FD" opacity="0.6" />
-                      </g>
-                    )}
+                <div className="flex items-center justify-center shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10">
+                    <g className="opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
+                      <path d="M 45 32 L 5 15 L 5 45 Z" className="fill-yellow-400 opacity-60" />
+                      <path d="M 45 32 L 15 5 L 25 5 Z" className="fill-yellow-400 opacity-40" />
+                      <path d="M 55 32 L 95 15 L 95 45 Z" className="fill-yellow-400 opacity-60" />
+                      <path d="M 55 32 L 85 5 L 75 5 Z" className="fill-yellow-400 opacity-40" />
+                      <path d="M 25 20 L 26 23 L 29 24 L 26 25 L 25 28 L 24 25 L 21 24 L 24 23 ZM 75 20 L 76 23 L 79 24 L 76 25 L 75 28 L 74 25 L 71 24 L 74 23 Z" className="fill-yellow-400" />
+                      <circle cx="15" cy="30" r="1.5" className="fill-yellow-400" />
+                      <circle cx="85" cy="30" r="1.5" className="fill-yellow-400" />
+                      <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
+                      <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
+                    </g>
+                    <g className="fill-slate-800 stroke-slate-800">
+                      <path d="M 50 82 C 30 82 15 75 5 70 C 10 78 25 86 50 90 C 75 86 90 78 95 70 C 85 75 70 82 50 82 Z" fill="currentColor" stroke="none" />
+                      <path d="M 50 88 C 35 88 20 83 10 78 C 15 85 30 92 50 96 C 70 92 85 85 90 78 C 80 83 65 88 50 88 Z" fill="currentColor" stroke="none" />
+                      <path d="M 50 94 C 35 94 25 90 15 86 C 20 91 35 97 50 100 C 65 97 80 91 85 86 C 75 90 65 94 50 94 Z" fill="currentColor" stroke="none" />
+                      <path d="M 37 77 L 63 77 L 60 72 L 40 72 Z" fill="currentColor" stroke="none" />
+                      <path d="M 42 72 L 46 38 L 54 38 L 58 72 Z" fill="none" strokeWidth="2.5" />
+                      <path d="M 43 65 C 48 68 52 62 57 65 M 44.5 50 C 49 53 51 47 55.5 50" strokeWidth="2.5" fill="none" />
+                      <path d="M 47.5 72 L 47.5 63 C 47.5 61 52.5 61 52.5 63 L 52.5 72 Z" fill="currentColor" stroke="none" />
+                      <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
+                      <path d="M 43 38 L 57 38 L 58 35 L 42 35 Z" fill="currentColor" stroke="none" />
+                      <rect x="45" y="27" width="10" height="8" fill="none" strokeWidth="2.5" />
+                      <rect x="48" y="27" width="4" height="8" fill="currentColor" stroke="none" />
+                      <path d="M 43 27 L 57 27 C 57 20 53 19 50 19 C 47 19 43 20 43 27 Z" fill="currentColor" stroke="none" />
+                      <path d="M 49 19 L 49 15 L 51 15 L 51 19 Z" fill="currentColor" stroke="none" />
+                      <circle cx="50" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                    </g>
                   </svg>
                 </div>
                 
-                <span className={`font-black text-2xl tracking-tight text-primary uppercase whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
-                  BEACON
+                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
+                  Beacon
                 </span>
               </div>
 
