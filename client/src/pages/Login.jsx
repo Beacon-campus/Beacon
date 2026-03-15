@@ -410,7 +410,7 @@ export default function Login() {
             <div className="space-y-4">
               {/* Registration Number */}
               <div>
-                <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm">
+                <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm overflow-hidden">
                   <input
                     type="text"
                     id="regno"
@@ -431,7 +431,7 @@ export default function Login() {
               </div>
 
               {/* Password */}
-              <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm">
+              <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm overflow-hidden">
                 <input
                   type={showPass ? "text" : "password"}
                   id="password"
