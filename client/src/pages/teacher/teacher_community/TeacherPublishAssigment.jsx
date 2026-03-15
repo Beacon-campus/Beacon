@@ -889,16 +889,7 @@ export default function TeacherPublishAssignment() {
     if (typeof value !== "string") return null;
 
     if (value.startsWith("data:")) {
-      const match = value.match(/^data:([^;]+);/);
-      const type = match ? match[1] : "application/octet-stream";
-      return {
-        name: "submission",
-        type,
-        url: value,
-        downloadUrl: value,
-        previewUrl: type === "application/pdf" ? value : null,
-        previewType: type === "application/pdf" ? type : null,
-      };
+      return null;
     }
 
     const name = decodeURIComponent(value.split("/").pop()?.split("?")[0] || "submission");
@@ -925,14 +916,7 @@ export default function TeacherPublishAssignment() {
                         ? "image/webp"
                         : "application/octet-stream";
 
-    return {
-      name,
-      type,
-      url: value,
-      downloadUrl: value,
-      previewUrl: type === "application/pdf" ? value : null,
-      previewType: type === "application/pdf" ? type : null,
-    };
+    return null;
   };
 
   useEffect(() => {
@@ -1305,7 +1289,7 @@ export default function TeacherPublishAssignment() {
                   }
 
                   const resolvedUrl = resolveAttachmentUrl(fileMeta);
-                  const imageUrl = fileMeta.previewUrl || resolvedUrl || fileMeta.url;
+                  const imageUrl = fileMeta.previewUrl || resolvedUrl;
                   const isImage = fileMeta.type?.startsWith("image/");
                   return (
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
@@ -1322,7 +1306,7 @@ export default function TeacherPublishAssignment() {
                             View
                           </button>
                           <a
-                            href={fileMeta.downloadUrl || resolvedUrl || fileMeta.url}
+                            href={resolvedUrl || ""}
                             download={fileMeta.name || "submission"}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                           >

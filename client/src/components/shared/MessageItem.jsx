@@ -193,7 +193,7 @@ const MessageItem = ({
                                     <p className="font-bold text-sm text-gray-800 truncate">{msg.noteData?.name?.replace(/^[0-9]+-[0-9a-fA-F-]+-/, '') || "Shared file"}</p>
                                     <p className="text-[11px] text-gray-400 font-medium mt-0.5">Click to view</p>
                                 </div>
-                                <a href={msg.noteData?.downloadUrl || resolveAttachmentUrl(msg.noteData)} download={msg.noteData?.name || "file"} onClick={(e) => e.stopPropagation()} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
+                                <a href={resolveAttachmentUrl(msg.noteData) || ""} download={msg.noteData?.name || "file"} onClick={(e) => e.stopPropagation()} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 </a>
                             </div>
@@ -259,10 +259,10 @@ const MessageItem = ({
             {msg.type === "file" && openDocViewer && (
                 <DocViewer
                     file={{
+                        ...msg.noteData,
                         name: msg.noteData?.name || "Shared file",
+                        mimeType: msg.noteData?.mimeType || msg.noteData?.type || "application/octet-stream",
                         type: msg.noteData?.mimeType || msg.noteData?.type || "application/octet-stream",
-                        url: resolveAttachmentUrl(msg.noteData) || "",
-                        downloadUrl: msg.noteData?.downloadUrl || resolveAttachmentUrl(msg.noteData) || "",
                         previewUrl: msg.noteData?.previewUrl || null,
                         previewType: msg.noteData?.previewType || null,
                         previewStatus: msg.noteData?.previewStatus || null,

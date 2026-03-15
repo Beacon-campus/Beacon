@@ -125,8 +125,15 @@ export function sanitizeFileName(fileName = "attachment") {
   return `${base}${safeExt || ""}`;
 }
 
+function stripImageExtension(publicId = "") {
+  return String(publicId).replace(/\.(png|jpe?g|webp|gif|svg)$/i, "");
+}
+
 export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto", options = {}) {
-  const normalizedPublicId = String(publicId || "").replace(/\\/g, "/");
+  let normalizedPublicId = String(publicId || "").replace(/\\/g, "/");
+  if (resourceType === "image") {
+    normalizedPublicId = stripImageExtension(normalizedPublicId);
+  }
   const assetFolder = path.posix.dirname(normalizedPublicId);
 
   return new Promise((resolve, reject) => {

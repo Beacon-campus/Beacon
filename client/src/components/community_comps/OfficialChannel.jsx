@@ -141,22 +141,8 @@ export default function OfficialChannel({
                 type: "file",
                 name: selectedAttachment.name,
                 mimeType: selectedAttachment.mimeType || selectedAttachment.type,
-                url: selectedAttachment.url,
                 size: selectedAttachment.size,
-                downloadUrl: selectedAttachment.downloadUrl || selectedAttachment.url,
-                path: selectedAttachment.path || null,
-                cloudinary: selectedAttachment.cloudinary || {
-                  publicId: selectedAttachment.publicId || null,
-                  version: selectedAttachment.version || null,
-                  resourceType: selectedAttachment.resourceType || null,
-                  format: selectedAttachment.format || null,
-                  secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
-                },
-                publicId: selectedAttachment.publicId || null,
-                version: selectedAttachment.version || null,
-                resourceType: selectedAttachment.resourceType || null,
-                format: selectedAttachment.format || null,
-                secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
+                cloudinary: selectedAttachment.cloudinary || null,
                 previewUrl: selectedAttachment.previewUrl || null,
                 previewDownloadUrl: selectedAttachment.previewDownloadUrl || null,
                 previewPath: selectedAttachment.previewPath || null,
@@ -319,7 +305,7 @@ export default function OfficialChannel({
                                           >
                                             View
                                           </button>
-                                          <a href={post.noteData?.downloadUrl || resolveAttachmentUrl(post.noteData)} download={post.noteData?.name || "file"} className="underline">Download</a>
+                                          <a href={resolveAttachmentUrl(post.noteData)} download={post.noteData?.name || "file"} className="underline">Download</a>
                                       </div>
                                    </div>
                                ) : (

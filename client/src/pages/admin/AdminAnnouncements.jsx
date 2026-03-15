@@ -23,21 +23,7 @@ function toAnnouncementAttachment(uploaded) {
     type: "file",
     name: uploaded.name,
     mimeType: uploaded.mimeType || uploaded.type,
-    url: uploaded.url,
-    downloadUrl: uploaded.downloadUrl || uploaded.url,
-    path: uploaded.path || "",
-    cloudinary: uploaded.cloudinary || {
-      publicId: uploaded.publicId || "",
-      version: uploaded.version || null,
-      resourceType: uploaded.resourceType || "",
-      format: uploaded.format || "",
-      secureUrl: uploaded.secureUrl || uploaded.url || "",
-    },
-    publicId: uploaded.publicId || "",
-    version: uploaded.version || null,
-    resourceType: uploaded.resourceType || "",
-    format: uploaded.format || "",
-    secureUrl: uploaded.secureUrl || uploaded.url || "",
+    cloudinary: uploaded.cloudinary || null,
     previewUrl: uploaded.previewUrl || "",
     previewDownloadUrl: uploaded.previewDownloadUrl || "",
     previewPath: uploaded.previewPath || "",
@@ -59,7 +45,7 @@ export default function AdminAnnouncements() {
 
   const stats = useMemo(() => {
     const total = announcements.length;
-    const withFiles = announcements.filter((a) => a.attachment?.url).length;
+    const withFiles = announcements.filter((a) => resolveAttachmentUrl(a.attachment)).length;
     const imagePosts = announcements.filter((a) => a.attachment?.kind === "image").length;
     return { total, withFiles, imagePosts };
   }, [announcements]);
@@ -229,7 +215,7 @@ export default function AdminAnnouncements() {
                       </p>
                       {resolveAttachmentUrl(item.attachment) ? (
                         <a
-                          href={item.attachment?.cloudinary?.secureUrl || item.attachment?.secureUrl || item.attachment?.downloadUrl || item.attachment?.url}
+                          href={resolveAttachmentUrl(item.attachment)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-blue-600 hover:underline"

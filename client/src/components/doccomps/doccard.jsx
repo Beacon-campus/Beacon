@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import DocViewer from "./docviewer";
 
 export default function DocCard({ file, role, onRenameUpload, onDeleteUpload }) {
@@ -7,8 +8,9 @@ export default function DocCard({ file, role, onRenameUpload, onDeleteUpload }) 
   const [nameDraft, setNameDraft] = useState(file.name || "");
   const [isSavingName, setIsSavingName] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const fileUrl = file.url || "";
-  const fileDownloadUrl = file.downloadUrl || file.url || "";
+  const resolvedUrl = resolveAttachmentUrl(file);
+  const fileUrl = resolvedUrl || "";
+  const fileDownloadUrl = resolvedUrl || "";
   const canManage = role === "teacher" && !String(file._id || "").startsWith("mock-");
 
   const handleDownload = () => {

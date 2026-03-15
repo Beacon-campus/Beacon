@@ -96,25 +96,20 @@ async function fetchCloudinaryUsage() {
 async function getStoragePathBreakdown() {
   const [chatFiles, groupFiles, communityOfficialFiles, communityHubFiles, studyMaterialFiles, assignmentSubmissionFiles, assignmentResourceFiles, universityFiles] =
     await Promise.all([
-      Message.countDocuments({ "noteData.path": { $regex: /^chat\// } }),
-      Message.countDocuments({ "noteData.path": { $regex: /^groups\// } }),
-      Announcement.countDocuments({ "noteData.path": { $regex: /^community\/official\// } }),
-      Message.countDocuments({ "noteData.path": { $regex: /^community\/hub\// } }),
+      Message.countDocuments({ "noteData.cloudinary.publicId": { $regex: /^chat\// } }),
+      Message.countDocuments({ "noteData.cloudinary.publicId": { $regex: /^groups\// } }),
+      Announcement.countDocuments({ "noteData.cloudinary.publicId": { $regex: /^community\/official\// } }),
+      Message.countDocuments({ "noteData.cloudinary.publicId": { $regex: /^community\/hub\// } }),
       Classroom.aggregate([
         { $unwind: "$subjects" },
         { $unwind: "$subjects.uploads" },
-        { $match: { "subjects.uploads.path": { $regex: /^study-materials\// } } },
+        { $match: { "subjects.uploads.cloudinary.publicId": { $regex: /^study-materials\// } } },
         { $count: "count" },
       ]).then((rows) => rows?.[0]?.count || 0),
       // Assignment submissions are stored in Submission.file
-      mongoose.connection.collection("submissions").countDocuments({ "file.path": { $regex: /^assignments\/submissions\// } }),
-      Message.countDocuments({ "noteData.path": { $regex: /^assignments\/resources\// } }),
-      UniversityAnnouncement.countDocuments({
-        $or: [
-          { "attachment.path": { $regex: /^university\/announcements\// } },
-          { "attachment.path": { $regex: /^university\// } },
-        ],
-      }),
+      mongoose.connection.collection("submissions").countDocuments({ "file.cloudinary.publicId": { $regex: /^assignments\/submissions\// } }),
+      Message.countDocuments({ "noteData.cloudinary.publicId": { $regex: /^assignments\/resources\// } }),
+      UniversityAnnouncement.countDocuments({ "attachment.cloudinary.publicId": { $regex: /^university\/announcements\// } }),
     ]);
 
   return {
