@@ -345,33 +345,44 @@ export default function Login() {
           {/* Header */}
           <div className="text-center space-y-2 mb-8 flex flex-col items-center w-full">
             <div className="flex items-center justify-center gap-3 group cursor-pointer mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 md:w-16 md:h-16">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 md:w-16 md:h-16 overflow-visible -mr-2">
+                <defs>
+                  <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="beam-right-lg" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
                 <g className="opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
-                  <path d="M 45 32 L 5 15 L 5 45 Z" className="fill-yellow-400 opacity-60" />
-                  <path d="M 45 32 L 15 5 L 25 5 Z" className="fill-yellow-400 opacity-40" />
-                  <path d="M 55 32 L 95 15 L 95 45 Z" className="fill-yellow-400 opacity-60" />
-                  <path d="M 55 32 L 85 5 L 75 5 Z" className="fill-yellow-400 opacity-40" />
-                  <path d="M 25 20 L 26 23 L 29 24 L 26 25 L 25 28 L 24 25 L 21 24 L 24 23 ZM 75 20 L 76 23 L 79 24 L 76 25 L 75 28 L 74 25 L 71 24 L 74 23 Z" className="fill-yellow-400" />
-                  <circle cx="15" cy="30" r="1.5" className="fill-yellow-400" />
-                  <circle cx="85" cy="30" r="1.5" className="fill-yellow-400" />
+                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
+                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
+                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
+                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
+                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
+                  <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
+                  <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
                   <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
                   <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
                 </g>
                 <g className="fill-slate-800 stroke-slate-800">
-                  <path d="M 50 82 C 30 82 15 75 5 70 C 10 78 25 86 50 90 C 75 86 90 78 95 70 C 85 75 70 82 50 82 Z" fill="currentColor" stroke="none" />
-                  <path d="M 50 88 C 35 88 20 83 10 78 C 15 85 30 92 50 96 C 70 92 85 85 90 78 C 80 83 65 88 50 88 Z" fill="currentColor" stroke="none" />
-                  <path d="M 50 94 C 35 94 25 90 15 86 C 20 91 35 97 50 100 C 65 97 80 91 85 86 C 75 90 65 94 50 94 Z" fill="currentColor" stroke="none" />
-                  <path d="M 37 77 L 63 77 L 60 72 L 40 72 Z" fill="currentColor" stroke="none" />
-                  <path d="M 42 72 L 46 38 L 54 38 L 58 72 Z" fill="none" strokeWidth="2.5" />
-                  <path d="M 43 65 C 48 68 52 62 57 65 M 44.5 50 C 49 53 51 47 55.5 50" strokeWidth="2.5" fill="none" />
-                  <path d="M 47.5 72 L 47.5 63 C 47.5 61 52.5 61 52.5 63 L 52.5 72 Z" fill="currentColor" stroke="none" />
+                  <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
+                  <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
+                  <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
+                  <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
+                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
+                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                  <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
                   <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
-                  <path d="M 43 38 L 57 38 L 58 35 L 42 35 Z" fill="currentColor" stroke="none" />
-                  <rect x="45" y="27" width="10" height="8" fill="none" strokeWidth="2.5" />
-                  <rect x="48" y="27" width="4" height="8" fill="currentColor" stroke="none" />
-                  <path d="M 43 27 L 57 27 C 57 20 53 19 50 19 C 47 19 43 20 43 27 Z" fill="currentColor" stroke="none" />
-                  <path d="M 49 19 L 49 15 L 51 15 L 51 19 Z" fill="currentColor" stroke="none" />
-                  <circle cx="50" cy="14" r="1.5" fill="currentColor" stroke="none" />
+                  <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
+                  <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                  <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
+                  <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
+                  <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
+                  <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 whitespace-nowrap">
