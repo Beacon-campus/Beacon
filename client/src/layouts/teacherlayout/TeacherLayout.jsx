@@ -124,7 +124,7 @@ export default function TeacherLayout() {
 
               {/* HEADER: Logo Area */}
               <div 
-                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-2 p-6"} mb-2 transition-opacity`}
+                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-2 p-6"} mb-2 transition-transform duration-200 ease-in-out hover:scale-[1.02] active:scale-95`}
               >
                 <div className="flex items-center justify-center shrink-0 -mr-1">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
@@ -138,7 +138,7 @@ export default function TeacherLayout() {
                         <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
                       </linearGradient>
                     </defs>
-                    <g className="opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
+                    <g className="opacity-0 scale-75 origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100">
                       <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left)" className="text-yellow-400" />
                       <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left)" className="text-yellow-400" />
                       <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right)" className="text-yellow-400" />
