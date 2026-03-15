@@ -6,7 +6,6 @@ import AdminEditProfileModal from "../admin/AdminEditProfileModal";
 import { notifyServerLogout } from "../../services/session.service";
 
 // Import your SVGs
-import flameGif from "../../assets/flame.gif";
 
 import { useState } from "react";
 

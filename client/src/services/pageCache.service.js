@@ -1,4 +1,4 @@
-const CACHE_STORAGE_KEY = "streak.page-cache.v1";
+const CACHE_STORAGE_KEY = "beacon.page-cache.v1";
 
 function safeParse(raw) {
   if (!raw) return {};

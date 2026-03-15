@@ -8,7 +8,6 @@ import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
 // SVG Imports removed (using inline)
-import flameGif from "../../assets/flame.gif";
 
 export default function TeacherLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -125,26 +124,53 @@ export default function TeacherLayout() {
 
               {/* HEADER: Logo Area */}
               <div 
-                className={`flex items-center ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 p-6"} mb-2 cursor-pointer hover:opacity-80 transition-opacity`}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-2 p-6"} mb-2 transition-transform duration-200 ease-in-out hover:scale-[1.02] active:scale-95`}
               >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                  {isHovered ? (
-                    <img src={flameGif} alt="Flame" className="w-8 h-8 object-contain" />
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      className="w-8 h-8 text-primary fill-current"
-                    >
-                      <path d="M12.8324 21.8013C15.9583 21.1747 20 18.926 20 13.1112C20 7.8196 16.1267 4.29593 13.3415 2.67685C12.7235 2.31757 12 2.79006 12 3.50492V5.3334C12 6.77526 11.3938 9.40711 9.70932 10.5018C8.84932 11.0607 7.92052 10.2242 7.816 9.20388L7.73017 8.36604C7.6304 7.39203 6.63841 6.80075 5.85996 7.3946C4.46147 8.46144 3 10.3296 3 13.1112C3 20.2223 8.28889 22.0001 10.9333 22.0001C11.0871 22.0001 11.2488 21.9955 11.4171 21.9858C10.1113 21.8742 8 21.064 8 18.4442C8 16.3949 9.49507 15.0085 10.631 14.3346C10.9365 14.1533 11.2941 14.3887 11.2941 14.7439V15.3331C11.2941 15.784 11.4685 16.4889 11.8836 16.9714C12.3534 17.5174 13.0429 16.9454 13.0985 16.2273C13.1161 16.0008 13.3439 15.8564 13.5401 15.9711C14.1814 16.3459 15 17.1465 15 18.4442C15 20.4922 13.871 21.4343 12.8324 21.8013Z" />
-                    </svg>
-                  )}
+                <div className="flex items-center justify-center shrink-0 -mr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
+                    <defs>
+                      <linearGradient id="beam-left" x1="1" y1="0" x2="0" y2="0">
+                        <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                        <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                      </linearGradient>
+                      <linearGradient id="beam-right" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                        <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <g className="opacity-0 scale-75 origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100">
+                      <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left)" className="text-yellow-400" />
+                      <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left)" className="text-yellow-400" />
+                      <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right)" className="text-yellow-400" />
+                      <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right)" className="text-yellow-400" />
+                      <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
+                      <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
+                      <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
+                      <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
+                      <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
+                    </g>
+                    <g className="fill-slate-800 stroke-slate-800">
+                      <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
+                      <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
+                      <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
+                      <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
+                      <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
+                      <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                      <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
+                      <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
+                      <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
+                      <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                      <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
+                      <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
+                      <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
+                      <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
+                    </g>
+                  </svg>
                 </div>
                 
-                <span className={`font-black text-2xl tracking-tight text-primary uppercase whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
-                  STREAK
+                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
+                  Beacon
                 </span>
               </div>
 

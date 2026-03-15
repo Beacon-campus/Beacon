@@ -321,18 +321,20 @@ export default function Login() {
         <div className="relative z-10 max-w-4xl w-full flex flex-col items-center gap-6">
 
           {/* Lottie Container (Top & Large) */}
-          <div className="w-full flex justify-center py-2">
+          <div className="w-full flex justify-center py-2 relative">
+            {/* Subtle brand glow behind lottie to tie the design together */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-amber-400/20 blur-[80px] rounded-full pointer-events-none"></div>
             <DotLottiePlayer
               src={studentLottie}
               loop
               autoplay
-              className="w-full h-auto max-h-[600px] grayscale"
+              className="w-full h-auto max-h-[600px] relative z-10"
             />
           </div>
 
           {/* Bottom text */}
-          <p className="text-black text-base leading-relaxed max-w-2xl font-medium text-center">
-            Welcome to your digital campus. Connect seamlessly with your classmates and teachers, manage your assignments with ease, and access powerful AI tools tailored to your studies. We've brought everything you need for a productive academic life—including real-time collaboration, instant resource sharing, and smart scheduling—into one intuitive, collaborative space suitable for everyone.
+          <p className="text-slate-600 text-xl leading-relaxed max-w-lg font-medium text-center">
+            Welcome to your digital campus.
           </p>
         </div>
       </div>
@@ -343,19 +345,55 @@ export default function Login() {
         <div className="w-full max-w-sm space-y-8">
 
           {/* Header */}
-          {/* Header */}
-          {/* Header */}
           <div className="text-center space-y-2 mb-8 flex flex-col items-center w-full">
-            <h1 className="text-xl md:text-2xl font-bold tracking-[0.2em] text-primary uppercase w-full whitespace-nowrap">
-              STREAK
-            </h1>
+            <div className="flex items-center justify-center gap-3 group cursor-pointer mb-2 transition-transform duration-200 ease-in-out hover:scale-[1.02] active:scale-95">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 md:w-16 md:h-16 overflow-visible -mr-2">
+                <defs>
+                  <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="beam-right-lg" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <g className={`${submitting ? "opacity-100 scale-100" : "opacity-0 scale-75"} origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100`}>
+                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
+                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
+                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
+                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
+                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
+                  <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
+                  <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
+                  <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
+                  <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
+                </g>
+                <g className="fill-slate-800 stroke-slate-800">
+                  <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
+                  <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
+                  <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
+                  <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
+                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
+                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                  <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
+                  <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
+                  <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
+                  <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                  <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
+                  <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
+                  <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
+                  <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
+                </g>
+              </svg>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-800 whitespace-nowrap">
+                Beacon
+              </h1>
+            </div>
             <p className="text-sm text-gray-500 font-medium max-w-[90%]">
               Your digital campus for learning, collaboration, and AI tools
             </p>
-            <div className="mt-1 flex items-center justify-center gap-2">
-              <StatusChip label="Render" status={renderStatus} />
-              <StatusChip label="Docker" status={dockerStatus} />
-            </div>
           </div>
 
           {/* Form */}
@@ -363,8 +401,8 @@ export default function Login() {
 
             <div className="space-y-6">
               {/* Reg No Floating Label */}
-              <div className="mt-1">
-                <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
+              <div>
+                <div className="relative group bg-slate-50 border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
                   <input
                     type="text"
                     id="regno"
@@ -372,20 +410,20 @@ export default function Login() {
                     placeholder=" "
                     value={regno}
                     onChange={(e) => setRegno(e.target.value)}
-                    className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer"
+                    className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer"
                   />
                   <label
                     htmlFor="regno"
-                    className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
+                    className="absolute text-gray-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
                   >
                     Registration Number
                   </label>
                 </div>
-                <p className="mt-1 text-xs text-gray-400">Use your institutional registration number</p>
+                <p className="mt-1 ml-1 text-xs text-gray-400">Use your institutional registration number</p>
               </div>
 
               {/* Password Floating Label */}
-              <div className="relative group border-b-2 border-gray-200 focus-within:border-primary transition-colors pt-4 pb-1">
+              <div className="relative group bg-slate-50 border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
                 <input
                   type={showPass ? "text" : "password"}
                   id="password"
@@ -395,11 +433,11 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
                   onBlur={() => setCapsLock(false)}
-                  className="block w-full bg-transparent border-none p-0 text-primary text-lg font-medium focus:ring-0 outline-none focus:outline-none peer pr-10"
+                  className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer pr-10"
                 />
                 <label
                   htmlFor="password"
-                  className="absolute text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-0 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-primary"
+                  className="absolute text-gray-500 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
                 >
                   Password
                 </label>
@@ -408,14 +446,14 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-0 top-1/2 translate-y-0 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPass ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
 
                 {/* Caps Lock Warning */}
                 {capsLock && (
-                  <p className="absolute -bottom-5 left-0 text-[10px] text-red-500 font-medium flex items-center gap-1">
+                  <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-medium flex items-center gap-1">
                     <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span> Caps Lock is ON
                   </p>
                 )}
@@ -428,12 +466,12 @@ export default function Login() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary transition-colors"
+                    className="w-4 h-4 rounded border-gray-300 text-slate-800 focus:ring-slate-800 transition-colors"
                   />
                   <span className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Remember me</span>
                 </label>
 
-                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-primary hover:underline transition-all">
+                <button type="button" onClick={handleForgotPassword} className="text-sm font-medium text-slate-800 hover:text-slate-600 hover:underline transition-all">
                   Forgot password?
                 </button>
               </div>
@@ -443,7 +481,7 @@ export default function Login() {
             <div className="space-y-4 pt-2">
               <button
                 disabled={submitting}
-                className="w-full h-12 rounded-xl bg-primary text-white font-semibold hover:-translate-y-[1px] hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
+                className="w-full h-12 rounded-xl bg-slate-900 text-white font-semibold hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center gap-2"
               >
                 {submitting ? "Signing In..." : "Sign In"}
               </button>
@@ -464,7 +502,7 @@ export default function Login() {
                   onClick={handleGoogleLogin}
                   className="group w-full h-12 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
                 >
-                  <div className="w-5 h-5 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all"><GoogleIcon /></div>
+                  <div className="w-5 h-5 transition-all"><GoogleIcon /></div>
                   Sign in with Google
                 </button>
               </div>
@@ -474,7 +512,7 @@ export default function Login() {
 
           {/* Footer moved to Right Panel */}
           <div className="flex items-center justify-center gap-4 pt-6">
-            <div className="flex -space-x-4 grayscale opacity-80">
+            <div className="flex -space-x-4">
               <img src={profile1} alt="User 1" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               <img src={profile5} alt="User 2" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               <img src={profile9} alt="User 3" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
