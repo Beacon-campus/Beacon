@@ -71,6 +71,26 @@ const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
+const parseTrustProxy = (value) => {
+  if (value == null || value === "") {
+    return process.env.NODE_ENV === "production" ? 1 : false;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+
+  const numericValue = Number(normalized);
+  if (!Number.isNaN(numericValue)) {
+    return numericValue;
+  }
+
+  return value;
+};
+
+app.set("trust proxy", parseTrustProxy(process.env.TRUST_PROXY));
+
 // Dynamic CORS configuration from env (comma-separated values supported)
 const allowedOrigins = String(process.env.CLIENT_URL || "http://localhost:5173,http://localhost:3000")
   .split(",")

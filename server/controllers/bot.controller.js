@@ -60,7 +60,20 @@ export const chatWithBot = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Chat Error:", error);
+    const errorCode = error?.code || error?.cause?.code || "BOT_CHAT_FAILED";
+    const errorMessage = error?.message || error?.cause?.message || "Server error processing chat";
+
+    console.error("Chat Error:", {
+      code: errorCode,
+      message: errorMessage,
+      cause: error?.cause?.message || null,
+      stack: error?.stack
+    });
+
+    if (errorCode === "BOT_CONFIG_MISSING") {
+      return res.status(500).json({ error: "Bot service is not configured on the server" });
+    }
+
     res.status(500).json({ error: 'Server error processing chat' });
   }
 };

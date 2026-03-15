@@ -1,7 +1,24 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import BotSession from "../models/BotSessions.js";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const DEFAULT_GEMINI_MODELS = [
+    process.env.GEMINI_MODEL,
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
+].filter(Boolean);
+
+const getGenAIClient = () => {
+    const apiKey = String(process.env.GOOGLE_API_KEY || "").trim();
+
+    if (!apiKey) {
+        const error = new Error("Missing GOOGLE_API_KEY");
+        error.code = "BOT_CONFIG_MISSING";
+        throw error;
+    }
+
+    return new GoogleGenerativeAI(apiKey);
+};
 
 export const calculateDocSize = (session) => {
     const str = JSON.stringify(session);
@@ -15,6 +32,7 @@ export const getSessionByIdAndUser = async (sessionId, userId) => {
 };
 
 export const generateBotResponse = async (botType, currentSummary, contextHistory, message) => {
+    const genAI = getGenAIClient();
     let systemPrompt = `
       You are a ${botType === 'teacher' ? 'Research Assistant' : 'Study Buddy'}.
       
@@ -31,32 +49,46 @@ export const generateBotResponse = async (botType, currentSummary, contextHistor
       - Keep it clear and academic.
     `;
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      systemInstruction: systemPrompt,
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
-    });
+    let lastError;
 
-    const chat = model.startChat({
-        history: contextHistory
-    });
+    for (const modelName of DEFAULT_GEMINI_MODELS) {
+        try {
+            const model = genAI.getGenerativeModel({
+              model: modelName,
+              systemInstruction: systemPrompt,
+              generationConfig: {
+                responseMimeType: "application/json"
+              }
+            });
 
-    const result = await chat.sendMessage(message);
-    const responseText = result.response.text();
-    
-    let parsedResponse;
-    try {
-        parsedResponse = JSON.parse(responseText);
-    } catch (e) {
-        parsedResponse = { 
-            reply: responseText, 
-            summary: currentSummary 
-        };
+            const chat = model.startChat({
+                history: contextHistory
+            });
+
+            const result = await chat.sendMessage(message);
+            const responseText = result.response.text();
+            
+            let parsedResponse;
+            try {
+                parsedResponse = JSON.parse(responseText);
+            } catch (e) {
+                parsedResponse = {
+                    reply: responseText,
+                    summary: currentSummary
+                };
+            }
+
+            return parsedResponse;
+        } catch (error) {
+            lastError = error;
+            console.error(`[bot] Gemini request failed for model "${modelName}":`, error?.message || error);
+        }
     }
-    
-    return parsedResponse;
+
+    const wrappedError = new Error(lastError?.message || "Failed to generate bot response");
+    wrappedError.code = lastError?.code || "BOT_PROVIDER_ERROR";
+    wrappedError.cause = lastError;
+    throw wrappedError;
 };
 
 export const saveSession = async (session) => {
