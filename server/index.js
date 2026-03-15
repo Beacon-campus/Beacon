@@ -159,7 +159,6 @@ app.use("/api/calendar", calendarRoutes);
 app.use("/api/timetable", timetableRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/assignments", assignmentRoutes);
-app.use("/api/uploads/file", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/bot", botRoutes);
 app.use("/api/friends", friendsRoutes);

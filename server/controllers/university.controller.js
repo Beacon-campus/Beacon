@@ -24,11 +24,24 @@ export const postUniversityAnnouncement = async (req, res) => {
 
     const normalizedAttachment = attachment
       ? {
+          type: "file",
           name: String(attachment.name || "").trim(),
-          type: String(attachment.type || "").trim(),
+          mimeType: String(attachment.mimeType || attachment.type || "").trim(),
           url: String(attachment.url || "").trim(),
           downloadUrl: String(attachment.downloadUrl || "").trim(),
           path: String(attachment.path || "").trim(),
+          cloudinary: attachment.cloudinary || {
+            publicId: String(attachment.publicId || "").trim(),
+            version: Number(attachment.version || 0) || null,
+            resourceType: String(attachment.resourceType || "").trim(),
+            format: String(attachment.format || "").trim(),
+            secureUrl: String(attachment.secureUrl || "").trim(),
+          },
+          publicId: String(attachment.publicId || "").trim(),
+          version: Number(attachment.version || 0) || null,
+          resourceType: String(attachment.resourceType || "").trim(),
+          format: String(attachment.format || "").trim(),
+          secureUrl: String(attachment.secureUrl || "").trim(),
           previewUrl: String(attachment.previewUrl || "").trim(),
           previewDownloadUrl: String(attachment.previewDownloadUrl || "").trim(),
           previewPath: String(attachment.previewPath || "").trim(),
@@ -68,7 +81,7 @@ export const postUniversityAnnouncement = async (req, res) => {
       target: { type: "university_announcement", id: String(created._id) },
       metadata: {
         hasAttachment: !!normalizedAttachment,
-        attachmentType: normalizedAttachment?.type || "",
+        attachmentType: normalizedAttachment?.mimeType || normalizedAttachment?.type || "",
         attachmentKind: normalizedAttachment?.kind || "",
         attachmentPath: normalizedAttachment?.path || "",
         messageLength: trimmedMessage.length,

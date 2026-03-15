@@ -19,13 +19,6 @@ import Classroom from "../models/Classroom.js";
 import UniversityAnnouncement from "../models/UniversityAnnouncement.js";
 
 const APPLY_CHANGES = process.argv.includes("--apply");
-const baseUrl = String(process.env.API_URL || "").replace(/\/+$/, "");
-
-if (!baseUrl) {
-  console.error("Missing API_URL in env. Aborting.");
-  process.exit(1);
-}
-
 if (!isCloudinaryConfigured) {
   console.error("Cloudinary is not configured. Aborting.");
   process.exit(1);
@@ -39,9 +32,13 @@ const MIME_TO_EXT = {
   "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
   "application/vnd.ms-excel": "xls",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/zip": "zip",
+  "text/plain": "txt",
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+  "image/gif": "gif",
+  "image/svg+xml": "svg",
 };
 
 const normalizeMime = (value) =>
@@ -69,14 +66,6 @@ const resolveSafeName = (fileName, mime) => {
   }
 
   return sanitizeFileName(rawName);
-};
-
-const buildUrls = (objectPath, fileName) => {
-  const encodedPath = encodeURIComponent(objectPath);
-  return {
-    url: `${baseUrl}/api/uploads/file/${encodedPath}`,
-    downloadUrl: `${baseUrl}/api/uploads/file/${encodedPath}?download=1&name=${encodeURIComponent(fileName)}`,
-  };
 };
 
 const parseDataUrl = (dataUrl) => {
@@ -121,14 +110,17 @@ const buildAttachmentFromDataUrl = async ({
     assignmentId,
   });
 
-  await uploadBufferToCloudinary(
+  const originalUpload = await uploadBufferToCloudinary(
     objectPath,
     buffer,
     normalizedMime,
     getResourceTypeForMime(normalizedMime)
   );
-
-  const original = buildUrls(objectPath, safeName);
+  const originalSecureUrl = originalUpload?.secure_url || "";
+  const originalPublicId = originalUpload?.public_id || objectPath;
+  const originalVersion = Number(originalUpload?.version || 0) || null;
+  const originalResourceType = originalUpload?.resource_type || getResourceTypeForMime(normalizedMime);
+  const originalFormat = originalUpload?.format || safeName.split(".").pop() || "";
 
   let previewPath = null;
   let previewUrl = null;
@@ -143,11 +135,15 @@ const buildAttachmentFromDataUrl = async ({
     if (previewResult.ok && previewResult.buffer?.length) {
       const pdfName = `${safeName.replace(/\.[^.]+$/, "")}.pdf`;
       const previewObjectPath = objectPath.replace(/[^/]+$/, `${Date.now()}-preview-${pdfName}`);
-      await uploadBufferToCloudinary(previewObjectPath, previewResult.buffer, "application/pdf", "raw");
-      const previewUrls = buildUrls(previewObjectPath, pdfName);
+      const previewUpload = await uploadBufferToCloudinary(
+        previewObjectPath,
+        previewResult.buffer,
+        "application/pdf",
+        "raw"
+      );
       previewPath = previewObjectPath;
-      previewUrl = previewUrls.url;
-      previewDownloadUrl = previewUrls.downloadUrl;
+      previewUrl = previewUpload?.secure_url || "";
+      previewDownloadUrl = previewUrl || "";
       previewType = "application/pdf";
       previewStatus = "ready";
     } else {
@@ -156,13 +152,13 @@ const buildAttachmentFromDataUrl = async ({
     }
   } else if (mime === "application/pdf") {
     previewPath = objectPath;
-    previewUrl = original.url;
-    previewDownloadUrl = original.downloadUrl;
+    previewUrl = originalSecureUrl;
+    previewDownloadUrl = originalSecureUrl;
     previewType = normalizedMime;
     previewStatus = "ready";
   } else if (normalizedMime.startsWith("image/")) {
-    previewUrl = original.url;
-    previewDownloadUrl = original.downloadUrl;
+    previewUrl = originalSecureUrl;
+    previewDownloadUrl = originalSecureUrl;
     previewType = normalizedMime;
     previewStatus = "ready";
   } else {
@@ -170,14 +166,27 @@ const buildAttachmentFromDataUrl = async ({
   }
 
   return {
+    type: "file",
     name: safeName,
-    type: normalizedMime,
+    mimeType: normalizedMime,
     size: buffer.length,
     kind: mime.startsWith("image/") ? "image" : "file",
     scope,
-    url: original.url,
-    downloadUrl: original.downloadUrl,
+    url: originalSecureUrl,
+    downloadUrl: originalSecureUrl,
     path: objectPath,
+    cloudinary: {
+      publicId: originalPublicId,
+      version: originalVersion,
+      resourceType: originalResourceType,
+      format: originalFormat,
+      secureUrl: originalSecureUrl,
+    },
+    publicId: originalPublicId,
+    version: originalVersion,
+    resourceType: originalResourceType,
+    format: originalFormat,
+    secureUrl: originalSecureUrl,
     previewUrl,
     previewDownloadUrl,
     previewPath,

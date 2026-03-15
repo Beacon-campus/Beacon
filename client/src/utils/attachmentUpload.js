@@ -11,12 +11,16 @@ export const SUPPORTED_ATTACHMENT_MIME_TYPES = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/zip",
+  "text/plain",
   "image/jpeg",
   "image/png",
   "image/webp",
+  "image/gif",
+  "image/svg+xml",
 ];
 
-export const ACCEPTED_ATTACHMENT_EXTENSIONS = ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp";
+export const ACCEPTED_ATTACHMENT_EXTENSIONS = ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip,.jpg,.jpeg,.png,.webp,.gif,.svg";
 export const MAX_ATTACHMENT_SIZE_BYTES = 2 * 1024 * 1024;
 export const MAX_IMAGE_SOURCE_SIZE_BYTES = 12 * 1024 * 1024;
 
@@ -98,13 +102,26 @@ export async function uploadAttachment(file, scope = "dm", options = {}) {
   );
 
   return {
+    type: "file",
     name: data.name || processedFile.name || file.name,
-    type: data.type || processedFile.type || file.type,
+    mimeType: data.mimeType || data.type || processedFile.type || file.type,
     size: Number(data.size || processedFile.size || file.size),
     kind: data.kind || ((processedFile.type || file.type).startsWith("image/") ? "image" : "file"),
-    url: data.url,
-    downloadUrl: data.downloadUrl || data.url,
+    url: data.secureUrl || data.url,
+    downloadUrl: data.secureUrl || data.downloadUrl || data.url,
     path: data.path || null,
+    cloudinary: data.cloudinary || {
+      publicId: data.publicId || null,
+      version: data.version || null,
+      resourceType: data.resourceType || null,
+      format: data.format || null,
+      secureUrl: data.secureUrl || data.url || null,
+    },
+    publicId: data.publicId || data.cloudinary?.publicId || null,
+    version: data.version || data.cloudinary?.version || null,
+    resourceType: data.resourceType || data.cloudinary?.resourceType || null,
+    format: data.format || data.cloudinary?.format || null,
+    secureUrl: data.secureUrl || data.cloudinary?.secureUrl || data.url || null,
     previewUrl: data.previewUrl || null,
     previewDownloadUrl: data.previewDownloadUrl || null,
     previewPath: data.previewPath || null,

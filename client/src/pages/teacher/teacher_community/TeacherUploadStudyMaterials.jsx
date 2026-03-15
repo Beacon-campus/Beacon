@@ -55,11 +55,18 @@ export default function TeacherUploadStudyMaterials() {
 
       const uploaded = await uploadAttachment(file, "study_material");
       const payload = {
+        type: "file",
         name: displayName || uploaded.name || file.name,
-        type: uploaded.type || file.type || "application/octet-stream",
+        mimeType: uploaded.mimeType || uploaded.type || file.type || "application/octet-stream",
         url: uploaded.url,
         downloadUrl: uploaded.downloadUrl || uploaded.url,
         path: uploaded.path || null,
+        publicId: uploaded.publicId || null,
+        version: uploaded.version || null,
+        resourceType: uploaded.resourceType || null,
+        format: uploaded.format || null,
+        secureUrl: uploaded.secureUrl || uploaded.url || null,
+        cloudinary: uploaded.cloudinary || null,
         previewUrl: uploaded.previewUrl || null,
         previewDownloadUrl: uploaded.previewDownloadUrl || null,
         previewPath: uploaded.previewPath || null,

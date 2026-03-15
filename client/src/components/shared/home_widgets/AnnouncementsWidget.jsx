@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Modal from "../../ui/Modal";
 import DocViewer from "../../doccomps/docviewer";
 import ImagePreviewModal from "../../ui/ImagePreviewModal";
+import { resolveAttachmentUrl } from "../../../utils/cloudinaryUrl";
 
 const LONG_MESSAGE_THRESHOLD = 130;
 
@@ -30,11 +31,12 @@ export default function AnnouncementsWidget({
 
     const openDocPreview = () => {
         if (!current?.attachment) return;
+        const resolvedUrl = resolveAttachmentUrl(current.attachment);
         setDocFile({
             name: current.attachment.name || "attachment",
-            type: current.attachment.type || "",
-            url: current.attachment.url || "",
-            downloadUrl: current.attachment.downloadUrl || current.attachment.url || "",
+            type: current.attachment.mimeType || current.attachment.type || "",
+            url: resolvedUrl || "",
+            downloadUrl: current.attachment.downloadUrl || resolvedUrl || "",
             previewUrl: current.attachment.previewUrl || null,
             previewDownloadUrl: current.attachment.previewDownloadUrl || null,
             previewPath: current.attachment.previewPath || null,
@@ -51,11 +53,11 @@ export default function AnnouncementsWidget({
             return;
         }
 
-        if (current?.attachment?.kind === "image" && current?.attachment?.url) {
+        if (current?.attachment?.kind === "image" && resolveAttachmentUrl(current?.attachment)) {
             setImageModalOpen(true);
             return;
         }
-        if (current?.attachment?.kind === "file" && current?.attachment?.url) {
+        if (current?.attachment?.kind === "file" && resolveAttachmentUrl(current?.attachment)) {
             openDocPreview();
             return;
         }
@@ -116,7 +118,7 @@ export default function AnnouncementsWidget({
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             if (enableAdvancedPreview) openDocPreview();
-                                            else window.open(current.attachment.downloadUrl || current.attachment.url, "_blank");
+                                            else window.open(current.attachment.downloadUrl || resolveAttachmentUrl(current.attachment), "_blank");
                                         }}
                                     >
                                         {enableAdvancedPreview ? "Preview attachment" : "Open attachment"}: {current.attachment.name || "file"}
@@ -175,7 +177,7 @@ export default function AnnouncementsWidget({
                     <ImagePreviewModal
                         isOpen={imageModalOpen}
                         onClose={() => setImageModalOpen(false)}
-                        imageUrl={current?.attachment?.url}
+                        imageUrl={resolveAttachmentUrl(current?.attachment)}
                         imageName={current?.attachment?.name || "Announcement image"}
                     />
                 </>

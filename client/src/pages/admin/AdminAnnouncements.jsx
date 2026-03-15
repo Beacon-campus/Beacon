@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { uploadAttachment, ACCEPTED_ATTACHMENT_EXTENSIONS } from "../../utils/attachmentUpload";
+import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import { createUniversityAnnouncement, fetchRecentUniversityAnnouncements } from "../../services/university.service";
 
 function formatDate(value) {
@@ -19,11 +20,24 @@ function fileSizeLabel(bytes) {
 function toAnnouncementAttachment(uploaded) {
   if (!uploaded) return null;
   return {
+    type: "file",
     name: uploaded.name,
-    type: uploaded.type,
+    mimeType: uploaded.mimeType || uploaded.type,
     url: uploaded.url,
     downloadUrl: uploaded.downloadUrl || uploaded.url,
     path: uploaded.path || "",
+    cloudinary: uploaded.cloudinary || {
+      publicId: uploaded.publicId || "",
+      version: uploaded.version || null,
+      resourceType: uploaded.resourceType || "",
+      format: uploaded.format || "",
+      secureUrl: uploaded.secureUrl || uploaded.url || "",
+    },
+    publicId: uploaded.publicId || "",
+    version: uploaded.version || null,
+    resourceType: uploaded.resourceType || "",
+    format: uploaded.format || "",
+    secureUrl: uploaded.secureUrl || uploaded.url || "",
     previewUrl: uploaded.previewUrl || "",
     previewDownloadUrl: uploaded.previewDownloadUrl || "",
     previewPath: uploaded.previewPath || "",
@@ -182,7 +196,7 @@ export default function AdminAnnouncements() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-bold text-slate-700 break-all">{attachment.name}</p>
-                      <p className="text-xs text-slate-500 mt-1">{attachment.type} {attachment.size ? `• ${fileSizeLabel(attachment.size)}` : ""}</p>
+                      <p className="text-xs text-slate-500 mt-1">{attachment.mimeType || attachment.type || ""} {attachment.size ? `• ${fileSizeLabel(attachment.size)}` : ""}</p>
                     </div>
                     <button type="button" onClick={() => setAttachment(null)} className="text-xs font-bold text-red-600 hover:underline">
                       Remove
@@ -213,9 +227,9 @@ export default function AdminAnnouncements() {
                       <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
                         {item.createdBy?.name || "Admin"} • {formatDate(item.createdAt)}
                       </p>
-                      {item.attachment?.url ? (
+                      {resolveAttachmentUrl(item.attachment) ? (
                         <a
-                          href={item.attachment.downloadUrl || item.attachment.url}
+                          href={item.attachment?.cloudinary?.secureUrl || item.attachment?.secureUrl || item.attachment?.downloadUrl || item.attachment?.url}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-blue-600 hover:underline"
@@ -231,9 +245,9 @@ export default function AdminAnnouncements() {
                       {item.message || item.attachment?.name || "Attachment only"}
                     </p>
 
-                    {item.attachment?.kind === "image" && item.attachment?.url ? (
+                    {item.attachment?.kind === "image" && resolveAttachmentUrl(item.attachment) ? (
                       <div className="mt-3">
-                        <img src={item.attachment.url} alt={item.attachment.name || "announcement"} className="rounded-lg border border-slate-200 max-h-56 object-cover" />
+                        <img src={resolveAttachmentUrl(item.attachment)} alt={item.attachment.name || "announcement"} className="rounded-lg border border-slate-200 max-h-56 object-cover" />
                       </div>
                     ) : null}
 

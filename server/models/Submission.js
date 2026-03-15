@@ -5,7 +5,10 @@ const submissionSchema = new mongoose.Schema({
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
     // Stored attachment metadata from uploads (or legacy string path).
-    file: { type: mongoose.Schema.Types.Mixed }, // Not required for quiz
+    file: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    }, // Not required for quiz
 
     // Quiz Specifics
     isCheated: { type: Boolean, default: false },

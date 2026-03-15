@@ -56,11 +56,24 @@ async function uploadSample(filePath, mimeType) {
   const result = await uploadBufferToCloudinary(publicId, buffer, mimeType, resourceType);
 
   return {
+    type: "file",
     name: fileName,
-    type: mimeType,
+    mimeType,
     url: result.secure_url,
     downloadUrl: result.secure_url,
     path: publicId,
+    publicId: result.public_id || publicId,
+    version: Number(result.version || 0) || null,
+    resourceType: result.resource_type || resourceType,
+    format: result.format || path.extname(fileName).replace(".", "") || "",
+    secureUrl: result.secure_url,
+    cloudinary: {
+      publicId: result.public_id || publicId,
+      version: Number(result.version || 0) || null,
+      resourceType: result.resource_type || resourceType,
+      format: result.format || path.extname(fileName).replace(".", "") || "",
+      secureUrl: result.secure_url,
+    },
     previewUrl: mimeType === "application/pdf" || isImage ? result.secure_url : "",
     previewDownloadUrl: mimeType === "application/pdf" || isImage ? result.secure_url : "",
     previewPath: mimeType === "application/pdf" || isImage ? publicId : "",

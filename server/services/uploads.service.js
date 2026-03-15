@@ -19,9 +19,13 @@ export const ALLOWED_MIME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/zip",
+  "text/plain",
   "image/jpeg",
   "image/png",
   "image/webp",
+  "image/gif",
+  "image/svg+xml",
 ]);
 
 export const OFFICE_MIME_TYPES = new Set([
@@ -43,7 +47,7 @@ const SCOPE_TO_PREFIX = {
   study_material: "study-materials",
   assignment_submission: "assignments/submissions",
   assignment_resource: "assignments/resources",
-  university_announcement: "university",
+  university_announcement: "university/announcements",
 };
 
 if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
@@ -110,7 +114,8 @@ export async function generateOfficePreviewPdf(buffer) {
 }
 
 export function getResourceTypeForMime(mimeType = "") {
-  return String(mimeType).startsWith("image/") ? "image" : "raw";
+  const normalized = String(mimeType).toLowerCase();
+  return normalized.startsWith("image/") ? "image" : "raw";
 }
 
 export function sanitizeFileName(fileName = "attachment") {
@@ -118,27 +123,6 @@ export function sanitizeFileName(fileName = "attachment") {
   const base = path.basename(fileName, ext).replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 64) || "attachment";
   const safeExt = ext.replace(/[^a-zA-Z0-9.]/g, "").slice(0, 10);
   return `${base}${safeExt || ""}`;
-}
-
-export function getBaseUrl(req) {
-  const configuredBaseUrl = process.env.API_URL;
-  if (!configuredBaseUrl) {
-    throw new Error("Missing required env var: API_URL");
-  }
-  const normalized = String(configuredBaseUrl).replace(/\/+$/, "");
-  let parsed;
-  try {
-    parsed = new URL(normalized);
-  } catch {
-    throw new Error("Invalid API_URL. It must be a valid absolute URL.");
-  }
-  if (!["http:", "https:"].includes(parsed.protocol)) {
-    throw new Error("Invalid API_URL protocol. Use http or https.");
-  }
-  if (process.env.NODE_ENV === "production" && parsed.protocol !== "https:") {
-    throw new Error("Invalid API_URL for production. HTTPS is required.");
-  }
-  return normalized;
 }
 
 export async function uploadBufferToCloudinary(publicId, buffer, contentType, resourceType = "auto", options = {}) {
@@ -152,6 +136,8 @@ export async function uploadBufferToCloudinary(publicId, buffer, contentType, re
         asset_folder: assetFolder && assetFolder !== "." ? assetFolder : undefined,
         overwrite: Boolean(options.overwrite),
         resource_type: resourceType,
+        type: "upload",
+        access_mode: "public",
         folder: undefined,
         use_filename: false,
         unique_filename: false,
@@ -175,6 +161,8 @@ function tryContentTypeFromPublicId(publicId = "") {
   if (lowerPath.endsWith(".png")) return "image/png";
   if (lowerPath.endsWith(".jpg") || lowerPath.endsWith(".jpeg")) return "image/jpeg";
   if (lowerPath.endsWith(".webp")) return "image/webp";
+  if (lowerPath.endsWith(".gif")) return "image/gif";
+  if (lowerPath.endsWith(".svg")) return "image/svg+xml";
   if (lowerPath.endsWith(".pdf")) return "application/pdf";
   if (lowerPath.endsWith(".doc")) return "application/msword";
   if (lowerPath.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -182,11 +170,13 @@ function tryContentTypeFromPublicId(publicId = "") {
   if (lowerPath.endsWith(".pptx")) return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
   if (lowerPath.endsWith(".xls")) return "application/vnd.ms-excel";
   if (lowerPath.endsWith(".xlsx")) return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  if (lowerPath.endsWith(".txt")) return "text/plain";
+  if (lowerPath.endsWith(".zip")) return "application/zip";
   return "application/octet-stream";
 }
 
 function stripKnownExtension(publicId = "") {
-  return String(publicId).replace(/\.(pdf|docx?|pptx?|xlsx?|png|jpe?g|webp)$/i, "");
+  return String(publicId).replace(/\.(pdf|docx?|pptx?|xlsx?|png|jpe?g|webp|gif|svg|txt|zip)$/i, "");
 }
 
 export async function resolveCloudinaryResource(publicId) {
@@ -220,15 +210,6 @@ export function buildCloudinarySignedDownloadUrl(publicId, resourceType = "raw")
     expires_at: expiresAt,
     attachment: false,
   });
-}
-
-export function buildUrls(req, objectPath, fileName) {
-  const encodedPath = encodeURIComponent(objectPath);
-  const baseUrl = getBaseUrl(req);
-  return {
-    url: `${baseUrl}/api/uploads/file/${encodedPath}`,
-    downloadUrl: `${baseUrl}/api/uploads/file/${encodedPath}?download=1&name=${encodeURIComponent(fileName)}`,
-  };
 }
 
 export function buildObjectPath({

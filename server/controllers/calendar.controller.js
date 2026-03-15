@@ -3,6 +3,7 @@ import {
   downloadCalendarImage,
   buildCloudinaryImageUrl,
 } from "../services/calendar.service.js";
+import { buildCloudinaryUrl } from "../utils/cloudinaryUrl.js";
 import AcademicCalendar from "../models/AcademicCalendar.js";
 import User from "../models/User.js";
 import { isCloudinaryConfigured, uploadBufferToCloudinary } from "../services/uploads.service.js";
@@ -61,8 +62,24 @@ export const getCurrentCalendar = async (req, res) => {
     const oddProxyUrl = `${apiOrigin}/api/calendar/image/odd`;
     const evenProxyUrl = `${apiOrigin}/api/calendar/image/even`;
 
-    const oddDirectUrl = buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_ODD_PUBLIC_ID);
-    const evenDirectUrl = buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
+    const oddCloudinary = calendar?.oddSemCloudinary || null;
+    const evenCloudinary = calendar?.evenSemCloudinary || null;
+
+    const oddDirectUrl = oddCloudinary?.secureUrl
+      || buildCloudinaryUrl({
+        publicId: oddCloudinary?.publicId || DEFAULT_ODD_PUBLIC_ID,
+        version: oddCloudinary?.version,
+        resourceType: oddCloudinary?.resourceType || "image",
+      })
+      || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_ODD_PUBLIC_ID);
+
+    const evenDirectUrl = evenCloudinary?.secureUrl
+      || buildCloudinaryUrl({
+        publicId: evenCloudinary?.publicId || DEFAULT_EVEN_PUBLIC_ID,
+        version: evenCloudinary?.version,
+        resourceType: evenCloudinary?.resourceType || "image",
+      })
+      || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
 
     const oddSemUrlCandidates = normalizeCandidates([
       calendar.oddSemUrl,
@@ -84,6 +101,8 @@ export const getCurrentCalendar = async (req, res) => {
       academicYear: calendar.academicYear,
       oddSemUrl: calendar.oddSemUrl || oddDirectUrl,
       evenSemUrl: calendar.evenSemUrl || evenDirectUrl,
+      oddSemCloudinary: oddCloudinary,
+      evenSemCloudinary: evenCloudinary,
       oddSemUrlCandidates,
       evenSemUrlCandidates,
       events: Array.isArray(calendar.events) ? calendar.events : [],
@@ -156,6 +175,7 @@ export const updateImagePaths = async (req, res) => {
     const academicYear = String(rawAcademicYear || getDefaultAcademicYear()).trim();
     let nextOddUrl = String(oddSemUrl || "").trim();
     let nextEvenUrl = String(evenSemUrl || "").trim();
+    const updateDoc = {};
 
     if (oddImageDataUrl || evenImageDataUrl) {
       if (!isCloudinaryConfigured) {
@@ -175,7 +195,15 @@ export const updateImagePaths = async (req, res) => {
         "image",
         { overwrite: true }
       );
-      nextOddUrl = uploaded?.secure_url || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_ODD_PUBLIC_ID);
+      const cloudinaryMeta = {
+        publicId: uploaded?.public_id || DEFAULT_ODD_PUBLIC_ID,
+        version: Number(uploaded?.version || 0) || null,
+        resourceType: uploaded?.resource_type || "image",
+        format: uploaded?.format || "png",
+        secureUrl: uploaded?.secure_url || "",
+      };
+      nextOddUrl = cloudinaryMeta.secureUrl || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_ODD_PUBLIC_ID);
+      updateDoc.oddSemCloudinary = cloudinaryMeta;
     }
 
     if (evenImageDataUrl) {
@@ -190,10 +218,17 @@ export const updateImagePaths = async (req, res) => {
         "image",
         { overwrite: true }
       );
-      nextEvenUrl = uploaded?.secure_url || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
+      const cloudinaryMeta = {
+        publicId: uploaded?.public_id || DEFAULT_EVEN_PUBLIC_ID,
+        version: Number(uploaded?.version || 0) || null,
+        resourceType: uploaded?.resource_type || "image",
+        format: uploaded?.format || "png",
+        secureUrl: uploaded?.secure_url || "",
+      };
+      nextEvenUrl = cloudinaryMeta.secureUrl || buildCloudinaryImageUrl(CLOUDINARY_CLOUD_NAME, DEFAULT_EVEN_PUBLIC_ID);
+      updateDoc.evenSemCloudinary = cloudinaryMeta;
     }
 
-    const updateDoc = {};
     if (nextOddUrl) updateDoc.oddSemUrl = nextOddUrl;
     if (nextEvenUrl) updateDoc.evenSemUrl = nextEvenUrl;
     if (Array.isArray(events)) updateDoc.events = events;
