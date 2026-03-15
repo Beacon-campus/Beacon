@@ -14,6 +14,20 @@ const calendarSchema = new mongoose.Schema({
   academicYear: { type: String, required: true, unique: true },
   oddSemUrl: { type: String, default: "" },
   evenSemUrl: { type: String, default: "" },
+  oddSemCloudinary: {
+    publicId: { type: String, default: "" },
+    version: { type: Number, default: null },
+    resourceType: { type: String, default: "" },
+    format: { type: String, default: "" },
+    secureUrl: { type: String, default: "" },
+  },
+  evenSemCloudinary: {
+    publicId: { type: String, default: "" },
+    version: { type: Number, default: null },
+    resourceType: { type: String, default: "" },
+    format: { type: String, default: "" },
+    secureUrl: { type: String, default: "" },
+  },
   events: [eventSchema],
 }, { 
   timestamps: true,

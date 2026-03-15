@@ -5,6 +5,7 @@ import { getOrFetchPageCache } from "../services/pageCache.service";
 import jsPDF from "jspdf";
 import Modal from "./ui/Modal";
 import { exportRowsToXlsx } from "../utils/excelExport";
+import { buildCloudinaryUrl } from "../utils/cloudinaryUrl";
 
 // --- Icons ---
 const DownloadIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>;
@@ -282,25 +283,41 @@ export default function Calendar() {
   const normalizeUrlCandidates = (urls) =>
     [...new Set((urls || []).filter((u) => typeof u === "string" && u.trim().length > 0))];
 
-  const oddSemUrlCandidates = useMemo(
-    () => normalizeUrlCandidates([
+  const oddSemUrlCandidates = useMemo(() => {
+    const cloudinaryCandidate = calendarData?.oddSemCloudinary
+      ? (calendarData.oddSemCloudinary.secureUrl
+        || buildCloudinaryUrl({
+          publicId: calendarData.oddSemCloudinary.publicId,
+          version: calendarData.oddSemCloudinary.version,
+          resourceType: calendarData.oddSemCloudinary.resourceType || "image",
+        }))
+      : null;
+    return normalizeUrlCandidates([
+      cloudinaryCandidate,
       calendarData?.oddSemUrl,
       ...(Array.isArray(calendarData?.oddSemUrlCandidates) ? calendarData.oddSemUrlCandidates : []),
       CLOUDINARY_ODD_FALLBACK,
       LOCAL_ODD_FALLBACK
-    ]),
-    [calendarData, CLOUDINARY_ODD_FALLBACK]
-  );
+    ]);
+  }, [calendarData, CLOUDINARY_ODD_FALLBACK]);
 
-  const evenSemUrlCandidates = useMemo(
-    () => normalizeUrlCandidates([
+  const evenSemUrlCandidates = useMemo(() => {
+    const cloudinaryCandidate = calendarData?.evenSemCloudinary
+      ? (calendarData.evenSemCloudinary.secureUrl
+        || buildCloudinaryUrl({
+          publicId: calendarData.evenSemCloudinary.publicId,
+          version: calendarData.evenSemCloudinary.version,
+          resourceType: calendarData.evenSemCloudinary.resourceType || "image",
+        }))
+      : null;
+    return normalizeUrlCandidates([
+      cloudinaryCandidate,
       calendarData?.evenSemUrl,
       ...(Array.isArray(calendarData?.evenSemUrlCandidates) ? calendarData.evenSemUrlCandidates : []),
       CLOUDINARY_EVEN_FALLBACK,
       LOCAL_EVEN_FALLBACK
-    ]),
-    [calendarData, CLOUDINARY_EVEN_FALLBACK]
-  );
+    ]);
+  }, [calendarData, CLOUDINARY_EVEN_FALLBACK]);
 
   const fetchBlobWithTimeout = async (url, timeoutMs = 12000) => {
     const controller = new AbortController();

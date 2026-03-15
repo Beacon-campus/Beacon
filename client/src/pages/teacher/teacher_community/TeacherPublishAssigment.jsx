@@ -13,6 +13,7 @@ import apiClient from "../../../services/apiClient";
 import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import socket from "../../../services/socket.service";
 import { exportRowsToXlsx } from "../../../utils/excelExport";
+import { resolveAttachmentUrl } from "../../../utils/cloudinaryUrl";
 
 const EMPTY_FORM = {
   title: "",
@@ -877,7 +878,14 @@ export default function TeacherPublishAssignment() {
 
   const normalizeSubmissionFile = (value) => {
     if (!value) return null;
-    if (typeof value === "object") return value;
+    if (typeof value === "object") {
+      const resolvedMime = value.mimeType || (value.type && value.type !== "file" ? value.type : "") || "";
+      return {
+        ...value,
+        mimeType: resolvedMime || value.mimeType || "",
+        type: resolvedMime || value.type || "application/octet-stream",
+      };
+    }
     if (typeof value !== "string") return null;
 
     if (value.startsWith("data:")) {
@@ -1296,7 +1304,8 @@ export default function TeacherPublishAssignment() {
                     );
                   }
 
-                  const imageUrl = fileMeta.previewUrl || fileMeta.url;
+                  const resolvedUrl = resolveAttachmentUrl(fileMeta);
+                  const imageUrl = fileMeta.previewUrl || resolvedUrl || fileMeta.url;
                   const isImage = fileMeta.type?.startsWith("image/");
                   return (
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
@@ -1313,7 +1322,7 @@ export default function TeacherPublishAssignment() {
                             View
                           </button>
                           <a
-                            href={fileMeta.downloadUrl || fileMeta.url}
+                            href={fileMeta.downloadUrl || resolvedUrl || fileMeta.url}
                             download={fileMeta.name || "submission"}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                           >

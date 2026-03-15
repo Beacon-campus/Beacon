@@ -8,6 +8,7 @@ import { auth } from "../../firebase/firebase";
 import ChatMediaPicker from "../chat_comps/ChatMediaPicker"; 
 import { toast } from "react-hot-toast";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/attachmentUpload";
+import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
 
 export default function OfficialChannel({
@@ -137,11 +138,25 @@ export default function OfficialChannel({
           type: selectedAttachment?.kind || "text",
           noteData: selectedAttachment
             ? {
+                type: "file",
                 name: selectedAttachment.name,
-                type: selectedAttachment.type,
+                mimeType: selectedAttachment.mimeType || selectedAttachment.type,
                 url: selectedAttachment.url,
                 size: selectedAttachment.size,
                 downloadUrl: selectedAttachment.downloadUrl || selectedAttachment.url,
+                path: selectedAttachment.path || null,
+                cloudinary: selectedAttachment.cloudinary || {
+                  publicId: selectedAttachment.publicId || null,
+                  version: selectedAttachment.version || null,
+                  resourceType: selectedAttachment.resourceType || null,
+                  format: selectedAttachment.format || null,
+                  secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
+                },
+                publicId: selectedAttachment.publicId || null,
+                version: selectedAttachment.version || null,
+                resourceType: selectedAttachment.resourceType || null,
+                format: selectedAttachment.format || null,
+                secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
                 previewUrl: selectedAttachment.previewUrl || null,
                 previewDownloadUrl: selectedAttachment.previewDownloadUrl || null,
                 previewPath: selectedAttachment.previewPath || null,
@@ -288,10 +303,10 @@ export default function OfficialChannel({
                             <div className={`p-4 shadow-sm relative ${bubbleRadius} ${isMe ? "bg-[#F0FDF4] border border-[#d1e6d8] text-gray-800 text-right" : "bg-white text-gray-800 border border-gray-100 text-left"}`}>
                                {post.type === "image" ? (
                                    <img
-                                     src={post.noteData?.url}
+                                     src={resolveAttachmentUrl(post.noteData)}
                                      alt={post.noteData?.name || "Shared image"}
                                      className="rounded-lg max-w-[300px] w-full object-cover border border-gray-200 cursor-zoom-in"
-                                     onClick={() => setImagePreview({ url: post.noteData?.url, name: post.noteData?.name || "Shared image" })}
+                                     onClick={() => setImagePreview({ url: resolveAttachmentUrl(post.noteData), name: post.noteData?.name || "Shared image" })}
                                    />
                                ) : post.type === "file" ? (
                                    <div className="flex flex-col gap-2 text-xs">
@@ -299,12 +314,12 @@ export default function OfficialChannel({
                                       <div className="flex items-center gap-3">
                                           <button
                                             type="button"
-                                            onClick={() => window.open(post.noteData?.previewUrl || post.noteData?.url, "_blank")}
+                                            onClick={() => window.open(post.noteData?.previewUrl || resolveAttachmentUrl(post.noteData), "_blank")}
                                             className="underline"
                                           >
                                             View
                                           </button>
-                                          <a href={post.noteData?.downloadUrl || post.noteData?.url} download={post.noteData?.name || "file"} className="underline">Download</a>
+                                          <a href={post.noteData?.downloadUrl || resolveAttachmentUrl(post.noteData)} download={post.noteData?.name || "file"} className="underline">Download</a>
                                       </div>
                                    </div>
                                ) : (

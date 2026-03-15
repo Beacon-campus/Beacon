@@ -98,7 +98,7 @@ async function getStoragePathBreakdown() {
     await Promise.all([
       Message.countDocuments({ "noteData.path": { $regex: /^chat\// } }),
       Message.countDocuments({ "noteData.path": { $regex: /^groups\// } }),
-      Message.countDocuments({ "noteData.path": { $regex: /^community\/official\// } }),
+      Announcement.countDocuments({ "noteData.path": { $regex: /^community\/official\// } }),
       Message.countDocuments({ "noteData.path": { $regex: /^community\/hub\// } }),
       Classroom.aggregate([
         { $unwind: "$subjects" },
@@ -106,9 +106,15 @@ async function getStoragePathBreakdown() {
         { $match: { "subjects.uploads.path": { $regex: /^study-materials\// } } },
         { $count: "count" },
       ]).then((rows) => rows?.[0]?.count || 0),
-      Message.countDocuments({ "noteData.path": { $regex: /^assignments\/submissions\// } }),
+      // Assignment submissions are stored in Submission.file
+      mongoose.connection.collection("submissions").countDocuments({ "file.path": { $regex: /^assignments\/submissions\// } }),
       Message.countDocuments({ "noteData.path": { $regex: /^assignments\/resources\// } }),
-      UniversityAnnouncement.countDocuments({ "attachment.path": { $regex: /^university\/announcements\// } }),
+      UniversityAnnouncement.countDocuments({
+        $or: [
+          { "attachment.path": { $regex: /^university\/announcements\// } },
+          { "attachment.path": { $regex: /^university\// } },
+        ],
+      }),
     ]);
 
   return {

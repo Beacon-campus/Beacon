@@ -2,11 +2,24 @@ import mongoose from "mongoose";
 
 const attachmentSchema = new mongoose.Schema(
   {
+    type: { type: String, default: "file" },
     name: { type: String, default: "" },
-    type: { type: String, default: "" },
+    mimeType: { type: String, default: "" },
     url: { type: String, default: "" },
     downloadUrl: { type: String, default: "" },
     path: { type: String, default: "" },
+    cloudinary: {
+      publicId: { type: String, default: "" },
+      version: { type: Number, default: null },
+      resourceType: { type: String, default: "" },
+      format: { type: String, default: "" },
+      secureUrl: { type: String, default: "" },
+    },
+    publicId: { type: String, default: "" },
+    version: { type: Number, default: null },
+    resourceType: { type: String, default: "" },
+    format: { type: String, default: "" },
+    secureUrl: { type: String, default: "" },
     previewUrl: { type: String, default: "" },
     previewDownloadUrl: { type: String, default: "" },
     previewPath: { type: String, default: "" },

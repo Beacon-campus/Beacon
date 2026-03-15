@@ -4,14 +4,10 @@ import {
   MAX_ATTACHMENT_SIZE_BYTES,
   ALLOWED_MIME_TYPES,
   OFFICE_MIME_TYPES,
-  SAFE_PREFIXES,
   generateOfficePreviewPdf,
   sanitizeFileName,
   uploadBufferToCloudinary,
   getResourceTypeForMime,
-  resolveCloudinaryResource,
-  buildCloudinarySignedDownloadUrl,
-  buildUrls,
   buildObjectPath,
 } from "../services/uploads.service.js";
 import { createLogFromRequest } from "../services/logs.service.js";
@@ -77,8 +73,9 @@ export const uploadAttachment = async (req, res) => {
     });
 
     const originalResourceType = getResourceTypeForMime(fileType);
+    let originalUpload;
     try {
-      await uploadBufferToCloudinary(objectPath, buffer, fileType, originalResourceType);
+      originalUpload = await uploadBufferToCloudinary(objectPath, buffer, fileType, originalResourceType);
     } catch (error) {
       console.error("Cloudinary upload failed (original):", {
         message: error?.message || "Unknown upload error",
@@ -88,7 +85,18 @@ export const uploadAttachment = async (req, res) => {
       });
       return res.status(500).json({ error: "Upload failed while storing original file" });
     }
-    const original = buildUrls(req, objectPath, safeName);
+    const originalSecureUrl = originalUpload?.secure_url || "";
+    const originalPublicId = originalUpload?.public_id || objectPath;
+    const originalVersion = Number(originalUpload?.version || 0) || null;
+    const originalResourceTypeResolved = originalUpload?.resource_type || originalResourceType;
+    const originalFormat = originalUpload?.format || path.extname(safeName).replace(".", "") || null;
+    const cloudinaryMeta = {
+      publicId: originalPublicId,
+      version: originalVersion,
+      resourceType: originalResourceTypeResolved,
+      format: originalFormat,
+      secureUrl: originalSecureUrl,
+    };
 
     let previewPath = null;
     let previewUrl = null;
@@ -104,7 +112,13 @@ export const uploadAttachment = async (req, res) => {
         const pdfName = `${path.basename(safeName, path.extname(safeName))}.pdf`;
         const previewObjectPath = objectPath.replace(/[^/]+$/, `${Date.now()}-preview-${pdfName}`);
         try {
-          await uploadBufferToCloudinary(previewObjectPath, previewResult.buffer, "application/pdf", "raw");
+          const previewUpload = await uploadBufferToCloudinary(
+            previewObjectPath,
+            previewResult.buffer,
+            "application/pdf",
+            "raw"
+          );
+          previewUrl = previewUpload?.secure_url || "";
         } catch (error) {
           console.error("Cloudinary upload failed (preview):", {
             message: error?.message || "Unknown preview upload error",
@@ -114,10 +128,8 @@ export const uploadAttachment = async (req, res) => {
           });
           return res.status(500).json({ error: "Upload failed while storing preview file" });
         }
-        const previewUrls = buildUrls(req, previewObjectPath, pdfName);
         previewPath = previewObjectPath;
-        previewUrl = previewUrls.url;
-        previewDownloadUrl = previewUrls.downloadUrl;
+        previewDownloadUrl = previewUrl || null;
         previewType = "application/pdf";
         previewStatus = "ready";
       } else {
@@ -127,11 +139,15 @@ export const uploadAttachment = async (req, res) => {
       }
     } else if (fileType === "application/pdf") {
       previewPath = objectPath;
-      previewUrl = original.url;
-      previewDownloadUrl = original.downloadUrl;
+      previewUrl = originalSecureUrl;
+      previewDownloadUrl = originalSecureUrl;
       previewType = fileType;
       previewStatus = "ready";
     } else if (fileType.startsWith("image/")) {
+      previewPath = objectPath;
+      previewUrl = originalSecureUrl;
+      previewDownloadUrl = originalSecureUrl;
+      previewType = fileType;
       previewStatus = "ready";
     } else {
       previewStatus = "unavailable";
@@ -161,13 +177,19 @@ export const uploadAttachment = async (req, res) => {
     }
 
     return res.status(201).json({
+      type: "file",
       name: safeName,
-      type: fileType,
+      mimeType: fileType,
       size: buffer.length,
       kind: fileType.startsWith("image/") ? "image" : "file",
       scope,
-      url: original.url,
-      downloadUrl: original.downloadUrl,
+      url: originalSecureUrl,
+      secureUrl: originalSecureUrl,
+      cloudinary: cloudinaryMeta,
+      publicId: originalPublicId,
+      version: originalVersion,
+      resourceType: originalResourceTypeResolved,
+      format: originalFormat,
       path: objectPath,
       previewUrl,
       previewDownloadUrl,
@@ -205,43 +227,7 @@ export const uploadAttachment = async (req, res) => {
 };
 
 export const downloadFile = async (req, res) => {
-  try {
-    if (!isCloudinaryConfigured) {
-      return res.status(500).json({ error: "Cloudinary is not configured on server" });
-    }
-
-    const encodedPath = req.params.encodedPath;
-    const objectPath = decodeURIComponent(encodedPath || "");
-    if (!objectPath || !SAFE_PREFIXES.some((prefix) => objectPath.startsWith(prefix))) {
-      return res.status(400).json({ error: "Invalid file path" });
-    }
-
-    const resource = await resolveCloudinaryResource(objectPath);
-    if (!resource?.secure_url) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    const signedDownloadUrl = buildCloudinarySignedDownloadUrl(objectPath, resource.resource_type || "raw");
-    const response = await fetch(signedDownloadUrl);
-    if (!response.ok) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const shouldDownload = String(req.query.download || "0") === "1";
-    const fileNameFromPath = path.basename(objectPath);
-    const requestedName = String(req.query.name || fileNameFromPath).replace(/[\r\n"]/g, "_");
-
-    res.setHeader("Content-Type", resource.content_type || "application/octet-stream");
-    res.setHeader("Cache-Control", "public, max-age=300");
-    if (shouldDownload) {
-      res.setHeader("Content-Disposition", `attachment; filename="${requestedName}"`);
-    } else {
-      res.setHeader("Content-Disposition", `inline; filename="${requestedName}"`);
-    }
-    return res.send(buffer);
-  } catch (error) {
-    console.error("GET /api/uploads/file/:encodedPath failed:", error);
-    return res.status(500).json({ error: "Server error while loading file" });
-  }
+  res.status(410).json({
+    error: "Deprecated endpoint. Use Cloudinary secure_url returned at upload time.",
+  });
 };

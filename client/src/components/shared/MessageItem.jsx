@@ -5,6 +5,7 @@ import AssignmentMessageCard from "../chat_comps/AssignmentMessageCard";
 import { getAvatarUrl } from "../../utils/avatarUtils";
 import DocViewer from "../doccomps/docviewer";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
+import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 
 const ChevronDown = () => (
     <svg
@@ -178,7 +179,7 @@ const MessageItem = ({
                             />
                         ) : msg.type === "image" ? (
                             <img
-                                src={msg.noteData?.url}
+                                src={resolveAttachmentUrl(msg.noteData)}
                                 alt={msg.noteData?.name || "Shared image"}
                                 className={`rounded-2xl max-w-[260px] w-full object-cover shadow-sm cursor-zoom-in ${isMe && !isConsecutive ? 'rounded-br-sm' : ''} ${!isMe && !isConsecutive ? 'rounded-bl-sm' : ''}`}
                                 onClick={() => setOpenImageViewer(true)}
@@ -192,7 +193,7 @@ const MessageItem = ({
                                     <p className="font-bold text-sm text-gray-800 truncate">{msg.noteData?.name?.replace(/^[0-9]+-[0-9a-fA-F-]+-/, '') || "Shared file"}</p>
                                     <p className="text-[11px] text-gray-400 font-medium mt-0.5">Click to view</p>
                                 </div>
-                                <a href={msg.noteData?.downloadUrl || msg.noteData?.url} download={msg.noteData?.name || "file"} onClick={(e) => e.stopPropagation()} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
+                                <a href={msg.noteData?.downloadUrl || resolveAttachmentUrl(msg.noteData)} download={msg.noteData?.name || "file"} onClick={(e) => e.stopPropagation()} className="p-2 bg-gray-50 hover:bg-gray-200 rounded-full text-gray-600 transition-colors shrink-0">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 </a>
                             </div>
@@ -259,9 +260,9 @@ const MessageItem = ({
                 <DocViewer
                     file={{
                         name: msg.noteData?.name || "Shared file",
-                        type: msg.noteData?.type || "application/octet-stream",
-                        url: msg.noteData?.url || "",
-                        downloadUrl: msg.noteData?.downloadUrl || msg.noteData?.url || "",
+                        type: msg.noteData?.mimeType || msg.noteData?.type || "application/octet-stream",
+                        url: resolveAttachmentUrl(msg.noteData) || "",
+                        downloadUrl: msg.noteData?.downloadUrl || resolveAttachmentUrl(msg.noteData) || "",
                         previewUrl: msg.noteData?.previewUrl || null,
                         previewType: msg.noteData?.previewType || null,
                         previewStatus: msg.noteData?.previewStatus || null,
@@ -275,7 +276,7 @@ const MessageItem = ({
                 <ImagePreviewModal
                     isOpen={openImageViewer}
                     onClose={() => setOpenImageViewer(false)}
-                    imageUrl={msg.noteData?.url}
+                    imageUrl={resolveAttachmentUrl(msg.noteData)}
                     imageName={msg.noteData?.name || "Shared image"}
                 />
             )}
