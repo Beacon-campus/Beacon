@@ -336,9 +336,14 @@ export default function Login() {
           </div>
 
           {/* Bottom text */}
-          <p className="text-slate-600 text-xl leading-relaxed max-w-lg font-semibold text-center mt-4">
-            Your entire campus, unified in one hub.
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-slate-600 text-2xl font-bold">
+              Where your coursework meets your community.
+            </p>
+            <p className="text-slate-500 text-lg font-medium leading-relaxed max-w-lg">
+              A unified hub designed to help you navigate your <br className="hidden md:block"/> campus journey with clarity and purpose.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -348,49 +353,49 @@ export default function Login() {
         <div className="w-full max-w-sm space-y-7 relative z-10">
 
           {/* Header */}
-          <div className="text-center space-y-1 mb-6 flex flex-col items-center w-full">
-            <div className="flex flex-col items-center justify-center gap-4 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-14 h-14 overflow-visible">
+          <div className="text-center space-y-1 mb-2 flex flex-col items-center w-full">
+            <div className="group transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] flex flex-col items-center justify-center gap-4 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-16 h-16 overflow-visible">
                 <defs>
                   <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
-                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0"/>
                   </linearGradient>
                   <linearGradient id="beam-right-lg" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
-                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
                 <g className={`${submitting ? "opacity-100 scale-100" : "opacity-0 scale-75"} origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100`}>
-                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
-                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
-                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
-                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
-                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
-                  <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
-                  <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
-                  <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
-                  <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
+                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-amber-500" />
+                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-amber-500" />
+                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-amber-500" />
+                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-amber-500" />
+                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-amber-500" />
+                  <circle cx="15" cy="35" r="1.5" className="fill-amber-500" />
+                  <circle cx="85" cy="35" r="1.5" className="fill-amber-500" />
+                  <circle cx="35" cy="10" r="1.5" className="fill-amber-500" />
+                  <circle cx="65" cy="10" r="1.5" className="fill-amber-500" />
                 </g>
-                <g className="fill-slate-800 stroke-slate-800">
+                <g className="fill-current text-slate-800 transition-colors duration-300">
                   <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
                   <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
                   <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
                   <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
-                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
-                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" stroke="currentColor" strokeWidth="3" />
+                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" stroke="currentColor" strokeWidth="3" fill="none" />
                   <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
                   <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
                   <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
-                  <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                  <rect x="44.5" y="26" width="11" height="8" fill="none" stroke="currentColor" strokeWidth="3" />
                   <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
-                  <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M 43 27 L 57 27" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
                   <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
                   <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-800">
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 transition-colors duration-300">
                 Beacon
               </h1>
             </div>
