@@ -285,20 +285,18 @@ export default function Login() {
   // 🔴 1. ONBOARDING OVERLAY
   if (onboardingStage && user) {
     return (
-      <div className="min-h-screen relative flex flex-col items-center justify-center p-4 gap-6 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 overflow-hidden">
+      <div className="min-h-screen relative flex flex-col items-center justify-center p-4 gap-6 bg-gray-100">
         <div className="absolute top-0 -left-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
         <div className="absolute top-0 -right-20 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
 
-        <div className="w-full max-w-md relative z-10 bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] p-10 sm:p-12 border border-white/60">
-          <div className="flex flex-col items-center">
-            {onboardingStage === "PASSWORD" && <ChangePasswordModal />}
-            {onboardingStage === "EMAIL" && <UpdateEmailModal />}
-          </div>
+        <div className="w-full max-w-sm relative z-10">
+          {onboardingStage === "PASSWORD" && <ChangePasswordModal />}
+          {onboardingStage === "EMAIL" && <UpdateEmailModal />}
         </div>
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-all border border-gray-200 shadow-sm cursor-pointer z-10 font-medium"
+          className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-all border border-gray-200 shadow-sm cursor-pointer z-10"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
@@ -311,139 +309,108 @@ export default function Login() {
         </p>
       </div>
     );
-  }  /* ================= UI RENDER ================= */
-
-  // 🔴 1. ONBOARDING OVERLAY
-  if (onboardingStage && user) {
-    return (
-      <div className="min-h-screen relative flex flex-col items-center justify-center p-4 gap-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-emerald-50 overflow-hidden font-sans">
-        <div className="absolute top-0 -left-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-0 -right-20 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-
-        <div className="w-full max-w-md relative z-10 bg-white/80 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-10 sm:p-12 border border-white/60">
-          <div className="flex flex-col items-center">
-            {onboardingStage === "PASSWORD" && <ChangePasswordModal />}
-            {onboardingStage === "EMAIL" && <UpdateEmailModal />}
-          </div>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-full hover:bg-slate-50 transition-all border border-slate-200 shadow-sm cursor-pointer z-10 font-bold"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-          </svg>
-          <span>Go Back to Login</span>
-        </button>
-
-        <p className="text-slate-400 text-sm mt-2 relative z-10 font-bold uppercase tracking-widest">
-          Step {onboardingStage === "PASSWORD" ? "1" : "2"} of 2: {onboardingStage === "PASSWORD" ? "Secure your account" : "Verify your email"}
-        </p>
-      </div>
-    );
   }
 
-  // 🟢 2. LIGHT DASHBOARD-STYLE SPLIT-CARD LOGIN LAYOUT
+  // 🟢 2. NEW SPLIT LOGIN LAYOUT
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-emerald-50 p-6 font-sans text-primary overflow-x-hidden">
+    <div className="h-screen w-full flex bg-[#F8FAFC] font-sans text-primary overflow-hidden relative">
       
-      {/* Main Container Wrapper (Glassy White) */}
-      <div className="w-full max-w-5xl rounded-[2rem] overflow-hidden flex flex-col md:flex-row relative z-10 animate-in fade-in zoom-in duration-700 min-h-[650px] bg-white/80 backdrop-blur-3xl border border-white/60 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)]">
-        
-        {/* LEFT SIDE: Brand Narrative (Soft Light Glass) */}
-        <div className="w-full md:w-1/2 bg-white/10 p-10 md:p-14 flex flex-col justify-between relative overflow-hidden border-r border-slate-100">
-          {/* Subtle Dot Pattern Overlay */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1.2px, transparent 1.2px)', backgroundSize: '32px 32px' }}></div>
-          
-          {/* Top: Logo Section */}
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 group transition-transform duration-200 ease-in-out hover:scale-[1.03] cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-14 h-14 overflow-visible">
+      {/* Ambient Aurora Background */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/60 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob"></div>
+      <div className="absolute top-[20%] right-[-5%] w-[35%] h-[40%] bg-green-100/60 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-100/60 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-4000"></div>
+
+      {/* LEFT PANEL - Animation & Info */}
+      <div className="hidden lg:flex w-[60%] h-full flex-col items-center justify-center p-8 relative">
+
+        <div className="relative z-10 max-w-4xl w-full flex flex-col items-center gap-10">
+
+          {/* Lottie Container (Top & Large) */}
+          <div className="w-full flex justify-center py-2">
+            <DotLottiePlayer
+              src={studentLottie}
+              loop
+              autoplay
+              className="w-full h-auto max-h-[550px]"
+            />
+          </div>
+
+          {/* Bottom text */}
+          <div className="text-center space-y-2">
+            <p className="text-slate-600 text-2xl font-bold">
+              Where your coursework meets your community.
+            </p>
+            <p className="text-slate-500 text-lg font-medium leading-relaxed max-w-lg">
+              A unified hub designed to help you navigate your <br className="hidden md:block"/> campus journey with clarity and purpose.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT PANEL - Form */}
+      <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
+
+        <div className="w-full max-w-sm space-y-7 relative z-10">
+
+          {/* Header */}
+          <div className="text-center space-y-1 mb-2 flex flex-col items-center w-full">
+            <div className="group transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] flex flex-col items-center justify-center gap-4 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-16 h-16 overflow-visible">
                 <defs>
                   <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
-                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0"/>
                   </linearGradient>
                   <linearGradient id="beam-right-lg" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
-                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.7"/>
+                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
                 <g className={`${submitting ? "opacity-100 scale-100" : "opacity-0 scale-75"} origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100`}>
-                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
-                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
-                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
-                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
+                  <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-amber-500" />
+                  <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-amber-500" />
+                  <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-amber-500" />
+                  <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-amber-500" />
+                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-amber-500" />
+                  <circle cx="15" cy="35" r="1.5" className="fill-amber-500" />
+                  <circle cx="85" cy="35" r="1.5" className="fill-amber-500" />
+                  <circle cx="35" cy="10" r="1.5" className="fill-amber-500" />
+                  <circle cx="65" cy="10" r="1.5" className="fill-amber-500" />
                 </g>
-                <g className="fill-slate-900 stroke-slate-900">
+                <g className="fill-current text-slate-800 transition-colors duration-300">
                   <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
                   <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
                   <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
                   <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
-                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
-                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                  <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" stroke="currentColor" strokeWidth="3" />
+                  <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" stroke="currentColor" strokeWidth="3" fill="none" />
                   <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
                   <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
                   <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
-                  <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                  <rect x="44.5" y="26" width="11" height="8" fill="none" stroke="currentColor" strokeWidth="3" />
                   <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
-                  <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M 43 27 L 57 27" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
                   <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
                   <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
-              <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">Beacon</h1>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 transition-colors duration-300">
+                Beacon
+              </h1>
             </div>
-          </div>
-
-          {/* Middle: Brand Message */}
-          <div className="relative z-10 mt-12 mb-12">
-            <h1 className="text-5xl md:text-6xl font-black leading-[1.05] text-slate-900 tracking-tight">
-              Your entire <br />
-              <span className="text-[#00D084]">digital campus,</span> <br />
-              unified.
-            </h1>
-            <p className="text-slate-500 text-lg mt-6 font-medium max-w-[280px] leading-relaxed">
-              Experience the next generation of academic collaboration.
+            <p className="text-sm text-slate-500 font-medium max-w-[95%]">
+              Learning, community, and collaboration. All in one place.
             </p>
           </div>
 
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-6" noValidate>
 
-          {/* Bottom: Campus Community */}
-          <div className="relative z-10">
-            <div className="flex items-center gap-5 group">
-              <div className="flex -space-x-4">
-                <img src={profile1} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
-                <img src={profile5} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
-                <img src={profile9} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                Trusted by <span className="text-slate-900">Students & Faculty</span>
-              </p>
-            </div>
-          </div>
-          <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-green-100/40 blur-[80px] rounded-full"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-blue-100/30 blur-[80px] rounded-full"></div>
-        </div>
-
-        {/* RIGHT SIDE: Form Panel (Clean White Glass) */}
-        <div className="w-full md:w-1/2 bg-white/40 p-10 md:p-14 flex flex-col justify-center relative">
-          
-          <div className="w-full max-w-sm mx-auto space-y-10 relative z-10">
-            {/* Form Header */}
-            <div className="space-y-2">
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight">Sign In</h2>
-              <p className="text-slate-500 font-medium">Please enter your credentials to continue.</p>
-            </div>
-
-            {/* Form Logic */}
-            <form onSubmit={handleLogin} className="space-y-6" noValidate>
-              <div className="space-y-4">
-                
-                {/* Registration Number Field */}
-                <div className="relative group bg-white border border-slate-200 rounded-2xl focus-within:border-[#00D084] focus-within:ring-2 focus-within:ring-green-100 transition-all shadow-sm">
+            <div className="space-y-4">
+              {/* Registration Number */}
+              <div>
+                <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm">
                   <input
                     type="text"
                     id="regno"
@@ -451,110 +418,114 @@ export default function Login() {
                     placeholder=" "
                     value={regno}
                     onChange={(e) => setRegno(e.target.value)}
-                    className="block w-full bg-transparent border-none px-6 pt-7 pb-2 text-slate-900 text-base font-bold focus:ring-0 outline-none peer leading-normal"
+                    className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer"
                   />
                   <label
                     htmlFor="regno"
-                    className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#00D084] cursor-text font-bold uppercase tracking-widest text-[10px]"
+                    className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text uppercase text-[10px] font-bold tracking-wider"
                   >
                     Registration Number
                   </label>
                 </div>
-
-                {/* Password Field */}
-                <div className="relative group bg-white border border-slate-200 rounded-2xl focus-within:border-[#00D084] focus-within:ring-2 focus-within:ring-green-100 transition-all shadow-sm">
-                  <input
-                    type={showPass ? "text" : "password"}
-                    id="password"
-                    required
-                    placeholder=" "
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
-                    onBlur={() => setCapsLock(false)}
-                    className="block w-full bg-transparent border-none px-6 pt-7 pb-2 text-slate-900 text-base font-bold focus:ring-0 outline-none peer pr-12 leading-normal"
-                  />
-                  <label
-                    htmlFor="password"
-                    className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#00D084] cursor-text font-bold uppercase tracking-widest text-[10px]"
-                  >
-                    Password
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-[#00D084] transition-colors"
-                  >
-                    {showPass ? <EyeOffIcon /> : <EyeIcon />}
-                  </button>
-
-                  {capsLock && (
-                    <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-black uppercase tracking-widest flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Caps Lock is ON
-                    </p>
-                  )}
-                </div>
-
-                {/* Options Layout */}
-                <div className="flex items-center justify-between px-1">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-[#00D084] focus:ring-[#00D084] transition-all"
-                    />
-                    <span className="text-xs text-slate-500 group-hover:text-slate-900 font-bold uppercase tracking-tighter transition-colors">Remember me</span>
-                  </label>
-
-                  <button 
-                    type="button" 
-                    onClick={handleForgotPassword} 
-                    className="text-xs font-black text-slate-900 hover:text-[#00D084] uppercase tracking-tighter transition-colors"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
+                <p className="mt-1.5 ml-1 text-[10px] text-slate-400 font-medium">Use your institutional registration number</p>
               </div>
 
-              {/* Action Stack */}
-              <div className="space-y-4 pt-4">
-                <button
-                  disabled={submitting}
-                  className="w-full h-14 rounded-2xl bg-slate-900 text-white font-black text-lg hover:-translate-y-[2px] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_30px_-5px_rgba(15,23,42,0.3)] flex items-center justify-center gap-3"
+              {/* Password */}
+              <div className="relative group bg-white border border-slate-200 rounded-xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all shadow-sm">
+                <input
+                  type={showPass ? "text" : "password"}
+                  id="password"
+                  required
+                  placeholder=" "
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
+                  onBlur={() => setCapsLock(false)}
+                  className="block w-full bg-transparent border-none px-4 pt-6 pb-2 text-slate-900 text-base font-medium focus:ring-0 outline-none peer pr-10"
+                />
+                <label
+                  htmlFor="password"
+                  className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text uppercase text-[10px] font-bold tracking-wider"
                 >
-                  {submitting ? (
-                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    "Sign In"
-                  )}
-                </button>
+                  Password
+                </label>
 
-                <div className="relative flex items-center py-2 h-6">
-                  <div className="flex-grow border-t border-slate-100"></div>
-                  <span className="flex-shrink-0 mx-4 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">or access using</span>
-                  <div className="flex-grow border-t border-slate-100"></div>
-                </div>
-
+                {/* Eye Icon */}
                 <button
                   type="button"
-                  onClick={handleGoogleLogin}
-                  className="w-full h-14 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-base hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm active:scale-[0.98]"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-colors"
                 >
-                  <div className="w-6 h-6"><GoogleIcon /></div>
-                  Continue with Google
+                  {showPass ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
+
+                {/* Caps Lock Warning */}
+                {capsLock && (
+                  <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-medium flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-red-500 inline-block"></span> Caps Lock is ON
+                  </p>
+                )}
+              </div>
+
+              {/* Options Row */}
+              <div className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-slate-800 focus:ring-slate-800 transition-colors cursor-pointer"
+                  />
+                  <span className="text-xs text-slate-500 font-medium group-hover:text-slate-700 transition-colors">Remember me</span>
+                </label>
+
+                <button type="button" onClick={handleForgotPassword} className="text-xs font-bold text-slate-800 hover:text-slate-600 transition-all">
+                  Forgot password?
                 </button>
               </div>
-            </form>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-4 pt-2">
+              <button
+                disabled={submitting}
+                className="w-full h-12 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center"
+              >
+                {submitting ? "Signing In..." : "Sign In"}
+              </button>
+
+              <div className="relative flex py-1 items-center">
+                <div className="flex-grow border-t border-slate-100"></div>
+                <span className="flex-shrink-0 mx-4 text-slate-400 text-[9px] font-bold uppercase tracking-widest">OR</span>
+                <div className="flex-grow border-t border-slate-100"></div>
+              </div>
+
+              {/* Google Button */}
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="group w-full h-12 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+              >
+                <div className="w-5 h-5 transition-all"><GoogleIcon /></div>
+                Sign in with Google
+              </button>
+            </div>
+
+          </form>
+
+          {/* Social Proof */}
+          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50">
+            <div className="flex -space-x-2.5">
+              <img src={profile1} alt="User 1" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
+              <img src={profile5} alt="User 2" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
+              <img src={profile9} alt="User 3" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
+            </div>
+            <p className="text-[10px] font-semibold text-slate-400 leading-tight">
+              Used daily across campus by students and faculty to<br/>boost productivity
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Background Animated Blobs (Dashboard Theme) */}
-      <div className="fixed top-[-15%] left-[-15%] w-[50%] h-[50%] bg-blue-100/40 blur-[130px] rounded-full -z-10 animate-blob"></div>
-      <div className="fixed bottom-[-15%] right-[-15%] w-[50%] h-[50%] bg-green-100/40 blur-[130px] rounded-full -z-10 animate-blob animation-delay-4000"></div>
-      <div className="fixed top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-100/30 blur-[130px] rounded-full -z-10 animate-blob animation-delay-2000"></div>
     </div>
   );
 }
