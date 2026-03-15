@@ -311,18 +311,16 @@ export default function Login() {
         </p>
       </div>
     );
-  }
-
-  /* ================= UI RENDER ================= */
+  }  /* ================= UI RENDER ================= */
 
   // 🔴 1. ONBOARDING OVERLAY
   if (onboardingStage && user) {
     return (
-      <div className="min-h-screen relative flex flex-col items-center justify-center p-4 gap-6 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 overflow-hidden">
-        <div className="absolute top-0 -left-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-0 -right-20 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="min-h-screen relative flex flex-col items-center justify-center p-4 gap-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-emerald-50 overflow-hidden font-sans">
+        <div className="absolute top-0 -left-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute top-0 -right-20 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
 
-        <div className="w-full max-w-md relative z-10 bg-white rounded-[2.5rem] shadow-[0_8px_40px_rgba(0,0,0,0.04)] p-10 sm:p-12 border border-white/60">
+        <div className="w-full max-w-md relative z-10 bg-white/80 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-10 sm:p-12 border border-white/60">
           <div className="flex flex-col items-center">
             {onboardingStage === "PASSWORD" && <ChangePasswordModal />}
             {onboardingStage === "EMAIL" && <UpdateEmailModal />}
@@ -331,37 +329,37 @@ export default function Login() {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 rounded-full hover:bg-gray-100 transition-all border border-gray-200 shadow-sm cursor-pointer z-10 font-medium"
+          className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-full hover:bg-slate-50 transition-all border border-slate-200 shadow-sm cursor-pointer z-10 font-bold"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
           </svg>
           <span>Go Back to Login</span>
         </button>
 
-        <p className="text-gray-500 text-sm mt-2 relative z-10 font-medium">
+        <p className="text-slate-400 text-sm mt-2 relative z-10 font-bold uppercase tracking-widest">
           Step {onboardingStage === "PASSWORD" ? "1" : "2"} of 2: {onboardingStage === "PASSWORD" ? "Secure your account" : "Verify your email"}
         </p>
       </div>
     );
   }
 
-  // 🟢 2. WIDE SPLIT-CARD LOGIN LAYOUT
+  // 🟢 2. LIGHT DASHBOARD-STYLE SPLIT-CARD LOGIN LAYOUT
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-6 font-sans text-primary overflow-x-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-emerald-50 p-6 font-sans text-primary overflow-x-hidden">
       
-      {/* Main Wide Card Wrapper */}
-      <div className="w-full max-w-5xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row relative z-10 animate-in fade-in zoom-in duration-500 min-h-[650px]">
+      {/* Main Container Wrapper (Glassy White) */}
+      <div className="w-full max-w-5xl rounded-[2rem] overflow-hidden flex flex-col md:flex-row relative z-10 animate-in fade-in zoom-in duration-700 min-h-[650px] bg-white/80 backdrop-blur-3xl border border-white/60 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)]">
         
-        {/* LEFT SIDE: Brand Panel (Dark Navy) */}
-        <div className="w-full md:w-1/2 bg-slate-900 text-white p-10 md:p-14 flex flex-col justify-between relative overflow-hidden">
+        {/* LEFT SIDE: Brand Narrative (Soft Light Glass) */}
+        <div className="w-full md:w-1/2 bg-white/10 p-10 md:p-14 flex flex-col justify-between relative overflow-hidden border-r border-slate-100">
           {/* Subtle Dot Pattern Overlay */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1.2px, transparent 1.2px)', backgroundSize: '32px 32px' }}></div>
           
           {/* Top: Logo Section */}
           <div className="relative z-10">
-            <div className="flex items-center gap-3 group transition-transform duration-200 ease-in-out hover:scale-[1.05] cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-12 h-12 overflow-visible">
+            <div className="flex items-center gap-3 group transition-transform duration-200 ease-in-out hover:scale-[1.03] cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-14 h-14 overflow-visible">
                 <defs>
                   <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
                     <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
@@ -377,13 +375,8 @@ export default function Login() {
                   <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
                   <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
                   <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
-                  <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
-                  <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
-                  <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
-                  <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
-                  <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
                 </g>
-                <g className="fill-white stroke-white">
+                <g className="fill-slate-900 stroke-slate-900">
                   <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
                   <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
                   <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
@@ -401,54 +394,56 @@ export default function Login() {
                   <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
-              <span className="text-2xl font-extrabold tracking-tight text-white">Beacon</span>
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">Beacon</h1>
             </div>
           </div>
 
-          {/* Middle: Content Section */}
+          {/* Middle: Brand Message */}
           <div className="relative z-10 mt-12 mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold leading-[1.1] text-white tracking-tight">
+            <h1 className="text-5xl md:text-6xl font-black leading-[1.05] text-slate-900 tracking-tight">
               Your entire <br />
-              <span className="text-amber-400">digital campus,</span> <br />
+              <span className="text-[#00D084]">digital campus,</span> <br />
               unified.
             </h1>
-            <div className="w-20 h-1.5 bg-amber-400 mt-8 rounded-full"></div>
+            <p className="text-slate-500 text-lg mt-6 font-medium max-w-[280px] leading-relaxed">
+              Experience the next generation of academic collaboration.
+            </p>
           </div>
 
-          {/* Bottom: Social Proof / Footer */}
+
+          {/* Bottom: Campus Community */}
           <div className="relative z-10">
-            <div className="flex items-center gap-4 group">
-              <div className="flex -space-x-3">
-                <img src={profile1} alt="User 1" className="w-10 h-10 rounded-full border-2 border-slate-900 object-cover shadow-lg" />
-                <img src={profile5} alt="User 2" className="w-10 h-10 rounded-full border-2 border-slate-900 object-cover shadow-lg" />
-                <img src={profile9} alt="User 3" className="w-10 h-10 rounded-full border-2 border-slate-900 object-cover shadow-lg" />
+            <div className="flex items-center gap-5 group">
+              <div className="flex -space-x-4">
+                <img src={profile1} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
+                <img src={profile5} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
+                <img src={profile9} alt="User" className="w-11 h-11 rounded-full border-2 border-white object-cover shadow-sm bg-slate-50" />
               </div>
-              <p className="text-sm font-medium text-slate-300">
-                Join <span className="text-white font-bold">1,000+</span> students & faculty
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                Trusted by <span className="text-slate-900">Students & Faculty</span>
               </p>
             </div>
           </div>
-
-          {/* Abstract Glow circles for background depth */}
-          <div className="absolute top-[-20%] right-[-20%] w-80 h-80 bg-blue-500/10 blur-[100px] rounded-full"></div>
-          <div className="absolute bottom-[-20%] left-[-20%] w-80 h-80 bg-amber-400/10 blur-[100px] rounded-full"></div>
+          <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-green-100/40 blur-[80px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-blue-100/30 blur-[80px] rounded-full"></div>
         </div>
 
-        {/* RIGHT SIDE: Form Panel (Clean White) */}
-        <div className="w-full md:w-1/2 bg-white p-10 md:p-14 flex flex-col justify-center">
+        {/* RIGHT SIDE: Form Panel (Clean White Glass) */}
+        <div className="w-full md:w-1/2 bg-white/40 p-10 md:p-14 flex flex-col justify-center relative">
           
-          <div className="w-full max-w-sm mx-auto space-y-10">
+          <div className="w-full max-w-sm mx-auto space-y-10 relative z-10">
             {/* Form Header */}
-            <div>
-              <h2 className="text-4xl font-extrabold text-slate-900 mb-2">Sign In</h2>
-              <p className="text-slate-500 font-medium">Welcome back! Please enter your details.</p>
+            <div className="space-y-2">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight">Sign In</h2>
+              <p className="text-slate-500 font-medium">Please enter your credentials to continue.</p>
             </div>
 
-            {/* Form Body */}
+            {/* Form Logic */}
             <form onSubmit={handleLogin} className="space-y-6" noValidate>
               <div className="space-y-4">
-                {/* Registration Number Input */}
-                <div className="relative group bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
+                
+                {/* Registration Number Field */}
+                <div className="relative group bg-white border border-slate-200 rounded-2xl focus-within:border-[#00D084] focus-within:ring-2 focus-within:ring-green-100 transition-all shadow-sm">
                   <input
                     type="text"
                     id="regno"
@@ -456,18 +451,18 @@ export default function Login() {
                     placeholder=" "
                     value={regno}
                     onChange={(e) => setRegno(e.target.value)}
-                    className="block w-full bg-transparent border-none px-5 pt-7 pb-2 text-slate-900 text-base font-semibold focus:ring-0 outline-none peer"
+                    className="block w-full bg-transparent border-none px-6 pt-7 pb-2 text-slate-900 text-base font-bold focus:ring-0 outline-none peer leading-normal"
                   />
                   <label
                     htmlFor="regno"
-                    className="absolute text-gray-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
+                    className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#00D084] cursor-text font-bold uppercase tracking-widest text-[10px]"
                   >
                     Registration Number
                   </label>
                 </div>
 
-                {/* Password Input */}
-                <div className="relative group bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-slate-800 focus-within:ring-1 focus-within:ring-slate-800 transition-all">
+                {/* Password Field */}
+                <div className="relative group bg-white border border-slate-200 rounded-2xl focus-within:border-[#00D084] focus-within:ring-2 focus-within:ring-green-100 transition-all shadow-sm">
                   <input
                     type={showPass ? "text" : "password"}
                     id="password"
@@ -477,11 +472,11 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
                     onBlur={() => setCapsLock(false)}
-                    className="block w-full bg-transparent border-none px-5 pt-7 pb-2 text-slate-900 text-base font-semibold focus:ring-0 outline-none peer pr-12"
+                    className="block w-full bg-transparent border-none px-6 pt-7 pb-2 text-slate-900 text-base font-bold focus:ring-0 outline-none peer pr-12 leading-normal"
                   />
                   <label
                     htmlFor="password"
-                    className="absolute text-gray-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-slate-800 cursor-text"
+                    className="absolute text-slate-400 duration-300 transform -translate-y-3 scale-75 top-5 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 peer-focus:text-[#00D084] cursor-text font-bold uppercase tracking-widest text-[10px]"
                   >
                     Password
                   </label>
@@ -489,59 +484,63 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-slate-600 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-[#00D084] transition-colors"
                   >
                     {showPass ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
 
                   {capsLock && (
-                    <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-bold uppercase tracking-tighter flex items-center gap-1">
+                    <p className="absolute -bottom-6 left-1 text-[10px] text-red-500 font-black uppercase tracking-widest flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Caps Lock is ON
                     </p>
                   )}
                 </div>
 
-                {/* Secondary Row */}
+                {/* Options Layout */}
                 <div className="flex items-center justify-between px-1">
                   <label className="flex items-center gap-2 cursor-pointer group">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-slate-900 focus:ring-slate-900 transition-all"
+                      className="w-4 h-4 rounded border-slate-300 text-[#00D084] focus:ring-[#00D084] transition-all"
                     />
-                    <span className="text-sm text-slate-500 group-hover:text-slate-800 font-medium transition-colors">Remember me</span>
+                    <span className="text-xs text-slate-500 group-hover:text-slate-900 font-bold uppercase tracking-tighter transition-colors">Remember me</span>
                   </label>
 
                   <button 
                     type="button" 
                     onClick={handleForgotPassword} 
-                    className="text-sm font-semibold text-slate-800 hover:text-slate-600 transition-colors"
+                    className="text-xs font-black text-slate-900 hover:text-[#00D084] uppercase tracking-tighter transition-colors"
                   >
-                    Forgot?
+                    Forgot Password?
                   </button>
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Stack */}
               <div className="space-y-4 pt-4">
                 <button
                   disabled={submitting}
-                  className="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold text-lg hover:-translate-y-[2px] hover:bg-slate-800 hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
+                  className="w-full h-14 rounded-2xl bg-slate-900 text-white font-black text-lg hover:-translate-y-[2px] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_30px_-5px_rgba(15,23,42,0.3)] flex items-center justify-center gap-3"
                 >
-                  {submitting ? "Signing In..." : "Sign In"}
+                  {submitting ? (
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    "Sign In"
+                  )}
                 </button>
 
-                <div className="relative flex items-center py-2">
+                <div className="relative flex items-center py-2 h-6">
                   <div className="flex-grow border-t border-slate-100"></div>
-                  <span className="flex-shrink-0 mx-4 text-slate-300 text-[10px] font-bold uppercase tracking-widest">OR</span>
+                  <span className="flex-shrink-0 mx-4 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em]">or access using</span>
                   <div className="flex-grow border-t border-slate-100"></div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="w-full h-14 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold text-base hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm active:scale-[0.98]"
+                  className="w-full h-14 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-base hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm active:scale-[0.98]"
                 >
                   <div className="w-6 h-6"><GoogleIcon /></div>
                   Continue with Google
@@ -552,9 +551,10 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Background Decorative Mesh */}
-      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/20 blur-[120px] rounded-full -z-10"></div>
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-200/20 blur-[120px] rounded-full -z-10"></div>
+      {/* Background Animated Blobs (Dashboard Theme) */}
+      <div className="fixed top-[-15%] left-[-15%] w-[50%] h-[50%] bg-blue-100/40 blur-[130px] rounded-full -z-10 animate-blob"></div>
+      <div className="fixed bottom-[-15%] right-[-15%] w-[50%] h-[50%] bg-green-100/40 blur-[130px] rounded-full -z-10 animate-blob animation-delay-4000"></div>
+      <div className="fixed top-[20%] right-[-10%] w-[40%] h-[40%] bg-purple-100/30 blur-[130px] rounded-full -z-10 animate-blob animation-delay-2000"></div>
     </div>
   );
 }
