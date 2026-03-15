@@ -343,11 +343,27 @@ export default function Login() {
         <div className="w-full max-w-sm space-y-8">
 
           {/* Header */}
-          {/* Header */}
-          {/* Header */}
           <div className="text-center space-y-2 mb-8 flex flex-col items-center w-full">
+            <div className="w-12 h-12 flex items-center justify-center mb-2 group cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="w-12 h-12 text-primary transition-all duration-500 group-hover:drop-shadow-[0_0_12px_rgba(59,130,246,0.8)] group-hover:scale-110 group-hover:text-blue-600">
+                {/* Base */}
+                <path d="M8.5 22l-1-12h9l-1 12H8.5z" opacity="0.9"/>
+                {/* Balcony */}
+                <path d="M6 10h12v-2H6v2z" />
+                {/* Glass room (Light source) */}
+                <path d="M9 8h6V5H9v3z" className="transition-colors duration-500 fill-current group-hover:fill-blue-400" />
+                {/* Roof */}
+                <path d="M12 2L8 5h8l-4-3z" />
+                {/* Beams */}
+                <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <g className="animate-pulse">
+                    <path d="M9 6.5L0 3v7l9-3.5zM15 6.5L24 3v7l-9-3.5z" fill="#93C5FD" opacity="0.6" />
+                  </g>
+                </g>
+              </svg>
+            </div>
             <h1 className="text-xl md:text-2xl font-bold tracking-[0.2em] text-primary uppercase w-full whitespace-nowrap">
-              STREAK
+              BEACON
             </h1>
             <p className="text-sm text-gray-500 font-medium max-w-[90%]">
               Your digital campus for learning, collaboration, and AI tools
