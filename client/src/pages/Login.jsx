@@ -358,7 +358,7 @@ export default function Login() {
                     <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
-                <g className="opacity-0 scale-75 origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100">
+                <g className={`${submitting ? "opacity-100 scale-100" : "opacity-0 scale-75"} origin-bottom transition-all duration-300 ease-out group-hover:opacity-100 group-hover:scale-100`}>
                   <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
                   <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-lg)" className="text-yellow-400" />
                   <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-lg)" className="text-yellow-400" />
