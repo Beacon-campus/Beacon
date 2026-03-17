@@ -39,9 +39,9 @@ export default function ShareNoteModal({ note, onClose }) {
         if (isTeacher) {
             const uniqueByClassroom = new Map();
             secondaryChats
-                .filter((c) => c.type === 'classroom' && c.classroomMode === 'official' && c.classroomId)
+                .filter((c) => c.type === 'classroom' && c.classroomMode === 'official')
                 .forEach((channel) => {
-                    const key = String(channel.classroomId);
+                    const key = channel.classroomId ? String(channel.classroomId) : String(channel._id);
                     if (!uniqueByClassroom.has(key)) uniqueByClassroom.set(key, channel);
                 });
             return Array.from(uniqueByClassroom.values());
