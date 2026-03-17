@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 import apiClient from "../services/apiClient";
-import { clearAllPageCache } from "../services/pageCache.service";
+import { clearAllPageCache, getOrFetchPageCache } from "../services/pageCache.service";
 import { prefetchSessionPageCaches } from "../services/sessionPrefetch.service";
 
 const AuthContext = createContext(null);
@@ -27,7 +27,15 @@ export function AuthProvider({ children }) {
         await wait(200);
       }
 
-      const { data } = await apiClient.get("/me");
+      const data = await getOrFetchPageCache(
+        "auth:me",
+        firebaseUser.uid,
+        async () => {
+          const response = await apiClient.get("/me");
+          return response.data;
+        },
+        { ttlMs: 60_000 }
+      );
       return data;
     } catch (error) {
       console.error("Mongo profile fetch failed:", error);

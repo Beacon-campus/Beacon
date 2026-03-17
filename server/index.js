@@ -8,6 +8,7 @@ import path from "path";
 import { createRequire } from "module";
 import mongoose from "mongoose";
 import { createServer } from "http";
+import { exec } from "child_process";
 
 import connectDB from "./config/db.js";
 import User from "./models/User.js";
@@ -131,15 +132,25 @@ app.get("/health", cors({ origin: "*", credentials: false }), (_, res) =>
   res.status(200).send("OK")
 );
 
-const apiLimiter = rateLimit({
+// Strict rate limits for public/abuse-prone endpoints.
+app.use("/api/login-lookup", strictLimiter);
+app.use("/api/bot/chat", strictLimiter);
+
+const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // Temporary higher limit for wakeup/polling testing
+  max: 100,
   message: { error: "Too many requests from this IP, please try again after 15 minutes." },
-  standardHeaders: true, 
+  standardHeaders: true,
   legacyHeaders: false,
 });
-// Apply rate limiter to all api routes
-app.use("/api", apiLimiter);
+
+const relaxedLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 2000,
+  message: { error: "Too many requests from this IP, please try again after 15 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 app.use(express.json({ limit: "20mb" }));
 app.use(buildMetricsMiddleware());
@@ -150,19 +161,31 @@ startMetricsSampling();
 
 console.log("🔥 SERVER FILE LOADED");
 
+function warmLibreOffice() {
+  exec("soffice --headless --version", (err) => {
+    if (err) {
+      console.log("LibreOffice warmup failed:", err.message);
+      return;
+    }
+    console.log("LibreOffice warmed up");
+  });
+}
+
+warmLibreOffice();
+
 /* ================= ROUTES ================= */
-app.use("/api/todos", todoRoutes);
+app.use("/api/todos", relaxedLimiter, todoRoutes);
 app.use("/api/sketch", sketchRoutes);
-app.use("/api/chat", chatRoutes);
-app.use("/api/classroom", classroomRoutes);
-app.use("/api/calendar", calendarRoutes);
-app.use("/api/timetable", timetableRoutes);
-app.use("/api/notes", noteRoutes);
-app.use("/api/assignments", assignmentRoutes);
+app.use("/api/chat", relaxedLimiter, chatRoutes);
+app.use("/api/classroom", relaxedLimiter, classroomRoutes);
+app.use("/api/calendar", relaxedLimiter, calendarRoutes);
+app.use("/api/timetable", relaxedLimiter, timetableRoutes);
+app.use("/api/notes", relaxedLimiter, noteRoutes);
+app.use("/api/assignments", relaxedLimiter, assignmentRoutes);
 app.use("/api/uploads", uploadRoutes);
-app.use("/api/bot", botRoutes);
-app.use("/api/friends", friendsRoutes);
-app.use("/api/notifications", notificationRoutes);
+app.use("/api/bot", relaxedLimiter, botRoutes);
+app.use("/api/friends", relaxedLimiter, friendsRoutes);
+app.use("/api/notifications", relaxedLimiter, notificationRoutes);
 app.use("/api/admin", adminRoutes); // [NEW] Admin Routes
 app.use("/api/university", universityRoutes);
 

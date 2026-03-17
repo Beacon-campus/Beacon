@@ -53,7 +53,7 @@ const studyQuotes = [
 ];
 
 const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
-const WAKE_INTERVAL_MS = 5000;
+const WAKE_INTERVAL_MS = 10000;
 const MESSAGE_ROTATE_MS = 5000;
 const MESSAGE_FADE_MS = 350;
 const ENABLE_WAKEUP_DEBUG = import.meta.env.VITE_WAKEUP_DEBUG === "true";

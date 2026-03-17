@@ -48,10 +48,12 @@ export default function StudentHome() {
         todos,
         notifications,
         universityAnnouncements,
+        calendarCurrent,
         fetchAllHomeData,
         fetchNotifications,
         toggleTodoComplete,
         setUniversityAnnouncements,
+        homeLoading,
     } = useHomeData();
 
     // Carousel State
@@ -181,31 +183,16 @@ export default function StudentHome() {
 
     // 2. Fetch Upcoming Event
     useEffect(() => {
-        const fetchNextEvent = async () => {
-            if (!user) return;
-            try {
-                const data = await getOrFetchPageCache(
-                    "student:home:calendar-current",
-                    userCacheKey,
-                    async () => {
-                        const response = await apiClient.get("/calendar/current");
-                        return response.data;
-                    },
-                    { ttlMs: 60_000 }
-                );
-                if (data?.upcomingEvents?.length > 0) {
-                    setNextEvent(data.upcomingEvents[0]);
-                } else {
-                    setNextEvent(null);
-                }
-            } catch (err) {
-                console.error("Failed to fetch event:", err);
-            } finally {
-                setLoadingEvent(false);
-            }
-        };
-        fetchNextEvent();
-    }, [user, userCacheKey]);
+        if (!calendarCurrent) return;
+        setNextEvent(calendarCurrent?.upcomingEvents?.[0] || null);
+        setLoadingEvent(false);
+    }, [calendarCurrent]);
+
+    useEffect(() => {
+        if (!homeLoading && !calendarCurrent) {
+            setLoadingEvent(false);
+        }
+    }, [homeLoading, calendarCurrent]);
 
     useEffect(() => {
         const onNewAnnouncement = (item) => {

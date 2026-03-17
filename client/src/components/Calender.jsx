@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useHomeData } from "../context/HomeDataContext";
 import apiClient from "../services/apiClient";
 import { getOrFetchPageCache } from "../services/pageCache.service";
 import jsPDF from "jspdf";
@@ -30,19 +31,17 @@ const GlitchText = ({ text, className = "" }) => (
 
 export default function Calendar() {
   const { user } = useAuth();
+  const { calendarCurrent, fetchCalendarCurrent, todos, fetchTodos } = useHomeData();
   const userCacheKey = user?.uid || "guest";
   const [now, setNow] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [blink, setBlink] = useState(false);
 
   // --- Data State ---
-  const [calendarData, setCalendarData] = useState(null);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeCell, setActiveCell] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [userTodos, setUserTodos] = useState([]);
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   // --- Toggle & Image State ---
@@ -76,43 +75,36 @@ export default function Calendar() {
     return `${y}-${m}-${d}`;
   };
 
+  const calendarData = calendarCurrent;
+  const upcomingEvents = Array.isArray(calendarData?.upcomingEvents) ? calendarData.upcomingEvents : [];
+
+  const userTodos = useMemo(() => {
+    const list = Array.isArray(todos) ? todos : [];
+    const currentUid = user?.uid;
+    const scopedTodos = currentUid
+      ? list.filter((t) => !t?.userId || t.userId === currentUid || t.uid === currentUid)
+      : list;
+    return scopedTodos.map((t) => ({
+      ...t,
+      __dueDateKey: toDateKey(t?.dueDate),
+    }));
+  }, [todos, user?.uid]);
+
   const fetchCalendarAndTodos = useCallback(async (force = false) => {
     if (!user) return;
 
     try {
-      const data = await getOrFetchPageCache(
-        "calendar:current",
-        userCacheKey,
-        async () => (await apiClient.get("/calendar/current")).data,
-        { ttlMs: 60_000, force }
-      );
-      setCalendarData(data);
-      setUpcomingEvents(Array.isArray(data?.upcomingEvents) ? data.upcomingEvents : []);
+      await fetchCalendarCurrent(force);
     } catch (err) {
       console.error("Failed to fetch calendar", err);
     }
 
     try {
-      const payload = await getOrFetchPageCache(
-        "calendar:todos",
-        userCacheKey,
-        async () => (await apiClient.get("/todos")).data,
-        { ttlMs: 60_000, force }
-      );
-      const todos = Array.isArray(payload) ? payload : Array.isArray(payload?.todos) ? payload.todos : [];
-      const currentUid = user?.uid;
-      const scopedTodos = currentUid
-        ? todos.filter((t) => !t?.userId || t.userId === currentUid || t.uid === currentUid)
-        : todos;
-      const normalizedTodos = scopedTodos.map((t) => ({
-        ...t,
-        __dueDateKey: toDateKey(t?.dueDate),
-      }));
-      setUserTodos(normalizedTodos);
+      await fetchTodos(force);
     } catch (err) {
       console.error("Failed to fetch todos", err);
     }
-  }, [user, userCacheKey]);
+  }, [user, fetchCalendarCurrent, fetchTodos]);
 
 
   // --- Clock Logic ---
@@ -163,11 +155,11 @@ export default function Calendar() {
 
   useEffect(() => {
     const handleTodosChanged = () => {
-      fetchCalendarAndTodos(true).catch(() => { });
+      fetchTodos(true).catch(() => { });
     };
     window.addEventListener("todos:changed", handleTodosChanged);
     return () => window.removeEventListener("todos:changed", handleTodosChanged);
-  }, [fetchCalendarAndTodos]);
+  }, [fetchTodos]);
 
   useEffect(() => {
     if (!showCalendar) return;

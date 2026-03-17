@@ -16,7 +16,7 @@ export async function fetchRecentUniversityAnnouncements(limit = 8, options = {}
       const { data } = await apiClient.get(`/university/announcements/recent?limit=${limit}`);
       return data;
     },
-    { ttlMs: 60_000, force }
+    { ttlMs: 120_000, force }
   );
 }
 

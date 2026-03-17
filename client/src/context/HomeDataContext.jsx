@@ -39,8 +39,10 @@ export function HomeDataProvider({ children }) {
   const userCacheKey = user?.uid || "guest";
   const [todos, setTodos] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [calendarCurrent, setCalendarCurrent] = useState(null);
   const [universityAnnouncements, setUniversityAnnouncements] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [notificationsAll, setNotificationsAll] = useState([]);
 
   const [todoLoading, setTodoLoading] = useState(false);
   const [noteLoading, setNoteLoading] = useState(false);
@@ -50,8 +52,10 @@ export function HomeDataProvider({ children }) {
     if (user) return;
     setTodos([]);
     setNotes([]);
+    setCalendarCurrent(null);
     setUniversityAnnouncements([]);
     setNotifications([]);
+    setNotificationsAll([]);
   }, [user]);
 
   const fetchTodos = useCallback(
@@ -65,7 +69,7 @@ export function HomeDataProvider({ children }) {
           "home:todos",
           userCacheKey,
           fetchTodosApi,
-          { force }
+          { force, ttlMs: 60_000 }
         );
         const mapped = (data || []).map((t) => ({ ...t, id: t._id }));
         setTodos(mapped);
@@ -88,7 +92,7 @@ export function HomeDataProvider({ children }) {
           "home:notes",
           userCacheKey,
           fetchNotesApi,
-          { force }
+          { force, ttlMs: 60_000 }
         );
         const mapped = (data || []).map((n) => ({ ...n, id: n._id }));
         setNotes(mapped);
@@ -109,7 +113,7 @@ export function HomeDataProvider({ children }) {
         `home:announcements:${limit}`,
         userCacheKey,
         () => fetchRecentUniversityAnnouncements(limit),
-        { force, ttlMs: 60_000 }
+        { force, ttlMs: 120_000 }
       );
       const normalized = (data || []).map((item) => ({
         ...item,
@@ -122,21 +126,9 @@ export function HomeDataProvider({ children }) {
     [user, universityAnnouncements, userCacheKey]
   );
 
-  const fetchNotifications = useCallback(
-    async (force = false, limit = 8) => {
-      if (!user) return [];
-      if (!force && notifications.length > 0) return notifications;
-
-      const data = await getOrFetchPageCache(
-        `home:notifications:${limit}`,
-        userCacheKey,
-        async () => {
-          const response = await apiClient.get("/notifications");
-          return response.data || [];
-        },
-        { force, ttlMs: 60_000 }
-      );
-      const latest = (data || [])
+  const buildNotificationSummary = useCallback(
+    (items, limit = 8) =>
+      (items || [])
         .sort(
           (a, b) =>
             new Date(b.timestamp || b.createdAt || 0) -
@@ -149,12 +141,68 @@ export function HomeDataProvider({ children }) {
           desc: n.content || n.description || "",
           type: normalizeNotificationType(n.type),
           rawType: n.type || "",
-        }));
+        })),
+    []
+  );
 
+  const fetchNotifications = useCallback(
+    async (force = false, limit = 8) => {
+      if (!user) return [];
+      if (!force && notifications.length > 0) return notifications;
+
+      const data = await getOrFetchPageCache(
+        "notifications:list",
+        userCacheKey,
+        async () => {
+          const response = await apiClient.get("/notifications");
+          return response.data || [];
+        },
+        { force, ttlMs: 60_000 }
+      );
+      const list = Array.isArray(data) ? data : [];
+      setNotificationsAll(list);
+      const latest = buildNotificationSummary(list, limit);
       setNotifications(latest);
       return latest;
     },
-    [user, notifications, userCacheKey]
+    [user, notifications, userCacheKey, buildNotificationSummary]
+  );
+
+  const fetchNotificationsAll = useCallback(
+    async (force = false, limit = 8) => {
+      if (!user) return [];
+      const data = await getOrFetchPageCache(
+        "notifications:list",
+        userCacheKey,
+        async () => {
+          const response = await apiClient.get("/notifications");
+          return response.data || [];
+        },
+        { force, ttlMs: 60_000 }
+      );
+      const list = Array.isArray(data) ? data : [];
+      setNotificationsAll(list);
+      if (limit != null) {
+        setNotifications(buildNotificationSummary(list, limit));
+      }
+      return list;
+    },
+    [user, userCacheKey, buildNotificationSummary]
+  );
+
+  const fetchCalendarCurrent = useCallback(
+    async (force = false) => {
+      if (!user) return null;
+      const data = await getOrFetchPageCache(
+        "home:calendar-current",
+        userCacheKey,
+        async () => (await apiClient.get("/calendar/current")).data,
+        { force, ttlMs: 60_000 }
+      );
+      setCalendarCurrent(data);
+      return data;
+    },
+    [user, userCacheKey]
   );
 
   const fetchAllHomeData = useCallback(
@@ -168,6 +216,10 @@ export function HomeDataProvider({ children }) {
         }
         if (force || notes.length === 0) {
           await fetchNotes(force);
+          await wait(250);
+        }
+        if (force || !calendarCurrent) {
+          await fetchCalendarCurrent(force);
           await wait(250);
         }
         if (force || universityAnnouncements.length === 0) {
@@ -187,10 +239,12 @@ export function HomeDataProvider({ children }) {
       user,
       todos.length,
       notes.length,
+      calendarCurrent,
       universityAnnouncements.length,
       notifications.length,
       fetchTodos,
       fetchNotes,
+      fetchCalendarCurrent,
       fetchUniversityAnnouncements,
       fetchNotifications,
     ]
@@ -201,7 +255,7 @@ export function HomeDataProvider({ children }) {
     const mapped = { ...newTodo, id: newTodo._id };
     setTodos((prev) => {
       const next = [mapped, ...prev];
-      setPageCache("home:todos", userCacheKey, next);
+      setPageCache("home:todos", userCacheKey, next, 60_000);
       return next;
     });
     return mapped;
@@ -211,7 +265,7 @@ export function HomeDataProvider({ children }) {
     const updated = await updateTodoApi(id, updates);
     setTodos((prev) => {
       const next = prev.map((t) => (t.id === id ? { ...t, ...updated, id: updated._id } : t));
-      setPageCache("home:todos", userCacheKey, next);
+      setPageCache("home:todos", userCacheKey, next, 60_000);
       return next;
     });
     return updated;
@@ -219,25 +273,34 @@ export function HomeDataProvider({ children }) {
 
   const toggleTodoComplete = useCallback(
     async (id, currentStatus) => {
-      setTodos((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, completed: currentStatus } : t))
+      const previous = [...todos];
+      const optimistic = previous.map((t) =>
+        t.id === id ? { ...t, completed: currentStatus } : t
       );
+      setTodos(optimistic);
+      setPageCache("home:todos", userCacheKey, optimistic, 60_000);
       try {
-        await updateTodoApi(id, { completed: currentStatus });
-        await fetchTodos(true);
+        const updated = await updateTodoApi(id, { completed: currentStatus });
+        const merged = optimistic.map((t) =>
+          t.id === id ? { ...t, ...updated, id: updated._id } : t
+        );
+        setTodos(merged);
+        setPageCache("home:todos", userCacheKey, merged, 60_000);
+        return updated;
       } catch (error) {
-        await fetchTodos(true);
+        setTodos(previous);
+        setPageCache("home:todos", userCacheKey, previous, 60_000);
         throw error;
       }
     },
-    [fetchTodos]
+    [todos, userCacheKey]
   );
 
   const deleteTodo = useCallback(async (id) => {
     await deleteTodoApi(id);
     setTodos((prev) => {
       const next = prev.filter((t) => t.id !== id);
-      setPageCache("home:todos", userCacheKey, next);
+      setPageCache("home:todos", userCacheKey, next, 60_000);
       return next;
     });
   }, [userCacheKey]);
@@ -247,7 +310,7 @@ export function HomeDataProvider({ children }) {
     const mapped = { ...newNote, id: newNote._id };
     setNotes((prev) => {
       const next = [mapped, ...prev];
-      setPageCache("home:notes", userCacheKey, next);
+      setPageCache("home:notes", userCacheKey, next, 60_000);
       return next;
     });
     toast.success("Note added");
@@ -257,7 +320,7 @@ export function HomeDataProvider({ children }) {
   const updateNote = useCallback(async (id, updates) => {
     setNotes((prev) => {
       const next = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
-      setPageCache("home:notes", userCacheKey, next);
+      setPageCache("home:notes", userCacheKey, next, 60_000);
       return next;
     });
     await updateNoteApi(id, updates);
@@ -268,7 +331,7 @@ export function HomeDataProvider({ children }) {
       const oldNotes = [...notes];
       setNotes((prev) => {
         const next = prev.filter((n) => n.id !== id);
-        setPageCache("home:notes", userCacheKey, next);
+        setPageCache("home:notes", userCacheKey, next, 60_000);
         return next;
       });
       try {
@@ -276,6 +339,7 @@ export function HomeDataProvider({ children }) {
         toast.success("Note deleted");
       } catch (error) {
         setNotes(oldNotes);
+        setPageCache("home:notes", userCacheKey, oldNotes, 60_000);
         throw error;
       }
     },
@@ -286,15 +350,19 @@ export function HomeDataProvider({ children }) {
     () => ({
       todos,
       notes,
+      calendarCurrent,
       universityAnnouncements,
       notifications,
+      notificationsAll,
       todoLoading,
       noteLoading,
       homeLoading,
       fetchTodos,
       fetchNotes,
+      fetchCalendarCurrent,
       fetchUniversityAnnouncements,
       fetchNotifications,
+      fetchNotificationsAll,
       fetchAllHomeData,
       addTodo,
       updateTodo,
@@ -309,15 +377,19 @@ export function HomeDataProvider({ children }) {
     [
       todos,
       notes,
+      calendarCurrent,
       universityAnnouncements,
       notifications,
+      notificationsAll,
       todoLoading,
       noteLoading,
       homeLoading,
       fetchTodos,
       fetchNotes,
+      fetchCalendarCurrent,
       fetchUniversityAnnouncements,
       fetchNotifications,
+      fetchNotificationsAll,
       fetchAllHomeData,
       addTodo,
       updateTodo,

@@ -4,6 +4,7 @@ import socket from "../services/socket.service";
 import axios from "axios";
 import { server } from "../main";
 import { auth } from "../firebase/firebase";
+import { getOrFetchPageCache } from "../services/pageCache.service";
 import notifSound from "../assets/sounds/notif.mp3";
 import ChatContext from "./ChatContext"; 
 
@@ -65,15 +66,24 @@ export function ChatProvider({ children }) {
       const currentUser = auth.currentUser;
       if (!currentUser) return; 
       const token = await currentUser.getIdToken();
-      
-      const { data } = await axios.get(`${server}/chat/my-channels`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const userKey = currentUser.uid || user?.uid || "guest";
 
-      setChats([...(data.peers || []), ...(data.teacherChats || [])]);
-      setSecondaryChats(data.secondary || []);
+      const data = await getOrFetchPageCache(
+        "chat:my-channels",
+        userKey,
+        async () => {
+          const response = await axios.get(`${server}/chat/my-channels`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          return response.data;
+        },
+        { ttlMs: 60_000 }
+      );
+
+      setChats([...(data?.peers || []), ...(data?.teacherChats || [])]);
+      setSecondaryChats(data?.secondary || []);
       
-      return [...(data.peers || []), ...(data.teacherChats || [])];
+      return [...(data?.peers || []), ...(data?.teacherChats || [])];
     } catch (error) {
       console.error("ChatContext: Error fetching chats", error);
       return [];

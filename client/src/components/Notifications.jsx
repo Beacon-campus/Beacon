@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useHomeData } from "../context/HomeDataContext";
 import apiClient from "../services/apiClient";
 import { auth } from "../firebase/firebase";
 import { clearPageCacheByPrefix, getOrFetchPageCache } from "../services/pageCache.service";
@@ -16,6 +17,7 @@ import socket from "../services/socket.service";
 
 export default function Notifications() {
   const { user: currentUserInfo, refreshUser } = useAuth();
+  const { notificationsAll, fetchNotificationsAll } = useHomeData();
   const userCacheKey = auth.currentUser?.uid || currentUserInfo?.uid || "guest";
   const [notifications, setNotifications] = useState([]);
   const [pendingFriendUsers, setPendingFriendUsers] = useState([]);
@@ -100,9 +102,18 @@ export default function Notifications() {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotificationsAll(true)
+      .catch(() => {})
+      .finally(() => setLoading(false));
     fetchPendingFriendRequests();
-  }, []);
+  }, [fetchNotificationsAll]);
+
+  useEffect(() => {
+    const nonFriendNotifications = (notificationsAll || []).filter(
+      (n) => !["FRIEND_REQUEST", "FRIEND_REQUEST_RECEIVED"].includes(n.type)
+    );
+    setNotifications(nonFriendNotifications);
+  }, [notificationsAll]);
 
   // --- REAL-TIME UPDATES ---
   useEffect(() => {
@@ -118,14 +129,14 @@ export default function Notifications() {
         ].includes(data.type)
       ) {
         refreshUser().finally(() => {
-          fetchNotifications();
+          refreshNotifications();
           fetchPendingFriendRequests();
         });
       }
     };
 
     const handleNewNotification = (notif) => {
-      fetchNotifications();
+      refreshNotifications();
       if (!notif?.type) return;
       // Friend request toasts are handled by socket manager; this is for persisted notifications.
       if (notif.type.startsWith("FRIEND_")) return;
@@ -141,19 +152,10 @@ export default function Notifications() {
     };
   }, []);
 
-  const fetchNotifications = async () => {
+  const refreshNotifications = async () => {
     try {
-      const data = await getOrFetchPageCache(
-        "notifications:list",
-        userCacheKey,
-        async () => (await apiClient.get("/notifications")).data || [],
-        { ttlMs: 60_000 }
-      );
-      // Friend request records are derived from friendRequests, not notification history.
-      const nonFriendNotifications = (data || []).filter(
-        (n) => !["FRIEND_REQUEST", "FRIEND_REQUEST_RECEIVED"].includes(n.type)
-      );
-      setNotifications(nonFriendNotifications);
+      setLoading(true);
+      await fetchNotificationsAll(true);
     } catch (error) {
       console.error("Failed to fetch notifications", error);
     } finally {
@@ -198,6 +200,7 @@ export default function Notifications() {
       clearPageCacheByPrefix("notifications:", userCacheKey);
 
       setNotifications([]);
+      await refreshNotifications();
       toast.success("All notifications deleted");
     } catch {
       toast.error("Failed to delete all");
@@ -216,7 +219,7 @@ export default function Notifications() {
       toast.success("Friend request accepted!");
       await refreshUser();
       await fetchPendingFriendRequests();
-      await fetchNotifications();
+      await refreshNotifications();
       if (openChatAfter) {
         await openDmWithUser(requesterId);
       }
@@ -232,7 +235,7 @@ export default function Notifications() {
       toast.success("Request removed");
       await refreshUser();
       await fetchPendingFriendRequests();
-      await fetchNotifications();
+      await refreshNotifications();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to decline");
     }

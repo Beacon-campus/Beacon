@@ -1,9 +1,12 @@
 import crypto from "crypto";
+import fs from "fs";
+import os from "os";
 import path from "path";
 import { spawnSync } from "child_process";
 import { v2 as cloudinary } from "cloudinary";
 import libre from "libreoffice-convert";
 import { promisify } from "util";
+import PQueue from "p-queue";
 
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "";
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || "";
@@ -63,6 +66,15 @@ export const isCloudinaryConfigured = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINAR
 
 export const convertToPdf = promisify(libre.convert);
 
+const libreOfficeQueue = new PQueue({ concurrency: 1 });
+
+const libreOfficeTempDir = path.join(os.tmpdir(), "libreoffice-temp");
+try {
+  fs.mkdirSync(libreOfficeTempDir, { recursive: true });
+} catch (error) {
+  console.warn("LibreOffice temp dir init failed:", error?.message || error);
+}
+
 let officeRuntimeCache = null;
 
 export function getOfficeRuntimeStatus() {
@@ -103,7 +115,9 @@ export async function generateOfficePreviewPdf(buffer) {
   }
 
   try {
-    const pdfBuffer = await convertToPdf(buffer, ".pdf", undefined);
+    const pdfBuffer = await libreOfficeQueue.add(() =>
+      convertToPdf(buffer, ".pdf", { tmpdir: libreOfficeTempDir })
+    );
     if (!pdfBuffer?.length) {
       return { ok: false, error: "LibreOffice conversion returned empty output." };
     }

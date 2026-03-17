@@ -1,5 +1,10 @@
 import apiClient from "./apiClient";
-import { setPageCache } from "./pageCache.service";
+import { getPageCache, setPageCache } from "./pageCache.service";
+
+const STAGE2_DELAY_MS = 500;
+const STAGE2_BATCH_SIZE = 2;
+const TTL_60S = 60_000;
+const TTL_120S = 120_000;
 
 async function safeGet(url) {
   try {
@@ -10,99 +15,80 @@ async function safeGet(url) {
   }
 }
 
-async function prefetchCommon(userKey) {
-  const [quote, calendar, todos, notes, notifications, announcements] = await Promise.all([
-    safeGet("/quotes/random"),
-    safeGet("/calendar/current"),
-    safeGet("/todos"),
-    safeGet("/notes"),
-    safeGet("/notifications"),
-    safeGet("/university/announcements/recent?limit=8"),
-  ]);
+async function getCachedOrFetch(userKey, cacheKey, url, ttlMs = 0) {
+  const cached = getPageCache(cacheKey, userKey);
+  if (cached !== null) return cached;
+  const data = await safeGet(url);
+  if (data) setPageCache(cacheKey, userKey, data, ttlMs);
+  return data;
+}
 
-  if (quote) {
-    setPageCache("student:home:quote", userKey, quote);
-    setPageCache("teacher:home:quote", userKey, quote);
-  }
-  if (calendar) {
-    setPageCache("student:home:calendar-current", userKey, calendar, 60_000);
-    setPageCache("teacher:home:calendar-current", userKey, calendar, 60_000);
-  }
-  if (todos) {
-    setPageCache("home:todos", userKey, todos);
-  }
-  if (notes) {
-    setPageCache("home:notes", userKey, notes);
-  }
-  if (notifications) {
-    setPageCache("home:notifications:8", userKey, notifications, 60_000);
-  }
-  if (announcements) {
-    setPageCache("home:announcements:8", userKey, announcements, 60_000);
-    setPageCache("university:recent:8", userKey, announcements, 60_000);
+async function runBatches(tasks, batchSize) {
+  for (let i = 0; i < tasks.length; i += batchSize) {
+    const batch = tasks.slice(i, i + batchSize).map((task) => task());
+    await Promise.all(batch);
   }
 }
 
-async function prefetchStudent(userKey) {
-  const [studyMaterials, botHistory] = await Promise.all([
-    safeGet("/classroom/study-materials/student"),
-    safeGet("/bot/history"),
-  ]);
-  if (studyMaterials) {
-    setPageCache("student:study-materials", userKey, studyMaterials, 120_000);
-  }
-  if (botHistory) {
-    setPageCache("bot:history:student", userKey, botHistory, 60_000);
-  }
+async function prefetchStage1(userKey) {
+  await Promise.all([
+    () => getCachedOrFetch(userKey, "auth:me", "/me", TTL_60S),
+    () => getCachedOrFetch(userKey, "chat:my-channels", "/chat/my-channels", TTL_60S),
+    () => getCachedOrFetch(userKey, "notifications:list", "/notifications", TTL_60S),
+  ].map((task) => task()));
 }
 
-async function prefetchTeacher(userKey) {
-  const [studyMaterials, classrooms, botHistory] = await Promise.all([
-    safeGet("/classroom/study-materials/teacher"),
-    safeGet("/assignments/my-classrooms"),
-    safeGet("/bot/history"),
-  ]);
+async function prefetchStage2(userKey, role) {
+  const tasks = [
+    () => getCachedOrFetch(userKey, "home:todos", "/todos", TTL_60S),
+    () => getCachedOrFetch(userKey, "home:notes", "/notes", TTL_60S),
+    () => getCachedOrFetch(userKey, "home:calendar-current", "/calendar/current", TTL_60S),
+    async () => {
+      const announcements = await getCachedOrFetch(
+        userKey,
+        "home:announcements:8",
+        "/university/announcements/recent?limit=8",
+        TTL_120S
+      );
+      if (announcements) {
+        setPageCache("university:recent:8", userKey, announcements, TTL_120S);
+      }
+    },
+  ];
 
-  if (studyMaterials) {
-    setPageCache("teacher:study-materials", userKey, studyMaterials, 120_000);
+  if (role === "student") {
+    tasks.push(
+      () => getCachedOrFetch(userKey, "bot:history:student", "/bot/history", TTL_60S),
+      () => getCachedOrFetch(userKey, "student:study-materials", "/classroom/study-materials/student", TTL_120S)
+    );
   }
-  if (classrooms) {
-    setPageCache("teacher:assignments:my-classrooms", userKey, classrooms, 120_000);
-  }
-  if (botHistory) {
-    setPageCache("bot:history:teacher", userKey, botHistory, 60_000);
-  }
-}
 
-async function prefetchAdmin(userKey) {
-  const [users, classrooms, dashboardOverview, announcements, logs] = await Promise.all([
-    safeGet("/admin/users"),
-    safeGet("/admin/classrooms"),
-    safeGet("/admin/dashboard/overview"),
-    safeGet("/university/announcements/recent?limit=50"),
-    safeGet("/admin/logs?page=1&limit=20"),
-  ]);
+  if (role === "teacher") {
+    tasks.push(
+      () => getCachedOrFetch(userKey, "bot:history:teacher", "/bot/history", TTL_60S),
+      () => getCachedOrFetch(userKey, "teacher:study-materials", "/classroom/study-materials/teacher", TTL_120S),
+      () => getCachedOrFetch(userKey, "teacher:assignments:my-classrooms", "/assignments/my-classrooms", TTL_120S)
+    );
+  }
 
-  if (users) setPageCache("admin:users", userKey, users, 120_000);
-  if (classrooms) setPageCache("admin:classrooms", userKey, classrooms, 120_000);
-  if (dashboardOverview) setPageCache("admin:dashboard:overview", userKey, dashboardOverview, 30_000);
-  if (announcements) setPageCache("university:recent:50", userKey, announcements, 60_000);
-  if (logs) setPageCache("admin:logs:page=1&limit=20", userKey, logs, 15_000);
+  if (role === "admin") {
+    tasks.push(
+      () => getCachedOrFetch(userKey, "admin:users", "/admin/users", TTL_120S),
+      () => getCachedOrFetch(userKey, "admin:classrooms", "/admin/classrooms", TTL_120S),
+      () => getCachedOrFetch(userKey, "admin:dashboard:overview", "/admin/dashboard/overview", 30_000),
+      () => getCachedOrFetch(userKey, "university:recent:50", "/university/announcements/recent?limit=50", TTL_60S),
+      () => getCachedOrFetch(userKey, "admin:logs:page=1&limit=20", "/admin/logs?page=1&limit=20", 15_000)
+    );
+  }
+
+  await runBatches(tasks, STAGE2_BATCH_SIZE);
 }
 
 export async function prefetchSessionPageCaches({ uid, role }) {
   const userKey = uid || "guest";
-  await prefetchCommon(userKey);
+  await prefetchStage1(userKey);
 
-  if (role === "student") {
-    await prefetchStudent(userKey);
-    return;
-  }
-  if (role === "teacher") {
-    await prefetchTeacher(userKey);
-    return;
-  }
-  if (role === "admin") {
-    await prefetchAdmin(userKey);
-  }
+  setTimeout(() => {
+    prefetchStage2(userKey, role).catch(() => {});
+  }, STAGE2_DELAY_MS);
 }
