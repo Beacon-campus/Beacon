@@ -59,6 +59,7 @@ export default function Calendar() {
   const [timetableState, setTimetableState] = useState("loading");
   const [classCards, setClassCards] = useState({ now: null, next: null, later: null });
   const [nextClassInfo, setNextClassInfo] = useState(null);
+  const timetableFetchRef = useRef({ key: null, inFlight: false });
 
   const toDateKey = (value) => {
     if (!value) return null;
@@ -77,6 +78,29 @@ export default function Calendar() {
 
   const calendarData = calendarCurrent;
   const upcomingEvents = Array.isArray(calendarData?.upcomingEvents) ? calendarData.upcomingEvents : [];
+
+  const timetableQuery = useMemo(() => {
+    if (!user) return null;
+    const shift = user.shift || user.profile?.shift;
+    if (!shift) return null;
+
+    if (user.role === "teacher") {
+      const department = user.department || user.profile?.department;
+      if (!department) return null;
+      return {
+        key: `calendar:timetable:teacher:${department}:${shift}`,
+        params: { department, shift },
+      };
+    }
+
+    const course = user.course || user.profile?.course;
+    const semester = user.semester || user.profile?.semester;
+    if (!course || !semester) return null;
+    return {
+      key: `calendar:timetable:student:${course}:${semester}:${shift}`,
+      params: { course, semester, shift },
+    };
+  }, [user]);
 
   const userTodos = useMemo(() => {
     const list = Array.isArray(todos) ? todos : [];
@@ -122,31 +146,63 @@ export default function Calendar() {
       if (!user) return;
       try {
         await fetchCalendarAndTodos();
-
-        const course = user.course || user.profile?.course;
-        const semester = user.semester || user.profile?.semester;
-        const shift = user.shift || user.profile?.shift;
-
-        if (course && semester && shift) {
-          const query = new URLSearchParams({ course, semester, shift });
-          const schedule = await getOrFetchPageCache(
-            `calendar:timetable:${course}:${semester}:${shift}`,
-            userCacheKey,
-            async () => (await apiClient.get(`/timetable/weekly?${query}`)).data || [],
-            { ttlMs: 60_000 }
-          );
-          setFullSchedule(schedule || []);
-        } else {
-          setTimetableState("error");
-        }
       } catch {
-        setTimetableState("error");
+        // Calendar + todos fetch error only.
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [user, fetchCalendarAndTodos, userCacheKey]);
+  }, [user, fetchCalendarAndTodos]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!timetableQuery) {
+      setFullSchedule([]);
+      setTimetableState("error");
+      return;
+    }
+    if (timetableFetchRef.current.inFlight) return;
+    if (timetableFetchRef.current.key === timetableQuery.key) return;
+
+    timetableFetchRef.current.key = timetableQuery.key;
+    timetableFetchRef.current.inFlight = true;
+    setTimetableState("loading");
+
+    const fetchTimetable = async () => {
+      try {
+        const query = new URLSearchParams(timetableQuery.params);
+        const result = await getOrFetchPageCache(
+          timetableQuery.key,
+          userCacheKey,
+          async () => (await apiClient.get(`/timetable/weekly?${query}`)).data,
+          { ttlMs: 60_000 }
+        );
+
+        if (!result || result.exists === false) {
+          setFullSchedule([]);
+          setTimetableState("missing");
+          return;
+        }
+
+        const schedule = Array.isArray(result.schedule)
+          ? result.schedule
+          : Array.isArray(result)
+            ? result
+            : [];
+        setFullSchedule(schedule || []);
+        if (!schedule || schedule.length === 0) {
+          setTimetableState("missing");
+        }
+      } catch {
+        setTimetableState("error");
+      } finally {
+        timetableFetchRef.current.inFlight = false;
+      }
+    };
+
+    fetchTimetable();
+  }, [user, timetableQuery?.key, userCacheKey]);
 
   useEffect(() => {
     if (!showCalendar) return;
@@ -658,6 +714,13 @@ export default function Calendar() {
                 ) : (
                   <p className="text-sm text-gray-400">No upcoming classes found this week.</p>
                 )}
+              </div>
+            )}
+
+            {user && timetableState === "missing" && (
+              <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl bg-white/50 gap-2">
+                <p className="text-sm text-gray-500 font-medium">No timetable published yet.</p>
+                <p className="text-xs text-gray-400">Ask admin to upload the schedule when ready.</p>
               </div>
             )}
 

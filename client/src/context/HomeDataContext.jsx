@@ -47,6 +47,7 @@ export function HomeDataProvider({ children }) {
   const [todoLoading, setTodoLoading] = useState(false);
   const [noteLoading, setNoteLoading] = useState(false);
   const [homeLoading, setHomeLoading] = useState(false);
+  const todosRef = useRef([]);
   const todosLoadingRef = useRef(false);
   const notesLoadingRef = useRef(false);
   const announcementsLoadingRef = useRef(false);
@@ -70,11 +71,15 @@ export function HomeDataProvider({ children }) {
     calendarLoadingRef.current = false;
   }, [user]);
 
+  useEffect(() => {
+    todosRef.current = todos;
+  }, [todos]);
+
   const fetchTodos = useCallback(
     async (force = false) => {
       if (!user) return [];
-      if (!force && todos.length > 0) return todos;
-      if (todosLoadingRef.current) return todos;
+      if (!force && todosRef.current.length > 0) return todosRef.current;
+      if (todosLoadingRef.current) return todosRef.current;
 
       setTodoLoading(true);
       todosLoadingRef.current = true;
@@ -93,7 +98,7 @@ export function HomeDataProvider({ children }) {
         todosLoadingRef.current = false;
       }
     },
-    [user, todos, userCacheKey]
+    [user, userCacheKey]
   );
 
   const fetchNotes = useCallback(

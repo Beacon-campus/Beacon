@@ -15,9 +15,10 @@ const daySchema = new mongoose.Schema({
 });
 
 const timetableSchema = new mongoose.Schema({
-  course: { type: String, required: true },   // "BCA"
-  semester: { type: Number, required: true }, // 6
+  course: { type: String, default: "" },      // "BCA" (students)
+  semester: { type: Number, default: null },  // 6 (students)
   shift: { type: Number, default: 1 },        // 2 (as per your request)
+  department: { type: String, default: "" },  // For teacher timetable queries
   schedule: [daySchema] // Array of 6 days (Mon-Sat)
 }, { timestamps: true });
 

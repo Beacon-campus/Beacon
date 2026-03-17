@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { useHomeData } from "../context/HomeDataContext";
 
 export default function useTodos() {
-  const { user } = useAuth();
   const {
     todos,
     todoLoading,
-    fetchTodos,
     addTodo: addTodoCached,
     updateTodo: updateTodoCached,
     deleteTodo: deleteTodoCached,
@@ -23,13 +20,6 @@ export default function useTodos() {
       })
     );
   };
-
-  useEffect(() => {
-    if (!user) return;
-    fetchTodos().catch((err) => {
-      console.error("Failed to load todos:", err);
-    });
-  }, [user, fetchTodos]);
 
   const addTodo = async (todoData) => {
     try {
