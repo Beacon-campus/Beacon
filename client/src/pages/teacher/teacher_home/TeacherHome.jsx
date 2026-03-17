@@ -45,7 +45,6 @@ export default function TeacherHome() {
         notifications,
         universityAnnouncements,
         calendarCurrent,
-        fetchAllHomeData,
         fetchNotifications,
         toggleTodoComplete,
         setUniversityAnnouncements,
@@ -93,10 +92,6 @@ export default function TeacherHome() {
     // Animation State for Todos
     const [animatingIds, setAnimatingIds] = useState([]);
 
-    useEffect(() => {
-        if (!user) return;
-        fetchAllHomeData();
-    }, [user, fetchAllHomeData]);
 
     const handleComplete = (id) => {
         if (animatingIds.includes(id)) return;

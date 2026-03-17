@@ -49,7 +49,6 @@ export default function StudentHome() {
         notifications,
         universityAnnouncements,
         calendarCurrent,
-        fetchAllHomeData,
         fetchNotifications,
         toggleTodoComplete,
         setUniversityAnnouncements,
@@ -108,10 +107,6 @@ export default function StudentHome() {
         }
     }, [activeNotif, homeNotifications.length]);
 
-    useEffect(() => {
-        if (!user) return;
-        fetchAllHomeData();
-    }, [user, fetchAllHomeData]);
 
     const handleComplete = (id) => {
         if (animatingIds.includes(id)) return;

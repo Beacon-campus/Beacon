@@ -58,8 +58,16 @@ export async function getOrFetchPageCache(pageKey, userId, fetcher, options = {}
     const cached = getPageCache(pageKey, userId);
     if (cached !== null) return cached;
   }
-  const freshData = await fetcher();
-  return setPageCache(pageKey, userId, freshData, ttlMs);
+  try {
+    const freshData = await fetcher();
+    if (freshData === null || freshData === undefined) {
+      return null;
+    }
+    return setPageCache(pageKey, userId, freshData, ttlMs);
+  } catch (error) {
+    console.error("getOrFetchPageCache failed:", error);
+    return null;
+  }
 }
 
 export function clearPageCache(pageKey, userId) {

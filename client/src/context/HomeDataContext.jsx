@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "./AuthContext";
 import apiClient from "../services/apiClient";
@@ -47,6 +47,12 @@ export function HomeDataProvider({ children }) {
   const [todoLoading, setTodoLoading] = useState(false);
   const [noteLoading, setNoteLoading] = useState(false);
   const [homeLoading, setHomeLoading] = useState(false);
+  const todosLoadingRef = useRef(false);
+  const notesLoadingRef = useRef(false);
+  const announcementsLoadingRef = useRef(false);
+  const notificationsLoadingRef = useRef(false);
+  const calendarLoadingRef = useRef(false);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     if (user) return;
@@ -56,14 +62,22 @@ export function HomeDataProvider({ children }) {
     setUniversityAnnouncements([]);
     setNotifications([]);
     setNotificationsAll([]);
+    hasFetchedRef.current = false;
+    todosLoadingRef.current = false;
+    notesLoadingRef.current = false;
+    announcementsLoadingRef.current = false;
+    notificationsLoadingRef.current = false;
+    calendarLoadingRef.current = false;
   }, [user]);
 
   const fetchTodos = useCallback(
     async (force = false) => {
       if (!user) return [];
       if (!force && todos.length > 0) return todos;
+      if (todosLoadingRef.current) return todos;
 
       setTodoLoading(true);
+      todosLoadingRef.current = true;
       try {
         const data = await getOrFetchPageCache(
           "home:todos",
@@ -76,6 +90,7 @@ export function HomeDataProvider({ children }) {
         return mapped;
       } finally {
         setTodoLoading(false);
+        todosLoadingRef.current = false;
       }
     },
     [user, todos, userCacheKey]
@@ -85,8 +100,10 @@ export function HomeDataProvider({ children }) {
     async (force = false) => {
       if (!user) return [];
       if (!force && notes.length > 0) return notes;
+      if (notesLoadingRef.current) return notes;
 
       setNoteLoading(true);
+      notesLoadingRef.current = true;
       try {
         const data = await getOrFetchPageCache(
           "home:notes",
@@ -99,6 +116,7 @@ export function HomeDataProvider({ children }) {
         return mapped;
       } finally {
         setNoteLoading(false);
+        notesLoadingRef.current = false;
       }
     },
     [user, notes, userCacheKey]
@@ -108,19 +126,17 @@ export function HomeDataProvider({ children }) {
     async (force = false, limit = 8) => {
       if (!user) return [];
       if (!force && universityAnnouncements.length > 0) return universityAnnouncements;
+      if (announcementsLoadingRef.current) return universityAnnouncements;
 
-      const data = await getOrFetchPageCache(
-        `home:announcements:${limit}`,
-        userCacheKey,
-        () => fetchRecentUniversityAnnouncements(limit),
-        { force, ttlMs: 120_000 }
-      );
+      announcementsLoadingRef.current = true;
+      const data = await fetchRecentUniversityAnnouncements(limit, { force });
       const normalized = (data || []).map((item) => ({
         ...item,
         text: item.message,
         sender: item.createdBy?.name || "Admin",
       }));
       setUniversityAnnouncements(normalized);
+      announcementsLoadingRef.current = false;
       return normalized;
     },
     [user, universityAnnouncements, userCacheKey]
@@ -149,7 +165,9 @@ export function HomeDataProvider({ children }) {
     async (force = false, limit = 8) => {
       if (!user) return [];
       if (!force && notifications.length > 0) return notifications;
+      if (notificationsLoadingRef.current) return notifications;
 
+      notificationsLoadingRef.current = true;
       const data = await getOrFetchPageCache(
         "notifications:list",
         userCacheKey,
@@ -163,6 +181,7 @@ export function HomeDataProvider({ children }) {
       setNotificationsAll(list);
       const latest = buildNotificationSummary(list, limit);
       setNotifications(latest);
+      notificationsLoadingRef.current = false;
       return latest;
     },
     [user, notifications, userCacheKey, buildNotificationSummary]
@@ -171,6 +190,9 @@ export function HomeDataProvider({ children }) {
   const fetchNotificationsAll = useCallback(
     async (force = false, limit = 8) => {
       if (!user) return [];
+      if (notificationsLoadingRef.current) return notificationsAll;
+
+      notificationsLoadingRef.current = true;
       const data = await getOrFetchPageCache(
         "notifications:list",
         userCacheKey,
@@ -185,14 +207,17 @@ export function HomeDataProvider({ children }) {
       if (limit != null) {
         setNotifications(buildNotificationSummary(list, limit));
       }
+      notificationsLoadingRef.current = false;
       return list;
     },
-    [user, userCacheKey, buildNotificationSummary]
+    [user, userCacheKey, buildNotificationSummary, notificationsAll]
   );
 
   const fetchCalendarCurrent = useCallback(
     async (force = false) => {
       if (!user) return null;
+      if (calendarLoadingRef.current) return calendarCurrent;
+      calendarLoadingRef.current = true;
       const data = await getOrFetchPageCache(
         "home:calendar-current",
         userCacheKey,
@@ -200,14 +225,16 @@ export function HomeDataProvider({ children }) {
         { force, ttlMs: 60_000 }
       );
       setCalendarCurrent(data);
+      calendarLoadingRef.current = false;
       return data;
     },
-    [user, userCacheKey]
+    [user, userCacheKey, calendarCurrent]
   );
 
   const fetchAllHomeData = useCallback(
     async (force = false) => {
       if (!user) return;
+      if (homeLoading) return;
       setHomeLoading(true);
       try {
         if (force || todos.length === 0) {
@@ -247,8 +274,16 @@ export function HomeDataProvider({ children }) {
       fetchCalendarCurrent,
       fetchUniversityAnnouncements,
       fetchNotifications,
+      homeLoading,
     ]
   );
+
+  useEffect(() => {
+    if (!user) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    fetchAllHomeData().catch(() => {});
+  }, [user, fetchAllHomeData]);
 
   const addTodo = useCallback(async (todoData) => {
     const newTodo = await createTodo(todoData);
