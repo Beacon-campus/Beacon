@@ -38,6 +38,9 @@ export function getPageCache(pageKey, userId) {
 }
 
 export function setPageCache(pageKey, userId, data, ttlMs = 0) {
+  if (data === null || data === undefined) {
+    return null;
+  }
   const cache = readCache();
   const key = buildKey(userId, pageKey);
   const expiresAt = ttlMs > 0 ? Date.now() + ttlMs : null;
