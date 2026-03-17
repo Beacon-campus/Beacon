@@ -1,6 +1,7 @@
 import React from "react";
 import ChatInterface from "../../../components/chat_comps/ChatMain";
 import { useAuth } from "../../../context/AuthContext";
+import LoadingState from "../../../components/ui/LoadingState";
 
 export default function StudentCommunity() {
   const { user, loading } = useAuth();
@@ -8,7 +9,7 @@ export default function StudentCommunity() {
   if (loading) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-2xl">
-        <p className="text-gray-400 animate-pulse">Loading Community...</p>
+        <LoadingState size="md" />
       </div>
     );
   }

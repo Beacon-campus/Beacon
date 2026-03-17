@@ -14,6 +14,7 @@ import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import socket from "../../../services/socket.service";
 import { exportRowsToXlsx } from "../../../utils/excelExport";
 import { resolveAttachmentUrl } from "../../../utils/cloudinaryUrl";
+import LoadingState from "../../../components/ui/LoadingState";
 
 const EMPTY_FORM = {
   title: "",
@@ -1457,7 +1458,7 @@ export default function TeacherPublishAssignment() {
           <div className="flex-1 overflow-y-auto pr-2 space-y-3">
             {loadingSubmissions ? (
               <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-500 font-bold">Loading student submissions...</p>
+                <LoadingState size="sm" />
               </div>
             ) : submissions.length === 0 ? (
               <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
@@ -1536,7 +1537,9 @@ export default function TeacherPublishAssignment() {
 
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {loadingDoubts ? (
-                <p className="text-xs text-gray-500">Loading doubts...</p>
+                <div className="py-4 flex items-center justify-center">
+                  <LoadingState size="xs" />
+                </div>
               ) : replyMode === "broadcast" ? (
                 // --- BROADCAST FEED ---
                 (() => {
@@ -1709,7 +1712,7 @@ export default function TeacherPublishAssignment() {
           <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-2 soft-scrollbar pb-4 pr-3 relative">
             {loadingAssignments ? (
               <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <p className="text-gray-400 font-medium">Loading assignments...</p>
+                <LoadingState size="sm" />
               </div>
             ) : classAssignments.length === 0 ? (
               <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">

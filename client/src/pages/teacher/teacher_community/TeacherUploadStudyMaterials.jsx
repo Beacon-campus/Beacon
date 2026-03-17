@@ -5,6 +5,7 @@ import { auth } from "../../../firebase/firebase";
 import apiClient from "../../../services/apiClient";
 import { getOrFetchPageCache, setPageCache } from "../../../services/pageCache.service";
 import { uploadAttachment } from "../../../utils/attachmentUpload";
+import LoadingState from "../../../components/ui/LoadingState";
 
 export default function TeacherUploadStudyMaterials() {
   const [classrooms, setClassrooms] = useState([]);
@@ -175,7 +176,11 @@ export default function TeacherUploadStudyMaterials() {
   };
 
   if (loading) {
-    return <div className="p-6 text-gray-500">Loading study materials...</div>;
+    return (
+      <div className="p-6 text-gray-500 flex items-center justify-center">
+        <LoadingState size="md" />
+      </div>
+    );
   }
 
   if (!selectedClassroom) {

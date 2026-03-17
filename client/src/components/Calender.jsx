@@ -7,6 +7,7 @@ import jsPDF from "jspdf";
 import Modal from "./ui/Modal";
 import { exportRowsToXlsx } from "../utils/excelExport";
 import { buildCloudinaryUrl } from "../utils/cloudinaryUrl";
+import LoadingState from "./ui/LoadingState";
 
 // --- Icons ---
 const DownloadIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>;
@@ -748,7 +749,9 @@ export default function Calendar() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center h-full text-gray-400">Loading events...</div>
+              <div className="flex items-center justify-center h-full text-gray-400">
+                <LoadingState size="sm" />
+              </div>
             ) : upcomingEvents.length > 0 ? (
               <div className="flex flex-col gap-2 overflow-y-auto pr-1 soft-scrollbar min-h-0 flex-1">
                 {upcomingEvents.map((event, i) => {
@@ -1076,8 +1079,7 @@ export default function Calendar() {
             >
               {cachedImages.isLoading ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-500 font-medium animate-pulse">Loading Original Documents...</p>
+                  <LoadingState size="md" />
                 </div>
               ) : (cachedImages.odd && cachedImages.even) ? (
                 <div

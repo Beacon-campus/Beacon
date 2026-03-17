@@ -3,6 +3,7 @@ import { getAvatarUrl } from "../../utils/avatarUtils";
 import { auth } from "../../firebase/firebase";
 import { useChat } from "../../context/ChatContext";
 import AddChat from "./AddChat";
+import LoadingState from "../ui/LoadingState";
 
 // Assets
 import AddIcon from "../../assets/user-add.svg";
@@ -89,7 +90,13 @@ export default function ChatSidebar({
   }, [peersChats, classmates, currentUserInfo]);
 
   const renderChatList = (chats, emptyMessage) => {
-      if (loading) return <p className="p-4 text-center text-gray-400">Loading...</p>;
+      if (loading) {
+        return (
+          <div className="p-4 flex items-center justify-center text-gray-400">
+            <LoadingState size="xs" />
+          </div>
+        );
+      }
       if (chats.length === 0) return <p className="p-4 text-center text-gray-400 text-sm">{emptyMessage}</p>;
 
       return chats.map((chat, idx) => {

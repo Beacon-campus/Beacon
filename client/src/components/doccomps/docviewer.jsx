@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
+import LoadingState from "../ui/LoadingState";
 
 export default function DocViewer({ file, onClose }) {
   if (!file) return null;
@@ -83,8 +84,7 @@ export default function DocViewer({ file, onClose }) {
         )}
         {canInlinePreview && isLoading && (
           <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center gap-4 z-10">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-500 font-medium animate-pulse">Loading Original Documents...</p>
+            <LoadingState size="md" />
           </div>
         )}
       </div>

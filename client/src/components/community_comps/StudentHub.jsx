@@ -6,6 +6,7 @@ import { MAX_CHAR_COUNT, BANNED_EMOJIS, ENGLISH_AND_EMOJI_REGEX } from "../../ut
 import socket from "../../services/socket.service";
 import { toast } from "react-hot-toast";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/attachmentUpload";
+import LoadingState from "../ui/LoadingState";
 
 export default function StudentHub({
     chatMessages,
@@ -189,8 +190,8 @@ export default function StudentHub({
                     )}
                     <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto pb-4 px-4 pt-4 no-scrollbar" onScroll={handleScroll}>
                         {isLoadingOlder && (
-                            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
-                                Loading older messages...
+                            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+                                <LoadingState size="xs" />
                             </div>
                         )}
                         {chatMessages.map((msg, idx) => {

@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { uploadAttachment, ACCEPTED_ATTACHMENT_EXTENSIONS } from "../../utils/attachmentUpload";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import { createUniversityAnnouncement, fetchRecentUniversityAnnouncements } from "../../services/university.service";
+import LoadingState from "../../components/ui/LoadingState";
 
 function formatDate(value) {
   if (!value) return "-";
@@ -201,7 +202,7 @@ export default function AdminAnnouncements() {
 
             {loading ? (
               <div className="h-40 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                <LoadingState size="sm" />
               </div>
             ) : announcements.length === 0 ? (
               <p className="text-sm text-slate-400 mt-4">No announcements posted yet.</p>

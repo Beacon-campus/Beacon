@@ -6,6 +6,7 @@ import { getAvatarUrl } from "../../utils/avatarUtils";
 import UserListItem from "../shared/UserListItem";
 import { server } from "../../main";
 import { auth } from "../../firebase/firebase";
+import LoadingState from "../ui/LoadingState";
 
 const AESTHETIC_COLORS = ["#FFD1DC", "#FFABAB", "#FFC3A0", "#FF677D", "#D4A5A5", "#B5EAD7", "#C7CEEA", "#E2F0CB", "#FF9AA2", "#FFDAC1"];
 
@@ -152,9 +153,13 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
                                 <button onClick={handleSaveDescription} className="text-xs bg-black text-white px-3 py-1 rounded-md font-bold">Save</button>
                             </div>
                         </div>
+                    ) : loading ? (
+                        <div className="min-h-[1.5em]">
+                            <LoadingState size="xs" align="start" className="items-start" />
+                        </div>
                     ) : (
                         <p className="text-xs text-gray-600 leading-relaxed font-medium min-h-[1.5em]">
-                            {loading ? <span className="animate-pulse bg-gray-200 text-transparent rounded">Loading desc...</span> : description}
+                            {description}
                         </p>
                     )}
                 </div>
@@ -167,16 +172,8 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
                 </h3>
                 <div className="space-y-3 pb-2">
                     {loading ? (
-                        <div className="space-y-3">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="flex items-center gap-3 animate-pulse">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-                                    <div className="flex-1 space-y-1">
-                                        <div className="h-2 bg-gray-200 rounded w-1/3"></div>
-                                        <div className="h-2 bg-gray-100 rounded w-1/4"></div>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="py-6 flex items-center justify-center">
+                            <LoadingState size="sm" />
                         </div>
                     ) : participants.length === 0 ? (
                         <p className="text-xs text-gray-400 italic text-center py-2">No participants found.</p>

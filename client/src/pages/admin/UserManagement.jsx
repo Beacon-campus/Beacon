@@ -5,6 +5,7 @@ import { auth } from "../../firebase/firebase";
 import { getOrFetchPageCache } from "../../services/pageCache.service";
 
 import UserModal from "../../components/admin/UserModal";
+import LoadingState from "../../components/ui/LoadingState";
 
 export default function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -186,7 +187,7 @@ export default function UserManagement() {
             <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
                 {loading ? (
                     <div className="h-full flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <LoadingState size="sm" />
                     </div>
                 ) : filteredUsers.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-gray-400">

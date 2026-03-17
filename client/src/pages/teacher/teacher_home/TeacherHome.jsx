@@ -39,7 +39,8 @@ export default function TeacherHome() {
     const { user } = useAuth();
     const userCacheKey = user?.uid || "guest";
     const navigate = useNavigate();
-    const [quote, setQuote] = useState({ text: "Loading inspiration...", author: "" });
+    const [quote, setQuote] = useState({ text: "", author: "" });
+    const [quoteLoading, setQuoteLoading] = useState(true);
     const {
         todos,
         notifications,
@@ -140,6 +141,7 @@ export default function TeacherHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
+            setQuoteLoading(true);
             try {
                 const data = await getOrFetchPageCache(
                     "teacher:home:quote",
@@ -156,6 +158,8 @@ export default function TeacherHome() {
                     text: "Education is not the filling of a pail, but the lighting of a fire.",
                     author: "W.B. Yeats"
                 });
+            } finally {
+                setQuoteLoading(false);
             }
         };
         fetchQuote();
@@ -225,6 +229,7 @@ export default function TeacherHome() {
                         quote={quote}
                         theme="blue"
                         roleLabel="Teacher"
+                        loadingQuote={quoteLoading}
                     />
 
                     <div className="flex-[2] flex flex-col gap-4">

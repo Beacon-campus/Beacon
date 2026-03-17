@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/attachmentUpload";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
+import LoadingState from "../ui/LoadingState";
 
 export default function OfficialChannel({
   channelId,
@@ -203,8 +204,8 @@ export default function OfficialChannel({
         onScroll={handleScroll}
       >
          {isLoadingOlder && (
-            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
-              Loading older announcements...
+            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+              <LoadingState size="xs" />
             </div>
          )}
          {announcements.filter(post => {

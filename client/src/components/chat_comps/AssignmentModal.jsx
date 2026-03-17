@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS } from "../../utils/attachmentUpload";
 import { createPortal } from "react-dom";
 import SendIcon from "../../assets/send.svg";
+import LoadingState from "../ui/LoadingState";
 
 export default function AssignmentModal({
   isOpen,
@@ -26,6 +27,26 @@ export default function AssignmentModal({
   const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
+  if (!assignment) {
+    return createPortal(
+      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl relative z-[1000]">
+          <div className="z-10 shrink-0 border-b border-gray-100 bg-white p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="line-clamp-1 text-lg font-bold text-gray-800">Assignment</h3>
+              <button type="button" onClick={onClose} className="text-2xl leading-none text-gray-400 hover:text-black">
+                &times;
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-8">
+            <LoadingState size="md" />
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
 
   return createPortal(
     <>
@@ -34,7 +55,7 @@ export default function AssignmentModal({
           <div className="z-10 shrink-0 border-b border-gray-100 bg-white p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h3 className="line-clamp-1 text-lg font-bold text-gray-800">{assignment?.title || "Loading..."}</h3>
+                <h3 className="line-clamp-1 text-lg font-bold text-gray-800">{assignment?.title || "Assignment"}</h3>
                 <span className="inline-block rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-700">
                   {assignment?.type || "qna"}
                 </span>

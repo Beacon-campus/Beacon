@@ -7,6 +7,7 @@ import { server } from "../../main";
 import { auth } from "../../firebase/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import LoadingState from "../ui/LoadingState";
 
 export default function GroupInfoModal({ isOpen, onClose, group }) {
   const { user: currentUser } = useAuth();
@@ -101,51 +102,59 @@ export default function GroupInfoModal({ isOpen, onClose, group }) {
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Project Group • {fullData?.participants?.length || 0} Members</p>
       </div>
 
-      <div className="px-6 mb-4 shrink-0">
-        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Goal & Deadline</h3>
-            {isAdmin && !isEditing && (
-              <button onClick={() => setIsEditing(true)} className="text-[10px] font-black text-indigo-600 uppercase">Edit</button>
-            )}
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center py-8">
+          <LoadingState size="md" />
+        </div>
+      ) : (
+        <>
+          <div className="px-6 mb-4 shrink-0">
+            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Goal & Deadline</h3>
+                {isAdmin && !isEditing && (
+                  <button onClick={() => setIsEditing(true)} className="text-[10px] font-black text-indigo-600 uppercase">Edit</button>
+                )}
+              </div>
+
+              {isEditing && isAdmin ? (
+                <div className="space-y-3">
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-white border border-gray-100 rounded-xl p-3 text-xs focus:outline-none focus:ring-4 focus:ring-black/5 resize-none" rows={2} />
+                  <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="w-full bg-white border border-gray-100 rounded-xl p-3 text-xs focus:outline-none" />
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => setIsEditing(false)} className="text-[10px] font-bold text-gray-400">Cancel</button>
+                    <button onClick={handleSaveSettings} className="bg-black text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-lg">Save</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-gray-600 leading-relaxed font-medium mb-3">{description}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Target:</span>
+                    <span className="text-[10px] font-black text-red-500 uppercase tracking-tighter">{deadline || "No Date Set"}</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
-          {isEditing && isAdmin ? (
+          <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
+            <h3 className="text-[10px] font-black text-gray-400 uppercase mb-3 sticky top-0 bg-white py-2 z-10 border-b border-gray-50">Team Members</h3>
             <div className="space-y-3">
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full bg-white border border-gray-100 rounded-xl p-3 text-xs focus:outline-none focus:ring-4 focus:ring-black/5 resize-none" rows={2} />
-              <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="w-full bg-white border border-gray-100 rounded-xl p-3 text-xs focus:outline-none" />
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setIsEditing(false)} className="text-[10px] font-bold text-gray-400">Cancel</button>
-                <button onClick={handleSaveSettings} className="bg-black text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-lg">Save</button>
-              </div>
+              {fullData?.participants?.map(member => (
+                <UserListItem
+                  key={member._id}
+                  user={member}
+                  badgeText={normalizeId(member._id) === adminId ? "Admin" : null}
+                  badgeColor="gray"
+                  actionLabel={isAdmin && normalizeId(member._id) !== adminId ? "Promote" : null}
+                  onActionClick={isAdmin && normalizeId(member._id) !== adminId ? () => handleTransferAdmin(member._id) : null}
+                />
+              ))}
             </div>
-          ) : (
-            <>
-              <p className="text-xs text-gray-600 leading-relaxed font-medium mb-3">{description}</p>
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Target:</span>
-                <span className="text-[10px] font-black text-red-500 uppercase tracking-tighter">{deadline || "No Date Set"}</span>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
-        <h3 className="text-[10px] font-black text-gray-400 uppercase mb-3 sticky top-0 bg-white py-2 z-10 border-b border-gray-50">Team Members</h3>
-        <div className="space-y-3">
-          {fullData?.participants?.map(member => (
-            <UserListItem
-              key={member._id}
-              user={member}
-              badgeText={normalizeId(member._id) === adminId ? "Admin" : null}
-              badgeColor="gray"
-              actionLabel={isAdmin && normalizeId(member._id) !== adminId ? "Promote" : null}
-              onActionClick={isAdmin && normalizeId(member._id) !== adminId ? () => handleTransferAdmin(member._id) : null}
-            />
-          ))}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </Modal>
   );
 }

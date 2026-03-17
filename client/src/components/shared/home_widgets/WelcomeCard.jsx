@@ -1,4 +1,6 @@
-export default function WelcomeCard({ user, quote, theme = "green", roleLabel = "Student" }) {
+import LoadingState from "../../ui/LoadingState";
+
+export default function WelcomeCard({ user, quote, theme = "green", roleLabel = "Student", loadingQuote = false }) {
     // Generate background color class dynamically but explicitly to avoiding purging
     const getBgColorClass = () => {
         if (theme === "blue") return "bg-blue-50";
@@ -22,10 +24,16 @@ export default function WelcomeCard({ user, quote, theme = "green", roleLabel = 
                 </h1>
 
                 <div className="pt-6 relative max-w-xl">
-                    <span className="absolute -top-6 -left-8 text-8xl text-slate-100 font-serif font-black opacity-80 select-none">"</span>
-                    <p className="text-xl text-slate-600 font-medium italic leading-relaxed relative z-10 pl-2">{quote.text}</p>
-                    {quote.author && (
-                        <p className="text-sm text-slate-400 font-bold mt-4 uppercase tracking-widest relative z-10 pl-2">— {quote.author}</p>
+                    {loadingQuote ? (
+                        <LoadingState size="sm" align="start" className="items-start" />
+                    ) : (
+                        <>
+                            <span className="absolute -top-6 -left-8 text-8xl text-slate-100 font-serif font-black opacity-80 select-none">"</span>
+                            <p className="text-xl text-slate-600 font-medium italic leading-relaxed relative z-10 pl-2">{quote.text}</p>
+                            {quote.author && (
+                                <p className="text-sm text-slate-400 font-bold mt-4 uppercase tracking-widest relative z-10 pl-2">— {quote.author}</p>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

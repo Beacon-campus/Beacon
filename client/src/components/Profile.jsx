@@ -186,7 +186,20 @@ export default function ProfileLayout() {
         );
       case "open":
         return (
-          <img src={AttributionIcon} alt="Open source attribution" className={imgClassName} />
+          <span
+            aria-hidden="true"
+            className={`${imgClassName} bg-current`}
+            style={{
+              WebkitMaskImage: `url(${AttributionIcon})`,
+              maskImage: `url(${AttributionIcon})`,
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }}
+          />
         );
       case "backup":
         return (

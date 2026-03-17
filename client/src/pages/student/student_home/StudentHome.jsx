@@ -41,7 +41,8 @@ const getTodoDateInfo = (dateStr) => {
 export default function StudentHome() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [quote, setQuote] = useState({ text: "Loading...", author: "" });
+    const [quote, setQuote] = useState({ text: "", author: "" });
+    const [quoteLoading, setQuoteLoading] = useState(true);
     const [nextEvent, setNextEvent] = useState(null);
     const [loadingEvent, setLoadingEvent] = useState(true);
     const {
@@ -155,6 +156,7 @@ export default function StudentHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
+            setQuoteLoading(true);
             try {
                 const data = await getOrFetchPageCache(
                     "student:home:quote",
@@ -171,6 +173,8 @@ export default function StudentHome() {
                     text: "Education is the passport to the future.",
                     author: "Malcolm X"
                 });
+            } finally {
+                setQuoteLoading(false);
             }
         };
         fetchQuote();
@@ -241,6 +245,7 @@ export default function StudentHome() {
                         quote={quote}
                         theme="green"
                         roleLabel="Student"
+                        loadingQuote={quoteLoading}
                     />
 
                     <div className="flex-[2] flex flex-col gap-4">

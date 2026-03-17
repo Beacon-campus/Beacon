@@ -14,6 +14,7 @@ import OfficialChannel from "./OfficialChannel";
 import TeacherClassList from "./TeacherClassList";
 import DoubtModal from "../shared/DoubtModal";
 import ClassroomInfoModal from "./ClassRoomInfoModal";
+import LoadingState from "../ui/LoadingState";
 
 const AESTHETIC_COLORS = ["#FFD1DC", "#FFABAB", "#FFC3A0", "#FF677D", "#D4A5A5", "#B5EAD7", "#C7CEEA", "#E2F0CB", "#FF9AA2", "#FFDAC1"];
 const getClassroomColor = (id) => {
@@ -51,7 +52,8 @@ export default function Community({ role }) {
   const [replyToComment, setReplyToComment] = useState(null);
   const doubtInputRef = useRef(null);
   const [hubTypingUsers, setHubTypingUsers] = useState([]);
-  const [teacherSubjects, setTeacherSubjects] = useState("...");
+  const [teacherSubjects, setTeacherSubjects] = useState("");
+  const [teacherSubjectsLoading, setTeacherSubjectsLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser && !hasSynced) {
@@ -90,8 +92,9 @@ export default function Community({ role }) {
 
   useEffect(() => {
     if (role === 'teacher' && activeTeacherClass?._id) {
-      setTeacherSubjects("Loading...");
       const getSubjects = async () => {
+        setTeacherSubjectsLoading(true);
+        setTeacherSubjects("");
         try {
           const token = await auth.currentUser.getIdToken();
           const { data } = await axios.get(`${server}/classroom/details/${activeTeacherClass._id}`, { headers: { Authorization: `Bearer ${token}` } });
@@ -108,6 +111,8 @@ export default function Community({ role }) {
         } catch (e) {
           console.error("Failed to load subs", e);
           setTeacherSubjects("Unknown Subjects");
+        } finally {
+          setTeacherSubjectsLoading(false);
         }
       };
       getSubjects();
@@ -204,7 +209,13 @@ export default function Community({ role }) {
     } catch (error) { console.error("Failed to delete", error); }
   };
 
-  if (chatLoading || !currentUser) return <div className="p-10 text-center text-gray-400">Loading Community...</div>;
+  if (chatLoading || !currentUser) {
+    return (
+      <div className="p-10 flex items-center justify-center text-gray-400">
+        <LoadingState size="md" />
+      </div>
+    );
+  }
 
   const isClassView = (role === 'student') || (role === 'teacher' && teacherViewMode === 'class');
   const classColor = activeClassroom ? getClassroomColor(activeClassroom._id) : "#E2F0CB";
@@ -233,7 +244,16 @@ export default function Community({ role }) {
               <div className="flex flex-col items-start gap-1">
                 <h2 className="text-sm font-black text-gray-800 leading-tight">{activeClassroom?.name || "Classroom"}</h2>
                 {role === 'teacher' ? (
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">YOU ARE TEACHING {teacherSubjects}</span>
+                  teacherSubjectsLoading ? (
+                    <LoadingState
+                      size="xs"
+                      align="start"
+                      className="items-start"
+                      messageClassName="text-[10px] font-bold text-gray-400 uppercase tracking-wider"
+                    />
+                  ) : (
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">YOU ARE TEACHING {teacherSubjects}</span>
+                  )
                 ) : (
                   <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 mt-0.5">
                     <div className={`absolute top-1 bottom-1 w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />

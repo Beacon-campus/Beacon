@@ -26,6 +26,13 @@ import UpdateEmailModal from "../components/UpdateEmailModal";
 import toast from "react-hot-toast";
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import studentLottie from '../assets/loading/STUDENT.lottie';
+import { preloadAsset } from "../utils/preloadAsset";
+import LoadingState from "../components/ui/LoadingState";
+
+preloadAsset(studentLottie, {
+  as: "fetch",
+  type: "application/octet-stream",
+});
 import profile1 from "../assets/profile/1.png";
 import profile5 from "../assets/profile/5.png";
 import profile9 from "../assets/profile/9.png";
@@ -272,7 +279,13 @@ export default function Login() {
     }
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <LoadingState size="lg" />
+      </div>
+    );
+  }
 
   /* ================= UI RENDER ================= */
 

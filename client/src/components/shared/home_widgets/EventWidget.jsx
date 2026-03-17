@@ -1,3 +1,5 @@
+import LoadingState from "../../ui/LoadingState";
+
 export default function EventWidget({ nextEvent, loadingEvent, relativeTime, widgetHeader, onClickRoute, navigate }) {
     const getBadgeColors = () => {
         if (relativeTime === "Today") return "bg-red-50 text-red-600 border-red-100 animate-pulse";
@@ -12,7 +14,7 @@ export default function EventWidget({ nextEvent, loadingEvent, relativeTime, wid
             </h3>
 
             {loadingEvent ? (
-                <p className="text-gray-400 text-sm animate-pulse">Loading...</p>
+                <LoadingState size="xs" />
             ) : nextEvent ? (
                 <div className="text-center z-10">
                     <p className="text-lg font-bold text-primary line-clamp-1">{nextEvent.title}</p>

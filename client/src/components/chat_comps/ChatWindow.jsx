@@ -18,6 +18,7 @@ import {
   ACCEPTED_ATTACHMENT_EXTENSIONS,
   uploadAttachment,
 } from "../../utils/attachmentUpload";
+import LoadingState from "../ui/LoadingState";
 
 export default function ChatWindow({
   isHidden, activeChat, activeChatTitle, messages, currentUserInfo,
@@ -447,8 +448,8 @@ export default function ChatWindow({
             )}
             <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto soft-scrollbar p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
               {isLoadingOlder && (
-                <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-1">
-                  Loading older messages...
+                <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+                  <LoadingState size="xs" />
                 </div>
               )}
               {messages.map((msg, idx) => (
