@@ -48,6 +48,7 @@ export function HomeDataProvider({ children }) {
   const [noteLoading, setNoteLoading] = useState(false);
   const [homeLoading, setHomeLoading] = useState(false);
   const todosRef = useRef([]);
+  const notesRef = useRef([]);
   const notificationsRef = useRef([]);
   const notificationsAllRef = useRef([]);
   const calendarCurrentRef = useRef(null);
@@ -77,6 +78,10 @@ export function HomeDataProvider({ children }) {
   useEffect(() => {
     todosRef.current = todos;
   }, [todos]);
+
+  useEffect(() => {
+    notesRef.current = notes;
+  }, [notes]);
 
   useEffect(() => {
     notificationsRef.current = notifications;
@@ -119,8 +124,8 @@ export function HomeDataProvider({ children }) {
   const fetchNotes = useCallback(
     async (force = false) => {
       if (!user) return [];
-      if (!force && notes.length > 0) return notes;
-      if (notesLoadingRef.current) return notes;
+      if (!force && notesRef.current.length > 0) return notesRef.current;
+      if (notesLoadingRef.current) return notesRef.current;
 
       setNoteLoading(true);
       notesLoadingRef.current = true;
@@ -139,7 +144,7 @@ export function HomeDataProvider({ children }) {
         notesLoadingRef.current = false;
       }
     },
-    [user, notes, userCacheKey]
+    [user, userCacheKey]
   );
 
   const fetchUniversityAnnouncements = useCallback(
