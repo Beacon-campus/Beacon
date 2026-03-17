@@ -132,10 +132,6 @@ app.get("/health", cors({ origin: "*", credentials: false }), (_, res) =>
   res.status(200).send("OK")
 );
 
-// Strict rate limits for public/abuse-prone endpoints.
-app.use("/api/login-lookup", strictLimiter);
-app.use("/api/bot/chat", strictLimiter);
-
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
@@ -143,6 +139,10 @@ const strictLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Strict rate limits for public/abuse-prone endpoints.
+app.use("/api/login-lookup", strictLimiter);
+app.use("/api/bot/chat", strictLimiter);
 
 const relaxedLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
