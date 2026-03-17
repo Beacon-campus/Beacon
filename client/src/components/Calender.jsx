@@ -53,6 +53,7 @@ export default function Calendar() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const imageFetchInFlightRef = useRef(false);
 
   // --- Timetable State ---
   const [fullSchedule, setFullSchedule] = useState([]);
@@ -565,8 +566,11 @@ export default function Calendar() {
 
   // --- Image Fetching & Zoom Logic ---
   const fetchImages = useCallback(async () => {
-    if (!calendarData || (cachedImages.odd && cachedImages.even)) return;
+    if (!calendarData) return;
+    if (cachedImages.isLoading || imageFetchInFlightRef.current) return;
+    if (cachedImages.odd && cachedImages.even) return;
 
+    imageFetchInFlightRef.current = true;
     setCachedImages(prev => ({ ...prev, isLoading: true }));
     try {
       const [{ blob: oddBlob }, { blob: evenBlob }] = await Promise.all([
@@ -584,8 +588,10 @@ export default function Calendar() {
         even: LOCAL_EVEN_FALLBACK,
         isLoading: false
       });
+    } finally {
+      imageFetchInFlightRef.current = false;
     }
-  }, [calendarData, cachedImages.odd, cachedImages.even, oddSemUrlCandidates, evenSemUrlCandidates]);
+  }, [calendarData, cachedImages.odd, cachedImages.even, cachedImages.isLoading, oddSemUrlCandidates, evenSemUrlCandidates]);
 
   useEffect(() => {
     if (viewMode === "calendar") {

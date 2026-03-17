@@ -48,6 +48,9 @@ export function HomeDataProvider({ children }) {
   const [noteLoading, setNoteLoading] = useState(false);
   const [homeLoading, setHomeLoading] = useState(false);
   const todosRef = useRef([]);
+  const notificationsRef = useRef([]);
+  const notificationsAllRef = useRef([]);
+  const calendarCurrentRef = useRef(null);
   const todosLoadingRef = useRef(false);
   const notesLoadingRef = useRef(false);
   const announcementsLoadingRef = useRef(false);
@@ -74,6 +77,18 @@ export function HomeDataProvider({ children }) {
   useEffect(() => {
     todosRef.current = todos;
   }, [todos]);
+
+  useEffect(() => {
+    notificationsRef.current = notifications;
+  }, [notifications]);
+
+  useEffect(() => {
+    notificationsAllRef.current = notificationsAll;
+  }, [notificationsAll]);
+
+  useEffect(() => {
+    calendarCurrentRef.current = calendarCurrent;
+  }, [calendarCurrent]);
 
   const fetchTodos = useCallback(
     async (force = false) => {
@@ -169,71 +184,81 @@ export function HomeDataProvider({ children }) {
   const fetchNotifications = useCallback(
     async (force = false, limit = 8) => {
       if (!user) return [];
-      if (!force && notifications.length > 0) return notifications;
-      if (notificationsLoadingRef.current) return notifications;
+      if (!force && notificationsRef.current.length > 0) return notificationsRef.current;
+      if (notificationsLoadingRef.current) return notificationsRef.current;
 
       notificationsLoadingRef.current = true;
-      const data = await getOrFetchPageCache(
-        "notifications:list",
-        userCacheKey,
-        async () => {
-          const response = await apiClient.get("/notifications");
-          return response.data || [];
-        },
-        { force, ttlMs: 60_000 }
-      );
-      const list = Array.isArray(data) ? data : [];
-      setNotificationsAll(list);
-      const latest = buildNotificationSummary(list, limit);
-      setNotifications(latest);
-      notificationsLoadingRef.current = false;
-      return latest;
+      try {
+        const data = await getOrFetchPageCache(
+          "notifications:list",
+          userCacheKey,
+          async () => {
+            const response = await apiClient.get("/notifications");
+            return response.data || [];
+          },
+          { force, ttlMs: 60_000 }
+        );
+        const list = Array.isArray(data) ? data : [];
+        setNotificationsAll(list);
+        const latest = buildNotificationSummary(list, limit);
+        setNotifications(latest);
+        return latest;
+      } finally {
+        notificationsLoadingRef.current = false;
+      }
     },
-    [user, notifications, userCacheKey, buildNotificationSummary]
+    [user, userCacheKey, buildNotificationSummary]
   );
 
   const fetchNotificationsAll = useCallback(
     async (force = false, limit = 8) => {
       if (!user) return [];
-      if (notificationsLoadingRef.current) return notificationsAll;
+      if (!force && notificationsAllRef.current.length > 0) return notificationsAllRef.current;
+      if (notificationsLoadingRef.current) return notificationsAllRef.current;
 
       notificationsLoadingRef.current = true;
-      const data = await getOrFetchPageCache(
-        "notifications:list",
-        userCacheKey,
-        async () => {
-          const response = await apiClient.get("/notifications");
-          return response.data || [];
-        },
-        { force, ttlMs: 60_000 }
-      );
-      const list = Array.isArray(data) ? data : [];
-      setNotificationsAll(list);
-      if (limit != null) {
-        setNotifications(buildNotificationSummary(list, limit));
+      try {
+        const data = await getOrFetchPageCache(
+          "notifications:list",
+          userCacheKey,
+          async () => {
+            const response = await apiClient.get("/notifications");
+            return response.data || [];
+          },
+          { force, ttlMs: 60_000 }
+        );
+        const list = Array.isArray(data) ? data : [];
+        setNotificationsAll(list);
+        if (limit != null) {
+          setNotifications(buildNotificationSummary(list, limit));
+        }
+        return list;
+      } finally {
+        notificationsLoadingRef.current = false;
       }
-      notificationsLoadingRef.current = false;
-      return list;
     },
-    [user, userCacheKey, buildNotificationSummary, notificationsAll]
+    [user, userCacheKey, buildNotificationSummary]
   );
 
   const fetchCalendarCurrent = useCallback(
     async (force = false) => {
       if (!user) return null;
-      if (calendarLoadingRef.current) return calendarCurrent;
+      if (calendarLoadingRef.current) return calendarCurrentRef.current;
       calendarLoadingRef.current = true;
-      const data = await getOrFetchPageCache(
-        "home:calendar-current",
-        userCacheKey,
-        async () => (await apiClient.get("/calendar/current")).data,
-        { force, ttlMs: 60_000 }
-      );
-      setCalendarCurrent(data);
-      calendarLoadingRef.current = false;
-      return data;
+      try {
+        const data = await getOrFetchPageCache(
+          "home:calendar-current",
+          userCacheKey,
+          async () => (await apiClient.get("/calendar/current")).data,
+          { force, ttlMs: 60_000 }
+        );
+        setCalendarCurrent(data);
+        return data;
+      } finally {
+        calendarLoadingRef.current = false;
+      }
     },
-    [user, userCacheKey, calendarCurrent]
+    [user, userCacheKey]
   );
 
   const fetchAllHomeData = useCallback(
