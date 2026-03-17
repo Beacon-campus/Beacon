@@ -43,10 +43,10 @@ export default function ChatMediaPicker({ onGifSelect, onEmojiSelect, onClose, h
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto bg-white p-2 relative">
+      <div className="flex-1 flex flex-col overflow-hidden bg-white p-2 relative">
           {activeTab === 'gif' && !hideGifs ? (
               <>
-                <div className="mb-2">
+                <div className="mb-2 shrink-0">
                     <input
                     type="text"
                     placeholder="Search safe GIFs..."
@@ -56,7 +56,7 @@ export default function ChatMediaPicker({ onGifSelect, onEmojiSelect, onClose, h
                     autoFocus
                     />
                 </div>
-                <div className="h-full overflow-y-auto scrollbar-hide">
+                <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
                     <Grid 
                         width={270} 
                         columns={2} 
@@ -72,7 +72,8 @@ export default function ChatMediaPicker({ onGifSelect, onEmojiSelect, onClose, h
                 </div>
               </>
           ) : (
-              <div className="grid grid-cols-6 gap-2 p-1">
+              <div className="flex-1 overflow-y-auto no-scrollbar min-h-0">
+                  <div className="grid grid-cols-6 gap-2 p-1">
                   {ALLOWED_EMOJIS.map((emoji, idx) => (
                       <button
                           key={idx}
@@ -82,6 +83,7 @@ export default function ChatMediaPicker({ onGifSelect, onEmojiSelect, onClose, h
                           {emoji}
                       </button>
                   ))}
+                  </div>
               </div>
           )}
       </div>

@@ -57,7 +57,7 @@ const MessageItem = ({
         (msg.sender?.firebaseUid && currentUser?.firebaseUid && msg.sender.firebaseUid === currentUser.firebaseUid)
     ));
 
-    const isNearBottom = index >= total - 3;
+    const isNearBottom = total > 3 && index >= total - 3;
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -76,7 +76,7 @@ const MessageItem = ({
     const showProfile = isCommunity && !isMe;
 
     return (
-        <div className={`flex w-full ${isMe ? "justify-end" : "justify-start"} items-start gap-2`}>
+        <div className={`flex w-full ${isMe ? "justify-end" : "justify-start"} items-start gap-2 ${showMenu ? "relative z-[999]" : "relative z-0"}`}>
             {showProfile && (
                 <div className="w-7 flex flex-col shrink-0">
                     {!isConsecutive && (
@@ -117,7 +117,7 @@ const MessageItem = ({
                         `}>
                         {/* THE INSIDE DROPDOWN MENU */}
                         {!msg.isDeleted && !disableDeleteActions && (!isCommunity || isMe) && (
-                            <div className="absolute top-1.5 right-1.5 z-[20] opacity-0 group-hover/bubble:opacity-100 transition-opacity flex flex-col items-end">
+                            <div className={`absolute top-1.5 right-1.5 z-[20] transition-opacity flex flex-col ${showMenu ? "opacity-100" : "opacity-0 group-hover/bubble:opacity-100"} ${isMe ? 'items-end' : 'items-start'}`}>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
                                     className="p-1 rounded-full bg-white/10 hover:bg-gray-200/50 text-gray-400 hover:text-black transition-colors"
@@ -126,8 +126,9 @@ const MessageItem = ({
                                 </button>
 
                                 {showMenu && (
-                                    <div ref={menuRef} className={`absolute top-full mt-1 w-36 bg-white rounded-xl shadow-2xl border border-gray-100/50 overflow-hidden animate-in zoom-in-95 duration-100 origin-top-right z-[100]
-                                            ${isNearBottom ? "bottom-full top-auto mb-1 origin-bottom-right" : ""}
+                                    <div ref={menuRef} className={`absolute mt-1 w-36 bg-white rounded-xl shadow-2xl border border-gray-100/50 overflow-hidden animate-in zoom-in-95 duration-100 z-[100]
+                                            ${isMe ? 'right-0' : 'left-0'}
+                                            ${isNearBottom ? "bottom-full top-auto mb-1 " + (isMe ? 'origin-bottom-right' : 'origin-bottom-left') : "top-full " + (isMe ? 'origin-top-right' : 'origin-top-left')}
                                             `}>
                                         {isMe && (
                                             <button
