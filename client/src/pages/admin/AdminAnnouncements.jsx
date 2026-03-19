@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { uploadAttachment, ACCEPTED_ATTACHMENT_EXTENSIONS } from "../../utils/attachmentUpload";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import { createUniversityAnnouncement, fetchRecentUniversityAnnouncements } from "../../services/university.service";
+import LoadingState from "../../components/ui/LoadingState";
 
 function formatDate(value) {
   if (!value) return "-";
@@ -23,21 +24,7 @@ function toAnnouncementAttachment(uploaded) {
     type: "file",
     name: uploaded.name,
     mimeType: uploaded.mimeType || uploaded.type,
-    url: uploaded.url,
-    downloadUrl: uploaded.downloadUrl || uploaded.url,
-    path: uploaded.path || "",
-    cloudinary: uploaded.cloudinary || {
-      publicId: uploaded.publicId || "",
-      version: uploaded.version || null,
-      resourceType: uploaded.resourceType || "",
-      format: uploaded.format || "",
-      secureUrl: uploaded.secureUrl || uploaded.url || "",
-    },
-    publicId: uploaded.publicId || "",
-    version: uploaded.version || null,
-    resourceType: uploaded.resourceType || "",
-    format: uploaded.format || "",
-    secureUrl: uploaded.secureUrl || uploaded.url || "",
+    cloudinary: uploaded.cloudinary || null,
     previewUrl: uploaded.previewUrl || "",
     previewDownloadUrl: uploaded.previewDownloadUrl || "",
     previewPath: uploaded.previewPath || "",
@@ -59,7 +46,7 @@ export default function AdminAnnouncements() {
 
   const stats = useMemo(() => {
     const total = announcements.length;
-    const withFiles = announcements.filter((a) => a.attachment?.url).length;
+    const withFiles = announcements.filter((a) => resolveAttachmentUrl(a.attachment)).length;
     const imagePosts = announcements.filter((a) => a.attachment?.kind === "image").length;
     return { total, withFiles, imagePosts };
   }, [announcements]);
@@ -215,7 +202,7 @@ export default function AdminAnnouncements() {
 
             {loading ? (
               <div className="h-40 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                <LoadingState size="sm" />
               </div>
             ) : announcements.length === 0 ? (
               <p className="text-sm text-slate-400 mt-4">No announcements posted yet.</p>
@@ -229,7 +216,7 @@ export default function AdminAnnouncements() {
                       </p>
                       {resolveAttachmentUrl(item.attachment) ? (
                         <a
-                          href={item.attachment?.cloudinary?.secureUrl || item.attachment?.secureUrl || item.attachment?.downloadUrl || item.attachment?.url}
+                          href={resolveAttachmentUrl(item.attachment)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-semibold text-blue-600 hover:underline"

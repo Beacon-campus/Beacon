@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useHomeData } from "../context/HomeDataContext";
 import apiClient from "../services/apiClient";
 import { getOrFetchPageCache } from "../services/pageCache.service";
 import jsPDF from "jspdf";
 import Modal from "./ui/Modal";
 import { exportRowsToXlsx } from "../utils/excelExport";
 import { buildCloudinaryUrl } from "../utils/cloudinaryUrl";
+import LoadingState from "./ui/LoadingState";
 
 // --- Icons ---
 const DownloadIcon = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>;
@@ -30,19 +32,17 @@ const GlitchText = ({ text, className = "" }) => (
 
 export default function Calendar() {
   const { user } = useAuth();
+  const { calendarCurrent, fetchCalendarCurrent, todos, fetchTodos } = useHomeData();
   const userCacheKey = user?.uid || "guest";
   const [now, setNow] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [blink, setBlink] = useState(false);
 
   // --- Data State ---
-  const [calendarData, setCalendarData] = useState(null);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeCell, setActiveCell] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [userTodos, setUserTodos] = useState([]);
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   // --- Toggle & Image State ---
@@ -54,12 +54,14 @@ export default function Calendar() {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const imageFetchInFlightRef = useRef(false);
 
   // --- Timetable State ---
   const [fullSchedule, setFullSchedule] = useState([]);
   const [timetableState, setTimetableState] = useState("loading");
   const [classCards, setClassCards] = useState({ now: null, next: null, later: null });
   const [nextClassInfo, setNextClassInfo] = useState(null);
+  const timetableFetchRef = useRef({ key: null, inFlight: false });
 
   const toDateKey = (value) => {
     if (!value) return null;
@@ -76,43 +78,59 @@ export default function Calendar() {
     return `${y}-${m}-${d}`;
   };
 
+  const calendarData = calendarCurrent;
+  const upcomingEvents = Array.isArray(calendarData?.upcomingEvents) ? calendarData.upcomingEvents : [];
+
+  const timetableQuery = useMemo(() => {
+    if (!user) return null;
+    const shift = user.shift || user.profile?.shift;
+    if (!shift) return null;
+
+    if (user.role === "teacher") {
+      const department = user.department || user.profile?.department;
+      if (!department) return null;
+      return {
+        key: `calendar:timetable:teacher:${department}:${shift}`,
+        params: { department, shift },
+      };
+    }
+
+    const course = user.course || user.profile?.course;
+    const semester = user.semester || user.profile?.semester;
+    if (!course || !semester) return null;
+    return {
+      key: `calendar:timetable:student:${course}:${semester}:${shift}`,
+      params: { course, semester, shift },
+    };
+  }, [user]);
+
+  const userTodos = useMemo(() => {
+    const list = Array.isArray(todos) ? todos : [];
+    const currentUid = user?.uid;
+    const scopedTodos = currentUid
+      ? list.filter((t) => !t?.userId || t.userId === currentUid || t.uid === currentUid)
+      : list;
+    return scopedTodos.map((t) => ({
+      ...t,
+      __dueDateKey: toDateKey(t?.dueDate),
+    }));
+  }, [todos, user?.uid]);
+
   const fetchCalendarAndTodos = useCallback(async (force = false) => {
     if (!user) return;
 
     try {
-      const data = await getOrFetchPageCache(
-        "calendar:current",
-        userCacheKey,
-        async () => (await apiClient.get("/calendar/current")).data,
-        { ttlMs: 60_000, force }
-      );
-      setCalendarData(data);
-      setUpcomingEvents(Array.isArray(data?.upcomingEvents) ? data.upcomingEvents : []);
+      await fetchCalendarCurrent(force);
     } catch (err) {
       console.error("Failed to fetch calendar", err);
     }
 
     try {
-      const payload = await getOrFetchPageCache(
-        "calendar:todos",
-        userCacheKey,
-        async () => (await apiClient.get("/todos")).data,
-        { ttlMs: 60_000, force }
-      );
-      const todos = Array.isArray(payload) ? payload : Array.isArray(payload?.todos) ? payload.todos : [];
-      const currentUid = user?.uid;
-      const scopedTodos = currentUid
-        ? todos.filter((t) => !t?.userId || t.userId === currentUid || t.uid === currentUid)
-        : todos;
-      const normalizedTodos = scopedTodos.map((t) => ({
-        ...t,
-        __dueDateKey: toDateKey(t?.dueDate),
-      }));
-      setUserTodos(normalizedTodos);
+      await fetchTodos(force);
     } catch (err) {
       console.error("Failed to fetch todos", err);
     }
-  }, [user, userCacheKey]);
+  }, [user, fetchCalendarCurrent, fetchTodos]);
 
 
   // --- Clock Logic ---
@@ -130,31 +148,63 @@ export default function Calendar() {
       if (!user) return;
       try {
         await fetchCalendarAndTodos();
-
-        const course = user.course || user.profile?.course;
-        const semester = user.semester || user.profile?.semester;
-        const shift = user.shift || user.profile?.shift;
-
-        if (course && semester && shift) {
-          const query = new URLSearchParams({ course, semester, shift });
-          const schedule = await getOrFetchPageCache(
-            `calendar:timetable:${course}:${semester}:${shift}`,
-            userCacheKey,
-            async () => (await apiClient.get(`/timetable/weekly?${query}`)).data || [],
-            { ttlMs: 60_000 }
-          );
-          setFullSchedule(schedule || []);
-        } else {
-          setTimetableState("error");
-        }
       } catch {
-        setTimetableState("error");
+        // Calendar + todos fetch error only.
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [user, fetchCalendarAndTodos, userCacheKey]);
+  }, [user, fetchCalendarAndTodos]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!timetableQuery) {
+      setFullSchedule([]);
+      setTimetableState("error");
+      return;
+    }
+    if (timetableFetchRef.current.inFlight) return;
+    if (timetableFetchRef.current.key === timetableQuery.key) return;
+
+    timetableFetchRef.current.key = timetableQuery.key;
+    timetableFetchRef.current.inFlight = true;
+    setTimetableState("loading");
+
+    const fetchTimetable = async () => {
+      try {
+        const query = new URLSearchParams(timetableQuery.params);
+        const result = await getOrFetchPageCache(
+          timetableQuery.key,
+          userCacheKey,
+          async () => (await apiClient.get(`/timetable/weekly?${query}`)).data,
+          { ttlMs: 60_000 }
+        );
+
+        if (!result || result.exists === false) {
+          setFullSchedule([]);
+          setTimetableState("missing");
+          return;
+        }
+
+        const schedule = Array.isArray(result.schedule)
+          ? result.schedule
+          : Array.isArray(result)
+            ? result
+            : [];
+        setFullSchedule(schedule || []);
+        if (!schedule || schedule.length === 0) {
+          setTimetableState("missing");
+        }
+      } catch {
+        setTimetableState("error");
+      } finally {
+        timetableFetchRef.current.inFlight = false;
+      }
+    };
+
+    fetchTimetable();
+  }, [user, timetableQuery?.key, userCacheKey]);
 
   useEffect(() => {
     if (!showCalendar) return;
@@ -163,11 +213,11 @@ export default function Calendar() {
 
   useEffect(() => {
     const handleTodosChanged = () => {
-      fetchCalendarAndTodos(true).catch(() => { });
+      fetchTodos(true).catch(() => { });
     };
     window.addEventListener("todos:changed", handleTodosChanged);
     return () => window.removeEventListener("todos:changed", handleTodosChanged);
-  }, [fetchCalendarAndTodos]);
+  }, [fetchTodos]);
 
   useEffect(() => {
     if (!showCalendar) return;
@@ -517,8 +567,11 @@ export default function Calendar() {
 
   // --- Image Fetching & Zoom Logic ---
   const fetchImages = useCallback(async () => {
-    if (!calendarData || (cachedImages.odd && cachedImages.even)) return;
+    if (!calendarData) return;
+    if (cachedImages.isLoading || imageFetchInFlightRef.current) return;
+    if (cachedImages.odd && cachedImages.even) return;
 
+    imageFetchInFlightRef.current = true;
     setCachedImages(prev => ({ ...prev, isLoading: true }));
     try {
       const [{ blob: oddBlob }, { blob: evenBlob }] = await Promise.all([
@@ -536,8 +589,10 @@ export default function Calendar() {
         even: LOCAL_EVEN_FALLBACK,
         isLoading: false
       });
+    } finally {
+      imageFetchInFlightRef.current = false;
     }
-  }, [calendarData, cachedImages.odd, cachedImages.even, oddSemUrlCandidates, evenSemUrlCandidates]);
+  }, [calendarData, cachedImages.odd, cachedImages.even, cachedImages.isLoading, oddSemUrlCandidates, evenSemUrlCandidates]);
 
   useEffect(() => {
     if (viewMode === "calendar") {
@@ -669,6 +724,13 @@ export default function Calendar() {
               </div>
             )}
 
+            {user && timetableState === "missing" && (
+              <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl bg-white/50 gap-2">
+                <p className="text-sm text-gray-500 font-medium">No timetable published yet.</p>
+                <p className="text-xs text-gray-400">Ask admin to upload the schedule when ready.</p>
+              </div>
+            )}
+
             {(!user || timetableState === "error") && (
               <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl bg-white/50 gap-2">
                 <p className="text-sm text-gray-500 font-medium">Timetable not available.</p>
@@ -687,7 +749,9 @@ export default function Calendar() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center h-full text-gray-400">Loading events...</div>
+              <div className="flex items-center justify-center h-full text-gray-400">
+                <LoadingState size="sm" />
+              </div>
             ) : upcomingEvents.length > 0 ? (
               <div className="flex flex-col gap-2 overflow-y-auto pr-1 soft-scrollbar min-h-0 flex-1">
                 {upcomingEvents.map((event, i) => {
@@ -1015,8 +1079,7 @@ export default function Calendar() {
             >
               {cachedImages.isLoading ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-4">
-                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-500 font-medium animate-pulse">Loading Original Documents...</p>
+                  <LoadingState size="md" />
                 </div>
               ) : (cachedImages.odd && cachedImages.even) ? (
                 <div

@@ -633,6 +633,12 @@ export const submitAssignment = async (req, res) => {
 
     const file = req.body.file;
     if (!file) return res.status(400).json({ error: "No file provided" });
+    if (!file.cloudinary?.publicId || !file.cloudinary?.secureUrl) {
+      return res.status(400).json({ error: "file.cloudinary with publicId and secureUrl is required" });
+    }
+    if (!file.cloudinary?.publicId || !file.cloudinary?.secureUrl) {
+      return res.status(400).json({ error: "file.cloudinary with publicId and secureUrl is required" });
+    }
 
     const existing = await getSubmission({ assignmentId: assignment._id, studentId: me._id });
     if (existing?.submittedAt) {

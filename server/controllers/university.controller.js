@@ -27,21 +27,15 @@ export const postUniversityAnnouncement = async (req, res) => {
           type: "file",
           name: String(attachment.name || "").trim(),
           mimeType: String(attachment.mimeType || attachment.type || "").trim(),
-          url: String(attachment.url || "").trim(),
-          downloadUrl: String(attachment.downloadUrl || "").trim(),
-          path: String(attachment.path || "").trim(),
-          cloudinary: attachment.cloudinary || {
-            publicId: String(attachment.publicId || "").trim(),
-            version: Number(attachment.version || 0) || null,
-            resourceType: String(attachment.resourceType || "").trim(),
-            format: String(attachment.format || "").trim(),
-            secureUrl: String(attachment.secureUrl || "").trim(),
-          },
-          publicId: String(attachment.publicId || "").trim(),
-          version: Number(attachment.version || 0) || null,
-          resourceType: String(attachment.resourceType || "").trim(),
-          format: String(attachment.format || "").trim(),
-          secureUrl: String(attachment.secureUrl || "").trim(),
+          cloudinary: attachment.cloudinary
+            ? {
+                publicId: String(attachment.cloudinary.publicId || "").trim(),
+                version: Number(attachment.cloudinary.version || 0) || null,
+                resourceType: String(attachment.cloudinary.resourceType || "").trim(),
+                format: String(attachment.cloudinary.format || "").trim(),
+                secureUrl: String(attachment.cloudinary.secureUrl || "").trim(),
+              }
+            : null,
           previewUrl: String(attachment.previewUrl || "").trim(),
           previewDownloadUrl: String(attachment.previewDownloadUrl || "").trim(),
           previewPath: String(attachment.previewPath || "").trim(),
@@ -52,6 +46,9 @@ export const postUniversityAnnouncement = async (req, res) => {
           kind: attachment.kind === "image" ? "image" : "file",
         }
       : null;
+    if (normalizedAttachment && (!normalizedAttachment.cloudinary?.publicId || !normalizedAttachment.cloudinary?.secureUrl)) {
+      return res.status(400).json({ error: "attachment.cloudinary with publicId and secureUrl is required" });
+    }
 
     const created = await createUniversityAnnouncement({
       kind: "announcement",
@@ -83,7 +80,7 @@ export const postUniversityAnnouncement = async (req, res) => {
         hasAttachment: !!normalizedAttachment,
         attachmentType: normalizedAttachment?.mimeType || normalizedAttachment?.type || "",
         attachmentKind: normalizedAttachment?.kind || "",
-        attachmentPath: normalizedAttachment?.path || "",
+        attachmentPath: normalizedAttachment?.cloudinary?.publicId || "",
         messageLength: trimmedMessage.length,
       },
     });

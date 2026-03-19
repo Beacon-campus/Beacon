@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
+import LoadingState from "../ui/LoadingState";
 
 export default function DocViewer({ file, onClose }) {
   if (!file) return null;
 
   const resolvedUrl = resolveAttachmentUrl(file);
-  const sourceUrl = file.previewUrl || resolvedUrl || file.url;
+  const sourceUrl = file.previewUrl || resolvedUrl;
   const sourceType = file.previewType || file.mimeType || file.type;
   const isImage = sourceType?.startsWith("image/");
   const isPdf = sourceType === "application/pdf";
@@ -25,7 +26,7 @@ export default function DocViewer({ file, onClose }) {
   const canInlinePreview = !!sourceUrl && (isImage || isPdf || !isOfficeDoc);
   const previewStatus = file.previewStatus || null;
   const previewError = file.previewError || null;
-  const originalDownloadUrl = file.downloadUrl || resolvedUrl || file.url || "";
+  const originalDownloadUrl = resolvedUrl || "";
   const [isLoading, setIsLoading] = useState(canInlinePreview);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function DocViewer({ file, onClose }) {
               <p className="text-xs text-red-500 max-w-xl break-words">{previewError}</p>
             )}
             <div className="flex items-center gap-4 text-sm">
-              <a href={resolvedUrl || file.url} target="_blank" rel="noreferrer" className="underline">
+              <a href={resolvedUrl || ""} target="_blank" rel="noreferrer" className="underline">
                 Open Original
               </a>
               <a href={originalDownloadUrl} download={file.name || "file"} className="underline">
@@ -83,8 +84,7 @@ export default function DocViewer({ file, onClose }) {
         )}
         {canInlinePreview && isLoading && (
           <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center gap-4 z-10">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-500 font-medium animate-pulse">Loading Original Documents...</p>
+            <LoadingState size="md" />
           </div>
         )}
       </div>

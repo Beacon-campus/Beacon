@@ -44,7 +44,7 @@ export default function AddChat({
   const syncFriendRelatedState = useCallback(async () => {
     await refreshUser();
     await fetchClassmates();
-    await fetchChats();
+    await fetchChats(true);
   }, [refreshUser, fetchClassmates, fetchChats]);
 
   // ...

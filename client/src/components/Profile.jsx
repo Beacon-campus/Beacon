@@ -12,7 +12,6 @@ import {
   registerFeatureTap,
 } from "../services/feature.service";
 import { FEATURE_EVENT_BY_NAME } from "../utils/feature.constants";
-
 // Helper to resolve profile images
 const getAvatarUrl = (id) => {
   if (!id) return null;

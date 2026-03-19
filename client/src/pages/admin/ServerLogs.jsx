@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { auth } from "../../firebase/firebase";
 import apiClient from "../../services/apiClient";
 import { getOrFetchPageCache } from "../../services/pageCache.service";
+import LoadingState from "../../components/ui/LoadingState";
 
 const PAGE_SIZE = 20;
 
@@ -168,7 +169,9 @@ export default function ServerLogs() {
 
       <div className="flex-1 overflow-auto rounded-xl border border-gray-100">
         {loading ? (
-          <div className="h-full flex items-center justify-center text-sm text-slate-500">Loading logs...</div>
+          <div className="h-full flex items-center justify-center text-sm text-slate-500">
+            <LoadingState size="sm" />
+          </div>
         ) : error ? (
           <div className="h-full flex items-center justify-center text-sm text-red-600">{error}</div>
         ) : rows.length === 0 ? (

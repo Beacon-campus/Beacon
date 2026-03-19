@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/firebase";
 import apiClient from "../services/apiClient";
-import { clearAllPageCache } from "../services/pageCache.service";
+import { clearAllPageCache, getOrFetchPageCache } from "../services/pageCache.service";
 import { prefetchSessionPageCaches } from "../services/sessionPrefetch.service";
 
 const AuthContext = createContext(null);
@@ -16,10 +16,11 @@ export function AuthProvider({ children }) {
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Fetch MongoDB Profile (Static Data)
-  const fetchMongoProfile = async (firebaseUser) => {
+  const fetchMongoProfile = async (firebaseUser, options = {}) => {
     if (!firebaseUser || !firebaseUser.uid || typeof firebaseUser.getIdToken !== "function") {
       return null;
     }
+    const { force = false } = options;
 
     try {
       if (!didInitialMongoFetchDelay.current) {
@@ -27,7 +28,15 @@ export function AuthProvider({ children }) {
         await wait(200);
       }
 
-      const { data } = await apiClient.get("/me");
+      const data = await getOrFetchPageCache(
+        "auth:me",
+        firebaseUser.uid,
+        async () => {
+          const response = await apiClient.get("/me");
+          return response.data;
+        },
+        { ttlMs: 60_000, force }
+      );
       return data;
     } catch (error) {
       console.error("Mongo profile fetch failed:", error);
@@ -131,13 +140,13 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = async (force = true) => {
     if (auth.currentUser) {
       await auth.currentUser.reload(); // Force refresh from Firebase
 
       const [fsSnap, mData] = await Promise.all([
         getDoc(doc(db, "users", auth.currentUser.uid)),
-        fetchMongoProfile(auth.currentUser)
+        fetchMongoProfile(auth.currentUser, { force })
       ]);
 
       if (fsSnap.exists()) {

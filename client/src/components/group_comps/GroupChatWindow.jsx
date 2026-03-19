@@ -11,6 +11,7 @@ import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/at
 import axios from "axios";
 import { server } from "../../main";
 import { useCallback } from "react";
+import LoadingState from "../ui/LoadingState";
 
 export default function GroupChatWindow({
     groupId,
@@ -117,22 +118,8 @@ export default function GroupChatWindow({
                     type: "file",
                     name: selectedAttachment.name,
                     mimeType: selectedAttachment.mimeType || selectedAttachment.type,
-                    url: selectedAttachment.url,
                     size: selectedAttachment.size,
-                    downloadUrl: selectedAttachment.downloadUrl || selectedAttachment.url,
-                    path: selectedAttachment.path || null,
-                    cloudinary: selectedAttachment.cloudinary || {
-                        publicId: selectedAttachment.publicId || null,
-                        version: selectedAttachment.version || null,
-                        resourceType: selectedAttachment.resourceType || null,
-                        format: selectedAttachment.format || null,
-                        secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
-                    },
-                    publicId: selectedAttachment.publicId || null,
-                    version: selectedAttachment.version || null,
-                    resourceType: selectedAttachment.resourceType || null,
-                    format: selectedAttachment.format || null,
-                    secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
+                    cloudinary: selectedAttachment.cloudinary || null,
                     previewUrl: selectedAttachment.previewUrl || null,
                     previewDownloadUrl: selectedAttachment.previewDownloadUrl || null,
                     previewPath: selectedAttachment.previewPath || null,
@@ -255,8 +242,8 @@ export default function GroupChatWindow({
             )}
             <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 flex flex-col no-scrollbar" onScroll={handleScroll}>
                 {isLoadingOlder && (
-                    <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
-                        Loading older messages...
+                    <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+                        <LoadingState size="xs" />
                     </div>
                 )}
                 {messages.length === 0 ? (

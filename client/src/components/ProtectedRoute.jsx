@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoadingState from "./ui/LoadingState";
 
 export default function ProtectedRoute({ children, allowedRole }) {
   const { user, loading } = useAuth();
@@ -9,7 +10,7 @@ export default function ProtectedRoute({ children, allowedRole }) {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <LoadingState size="lg" />
       </div>
     );
   }

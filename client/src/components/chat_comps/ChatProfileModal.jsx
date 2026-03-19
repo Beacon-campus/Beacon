@@ -4,6 +4,7 @@ import { server } from "../../main";
 import { auth } from "../../firebase/firebase";
 import Modal from "../ui/Modal";
 import ProfileCard from "../ProfileCard";
+import LoadingState from "../ui/LoadingState";
 
 export default function ChatProfileModal({ user, onClose, onUnfriend, role }) {
   const [profileData, setProfileData] = useState(null);
@@ -79,7 +80,7 @@ export default function ChatProfileModal({ user, onClose, onUnfriend, role }) {
              {/* LOADING STATE */}
              {loading ? (
                 <div className="w-[340px] h-[400px] bg-white rounded-[30px] flex items-center justify-center shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)]">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                    <LoadingState size="sm" />
                 </div>
              ) : (
                 <ProfileCard user={displayUser} profileData={profileOverride} />

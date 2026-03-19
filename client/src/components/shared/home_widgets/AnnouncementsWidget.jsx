@@ -31,12 +31,11 @@ export default function AnnouncementsWidget({
 
     const openDocPreview = () => {
         if (!current?.attachment) return;
-        const resolvedUrl = resolveAttachmentUrl(current.attachment);
         setDocFile({
+            ...current.attachment,
             name: current.attachment.name || "attachment",
+            mimeType: current.attachment.mimeType || current.attachment.type || "",
             type: current.attachment.mimeType || current.attachment.type || "",
-            url: resolvedUrl || "",
-            downloadUrl: current.attachment.downloadUrl || resolvedUrl || "",
             previewUrl: current.attachment.previewUrl || null,
             previewDownloadUrl: current.attachment.previewDownloadUrl || null,
             previewPath: current.attachment.previewPath || null,
@@ -115,11 +114,11 @@ export default function AnnouncementsWidget({
                                     <button
                                         type="button"
                                         className="mt-2 inline-block text-xs font-semibold text-blue-600 hover:underline"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (enableAdvancedPreview) openDocPreview();
-                                            else window.open(current.attachment.downloadUrl || resolveAttachmentUrl(current.attachment), "_blank");
-                                        }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (enableAdvancedPreview) openDocPreview();
+                                            else window.open(resolveAttachmentUrl(current.attachment), "_blank");
+                                            }}
                                     >
                                         {enableAdvancedPreview ? "Preview attachment" : "Open attachment"}: {current.attachment.name || "file"}
                                     </button>

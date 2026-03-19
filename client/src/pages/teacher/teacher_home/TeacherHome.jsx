@@ -39,15 +39,17 @@ export default function TeacherHome() {
     const { user } = useAuth();
     const userCacheKey = user?.uid || "guest";
     const navigate = useNavigate();
-    const [quote, setQuote] = useState({ text: "Loading inspiration...", author: "" });
+    const [quote, setQuote] = useState({ text: "", author: "" });
+    const [quoteLoading, setQuoteLoading] = useState(true);
     const {
         todos,
         notifications,
         universityAnnouncements,
-        fetchAllHomeData,
+        calendarCurrent,
         fetchNotifications,
         toggleTodoComplete,
         setUniversityAnnouncements,
+        homeLoading,
     } = useHomeData();
 
     // --- New Event State ---
@@ -91,10 +93,6 @@ export default function TeacherHome() {
     // Animation State for Todos
     const [animatingIds, setAnimatingIds] = useState([]);
 
-    useEffect(() => {
-        if (!user) return;
-        fetchAllHomeData();
-    }, [user, fetchAllHomeData]);
 
     const handleComplete = (id) => {
         if (animatingIds.includes(id)) return;
@@ -143,6 +141,7 @@ export default function TeacherHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
+            setQuoteLoading(true);
             try {
                 const data = await getOrFetchPageCache(
                     "teacher:home:quote",
@@ -159,6 +158,8 @@ export default function TeacherHome() {
                     text: "Education is not the filling of a pail, but the lighting of a fire.",
                     author: "W.B. Yeats"
                 });
+            } finally {
+                setQuoteLoading(false);
             }
         };
         fetchQuote();
@@ -166,31 +167,16 @@ export default function TeacherHome() {
 
     // 2. Fetch Upcoming Event (Same logic as Student)
     useEffect(() => {
-        const fetchNextEvent = async () => {
-            if (!user) return;
-            try {
-                const data = await getOrFetchPageCache(
-                    "teacher:home:calendar-current",
-                    userCacheKey,
-                    async () => {
-                        const response = await apiClient.get("/calendar/current");
-                        return response.data;
-                    },
-                    { ttlMs: 60_000 }
-                );
-                if (data?.upcomingEvents?.length > 0) {
-                    setNextEvent(data.upcomingEvents[0]);
-                } else {
-                    setNextEvent(null);
-                }
-            } catch (err) {
-                console.error("Failed to fetch event:", err);
-            } finally {
-                setLoadingEvent(false);
-            }
-        };
-        fetchNextEvent();
-    }, [user, userCacheKey]);
+        if (!calendarCurrent) return;
+        setNextEvent(calendarCurrent?.upcomingEvents?.[0] || null);
+        setLoadingEvent(false);
+    }, [calendarCurrent]);
+
+    useEffect(() => {
+        if (!homeLoading && !calendarCurrent) {
+            setLoadingEvent(false);
+        }
+    }, [homeLoading, calendarCurrent]);
 
     useEffect(() => {
         const onNewAnnouncement = (item) => {
@@ -243,6 +229,7 @@ export default function TeacherHome() {
                         quote={quote}
                         theme="blue"
                         roleLabel="Teacher"
+                        loadingQuote={quoteLoading}
                     />
 
                     <div className="flex-[2] flex flex-col gap-4">

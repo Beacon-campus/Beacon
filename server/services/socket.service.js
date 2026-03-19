@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import Message from "../models/Message.js";
 import Channel from "../models/Channel.js";
+import User from "../models/User.js";
 
 const initializeSocket = (server, app, allowedOrigins = []) => {
   const io = new Server(server, {
@@ -74,6 +75,29 @@ const initializeSocket = (server, app, allowedOrigins = []) => {
       try {
         const channel = await Channel.findById(data.channelId);
         if (!channel) return;
+
+        if (channel.type === "dm" && Array.isArray(channel.participants) && channel.participants.length === 2) {
+          const participants = await User.find({ _id: { $in: channel.participants } }).select("_id role friends");
+          const [firstUser, secondUser] = participants;
+
+          if (
+            participants.length === 2 &&
+            firstUser?.role === "student" &&
+            secondUser?.role === "student"
+          ) {
+            const firstHasSecond = firstUser.friends.some((id) => id.equals(secondUser._id));
+            const secondHasFirst = secondUser.friends.some((id) => id.equals(firstUser._id));
+
+            if (!firstHasSecond || !secondHasFirst) {
+              socket.emit("send_error", {
+                code: "DM_NOT_FRIENDS",
+                channelId: data.channelId,
+                message: "You must be friends with this user to message them.",
+              });
+              return;
+            }
+          }
+        }
 
         if (channel.type === "project_group" && channel.deadline) {
           const deadlineDate = new Date(channel.deadline);

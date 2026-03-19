@@ -4,6 +4,7 @@ import DocLayout from "../../../components/doccomps/doclayout";
 import { auth } from "../../../firebase/firebase";
 import apiClient from "../../../services/apiClient";
 import { getOrFetchPageCache } from "../../../services/pageCache.service";
+import LoadingState from "../../../components/ui/LoadingState";
 
 export default function StudentStudyMaterials() {
   const [classrooms, setClassrooms] = useState([]);
@@ -53,7 +54,11 @@ export default function StudentStudyMaterials() {
   );
 
   if (loading) {
-    return <div className="p-6 text-gray-500">Loading study materials...</div>;
+    return (
+      <div className="p-6 text-gray-500 flex items-center justify-center">
+        <LoadingState size="md" />
+      </div>
+    );
   }
 
   if (!selectedClassroom) {

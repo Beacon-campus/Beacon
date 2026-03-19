@@ -11,6 +11,8 @@ StudyGroup is a role-based campus collaboration platform with:
 - AI assistant chat (student study bot / teacher research bot) with session history.
 - University-wide announcements with optional attachments.
 - Admin panel for user/classroom operations and server observability.
+- Academic calendar + timetable system with image-backed semester docs and per-role schedule logic.
+- Session prefetch + page-cache layer to reduce redundant requests.
 
 ## Current Implementation Status
 
@@ -19,11 +21,11 @@ Fully implemented in current branch:
 - Home and community experiences for student/teacher.
 - Admin dashboard, user management, classroom management, bulk user import, server logs, university announcements.
 - Backend APIs for all major modules listed above.
+- Calendar image update API (`PUT /api/calendar/image-paths`) with admin guard and Cloudinary upload.
 
 Partially implemented / placeholder in current branch:
 - `Admin > Transfer User` page exists but is currently a placeholder UI.
 - `Admin > Calendar` page exists but is currently a placeholder UI.
-- `PUT /api/calendar/image-paths` is intentionally `501 Not implemented yet`.
 - Legacy docs helper (`client/src/services/doc.service.js`) returns empty arrays and is not wired into main routing.
 
 ## Architecture
@@ -34,6 +36,8 @@ Partially implemented / placeholder in current branch:
 - Route protection is role-based (`student`, `teacher`, `admin`).
 - Real-time updates use `socket.io-client`.
 - API calls use mixed patterns: centralized `apiClient` (token interceptor) and direct `fetch/axios` with Firebase token.
+- Home data is centralized in `HomeDataContext` (todos, notes, calendar, notifications, announcements).
+- Session prefetch + in-session page cache reduce redundant fetches.
 
 Main route structure:
 - `/` - Login and onboarding gates.
@@ -47,6 +51,7 @@ Main route structure:
 - Auth middleware verifies Firebase ID token on protected routes.
 - Central error middleware handles not-found and runtime errors.
 - Metrics sampler records request/runtime stats for admin dashboard.
+- Session caching helper stores per-user page cache in `sessionStorage`.
 
 ## Core Domain Modules (As Implemented)
 
@@ -99,6 +104,7 @@ Main route structure:
 - Todos: CRUD + max 30 tasks per user.
 - Notes: CRUD with title/content/color/pinned/category/watermark fields.
 - Sketch: one persistent whiteboard document per user, with payload-size guard.
+- Notes sharing supports friends/peers, groups, and classroom channels (student hub + official teacher channels).
 
 ## Bot (AI Chat)
 - Endpoint set:
@@ -124,8 +130,11 @@ Main route structure:
 - Calendar endpoint returns academic year, events, and semester image URL candidates:
   - `GET /api/calendar/current`
   - `GET /api/calendar/image/:semester`
+- Calendar update endpoint for admins:
+  - `PUT /api/calendar/image-paths`
 - Timetable endpoint:
-  - `GET /api/timetable/weekly?course=&semester=&shift=`
+  - `GET /api/timetable/weekly?course=&semester=&shift=` (student)
+  - `GET /api/timetable/weekly?department=&shift=` (teacher)
 
 ## Notifications and Friends
 - Notifications: fetch, mark read (single or scoped), clear-all, delete-one.
@@ -198,10 +207,14 @@ Main models present in this branch:
   - `FIREBASE_TOKEN_URI`
   - `FIREBASE_AUTH_PROVIDER_X509_CERT_URL`
   - `FIREBASE_CLIENT_X509_CERT_URL`
-  - `FIREBASE_UNIVERSE_DOMAIN`
+- `FIREBASE_UNIVERSE_DOMAIN`
 - Calendar IDs:
   - `CALENDAR_ODD_PUBLIC_ID`
   - `CALENDAR_EVEN_PUBLIC_ID`
+- Other server settings:
+  - `CLIENT_URL` (comma-separated allowlist)
+  - `TRUST_PROXY`
+  - `PORT`
 
 ## Client (`client/.env` based on `.env.example`)
 - `VITE_API_BASE_URL`
@@ -236,9 +249,17 @@ Expected defaults:
 - Backend: `http://localhost:5000`
 - Frontend: `http://localhost:5173`
 
+## Request Optimization Notes (Current Branch)
+- `sessionPrefetch` warms `/me`, `/chat/my-channels`, `/notifications`, then batches home data.
+- `getOrFetchPageCache` provides per-user, per-page session cache with TTL.
+- HomeDataContext guards prevent repeated fetch loops across notes/todos/calendar/notifications.
+- Calendar image fetch is guarded to prevent duplicate blob requests.
+
 ## Important Behavior Constraints (Current Branch)
 - CORS allows localhost frontend and optional `CLIENT_URL` env.
-- API rate limit on `/api`: 150 requests per 15 minutes per IP.
+- API rate limits:
+  - Strict (public/abuse-prone): 100 per 15 minutes.
+  - Relaxed (most `/api` routes): 2000 per 15 minutes.
 - Todos are capped at 30 per user.
 - Sketch save payload is rejected if too large.
 - Uploads require allowed MIME and size rules.

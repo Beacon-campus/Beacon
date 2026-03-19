@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { auth } from "../../../firebase/firebase";
 import apiClient from "../../../services/apiClient";
 import { useAuth } from "../../../context/AuthContext";
+import LoadingState from "../../../components/ui/LoadingState";
 
 export default function QuizActive() {
   const { assignmentId } = useParams();
@@ -223,7 +224,11 @@ export default function QuizActive() {
   };
 
   if (loading || authLoading) {
-    return <div className="h-screen flex items-center justify-center bg-gray-50">Loading quiz...</div>;
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <LoadingState size="lg" />
+      </div>
+    );
   }
 
   if (violation) {

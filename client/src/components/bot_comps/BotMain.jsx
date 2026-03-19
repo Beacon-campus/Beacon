@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import apiClient from "../../services/apiClient";
 import { clearPageCacheByPrefix, getOrFetchPageCache, setPageCache } from "../../services/pageCache.service";
 import ReactMarkdown from "react-markdown";
+import LoadingState from "../ui/LoadingState";
 
 // Helper to resolve profile images
 const getAvatarUrl = (id) => {
@@ -410,14 +411,12 @@ export default function Bot() {
             ))}
 
             {loading && (
-              <div className="flex gap-3 mr-auto max-w-2xl">
+              <div className="flex gap-3 mr-auto max-w-2xl items-start">
                 <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex-shrink-0 flex items-center justify-center">
                   <BotAvatar />
                 </div>
-                <div className="px-5 py-4 rounded-2xl bg-gray-50 border border-gray-200 rounded-tl-none flex items-center gap-1">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></span>
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></span>
+                <div className="px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 rounded-tl-none">
+                  <LoadingState size="xs" align="start" className="items-start" />
                 </div>
               </div>
             )}

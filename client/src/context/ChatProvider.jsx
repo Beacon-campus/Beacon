@@ -4,6 +4,7 @@ import socket from "../services/socket.service";
 import axios from "axios";
 import { server } from "../main";
 import { auth } from "../firebase/firebase";
+import { getOrFetchPageCache } from "../services/pageCache.service";
 import notifSound from "../assets/sounds/notif.mp3";
 import ChatContext from "./ChatContext"; 
 
@@ -58,22 +59,31 @@ export function ChatProvider({ children }) {
   }, []);
 
   // --- ACTIONS ---
-  const fetchChats = useCallback(async () => {
+  const fetchChats = useCallback(async (force = false) => {
     if (!user) return;
     try {
       setLoading(true);
       const currentUser = auth.currentUser;
       if (!currentUser) return; 
       const token = await currentUser.getIdToken();
-      
-      const { data } = await axios.get(`${server}/chat/my-channels`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const userKey = currentUser.uid || user?.uid || "guest";
 
-      setChats([...(data.peers || []), ...(data.teacherChats || [])]);
-      setSecondaryChats(data.secondary || []);
+      const data = await getOrFetchPageCache(
+        "chat:my-channels",
+        userKey,
+        async () => {
+          const response = await axios.get(`${server}/chat/my-channels`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          return response.data;
+        },
+        { ttlMs: 60_000, force }
+      );
+
+      setChats([...(data?.peers || []), ...(data?.teacherChats || [])]);
+      setSecondaryChats(data?.secondary || []);
       
-      return [...(data.peers || []), ...(data.teacherChats || [])];
+      return [...(data?.peers || []), ...(data?.teacherChats || [])];
     } catch (error) {
       console.error("ChatContext: Error fetching chats", error);
       return [];
@@ -535,7 +545,7 @@ export function ChatProvider({ children }) {
             const sent = (user.friendRequests?.sent || []).map((id) => id.toString());
             const friends = (user.friends || []).map((id) => id.toString());
             if (accepterId && (sent.includes(accepterId) || friends.includes(accepterId))) {
-                fetchChats();
+                fetchChats(true);
             }
         }
 
@@ -543,7 +553,7 @@ export function ChatProvider({ children }) {
             const removerId = event.payload?.removerId?.toString();
             const friends = (user.friends || []).map((id) => id.toString());
             if (removerId && friends.includes(removerId)) {
-                fetchChats();
+                fetchChats(true);
             }
         }
     };

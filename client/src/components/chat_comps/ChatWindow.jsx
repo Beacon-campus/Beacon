@@ -18,6 +18,7 @@ import {
   ACCEPTED_ATTACHMENT_EXTENSIONS,
   uploadAttachment,
 } from "../../utils/attachmentUpload";
+import LoadingState from "../ui/LoadingState";
 
 export default function ChatWindow({
   isHidden, activeChat, activeChatTitle, messages, currentUserInfo,
@@ -66,9 +67,11 @@ export default function ChatWindow({
   const [showDateBadge, setShowDateBadge] = useState(false);
   const [dateBadgeText, setDateBadgeText] = useState("");
   const scrollContainerRef = useRef(null);
+  const actionsMenuRef = useRef(null);
   const isFetchingOlderRef = useRef(false);
   const hideDateBadgeTimeoutRef = useRef(null);
   const isDirectPeerChat = !!activeChat && !activeChat.isTeacherChat && !activeChat.type?.includes("group") && !activeChat.chatName;
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
 
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current?.parentElement) {
@@ -228,6 +231,35 @@ export default function ChatWindow({
       if (hideDateBadgeTimeoutRef.current) clearTimeout(hideDateBadgeTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    setShowActionsMenu(false);
+  }, [activeChat?._id]);
+
+  useEffect(() => {
+    if (!showActionsMenu) return;
+
+    const handleOutsideClick = (event) => {
+      if (!actionsMenuRef.current?.contains(event.target)) {
+        setShowActionsMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showActionsMenu]);
+
+  useEffect(() => {
+    const handleSendError = (payload) => {
+      if (!payload || payload.channelId !== activeChat?._id) return;
+      if (payload.code === "DM_NOT_FRIENDS") {
+        toast.error(payload.message || "You must be friends with this user to message them.");
+      }
+    };
+
+    socket.on("send_error", handleSendError);
+    return () => socket.off("send_error", handleSendError);
+  }, [activeChat?._id]);
 
   const isOverLimit = newMessage.length > MAX_CHAR_COUNT;
   const isSendDisabled =
@@ -409,20 +441,41 @@ export default function ChatWindow({
             </div>
             <h3 className="font-bold text-gray-800">{activeChatTitle}</h3>
             {role === 'student' && !activeChat.isTeacherChat && !activeChat.type?.includes("group") && (
-              <div className="ml-auto flex items-center relative group" onClick={(e) => e.stopPropagation()}>
+              <div
+                ref={actionsMenuRef}
+                className="ml-auto flex items-center relative"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {(() => {
                   const other = activeChat?.participants?.find(p => p.firebaseUid !== auth.currentUser?.uid);
                   if (!other || isRestricted) return null;
                   return (
                     <>
-                      <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors hidden md:block group-hover:bg-gray-100">
+                      <button
+                        onClick={() => setShowActionsMenu((prev) => !prev)}
+                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors hidden md:block"
+                      >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors md:hidden">
+                      <button
+                        onClick={() => setShowActionsMenu((prev) => !prev)}
+                        className="p-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors md:hidden"
+                      >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                       </button>
-                      <div className="absolute right-0 top-full mt-2 w-40 dropdown-menu-glass rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all z-[100] overflow-hidden">
-                        <button onClick={(e) => { e.stopPropagation(); onUnfriend(other); }} className="w-full text-left px-4 py-3 text-xs text-red-600 hover:bg-red-50 font-bold flex items-center gap-3 transition-colors">
+                      <div
+                        className={`absolute right-0 top-full mt-2 w-40 dropdown-menu-glass rounded-xl transition-all z-[100] overflow-hidden ${
+                          showActionsMenu ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                        }`}
+                      >
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowActionsMenu(false);
+                            onUnfriend(other);
+                          }}
+                          className="w-full text-left px-4 py-3 text-xs text-red-600 hover:bg-red-50 font-bold flex items-center gap-3 transition-colors"
+                        >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                           Unfriend
                         </button>
@@ -447,8 +500,8 @@ export default function ChatWindow({
             )}
             <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto soft-scrollbar p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
               {isLoadingOlder && (
-                <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-1">
-                  Loading older messages...
+                <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+                  <LoadingState size="xs" />
                 </div>
               )}
               {messages.map((msg, idx) => (

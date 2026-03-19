@@ -20,18 +20,16 @@ export function buildCloudinaryUrl({ publicId, version, resourceType, optimized 
 export function resolveAttachmentUrl(attachment, { optimized = false } = {}) {
   if (!attachment) return null;
   const cloudinary = attachment.cloudinary || null;
-  if (cloudinary?.secureUrl) {
-    if (optimized && cloudinary.resourceType === "image") {
-      return (
-        buildCloudinaryUrl({
-          publicId: cloudinary.publicId,
-          version: cloudinary.version,
-          resourceType: cloudinary.resourceType,
-          optimized: true,
-        }) || cloudinary.secureUrl
-      );
-    }
-    return cloudinary.secureUrl;
+  if (!cloudinary?.secureUrl) return null;
+  if (optimized && cloudinary.resourceType === "image") {
+    return (
+      buildCloudinaryUrl({
+        publicId: cloudinary.publicId,
+        version: cloudinary.version,
+        resourceType: cloudinary.resourceType,
+        optimized: true,
+      }) || cloudinary.secureUrl
+    );
   }
-  return attachment.secureUrl || attachment.url || null;
+  return cloudinary.secureUrl;
 }

@@ -39,15 +39,35 @@ export default function ShareNoteModal({ note, onClose }) {
         if (isTeacher) {
             const uniqueByClassroom = new Map();
             secondaryChats
-                .filter((c) => c.type === 'classroom' && c.classroomMode === 'official' && c.classroomId)
+                .filter((c) => c.type === 'classroom' && c.classroomMode === 'official')
                 .forEach((channel) => {
-                    const key = String(channel.classroomId);
+                    const key = channel.classroomId ? String(channel.classroomId) : String(channel._id);
                     if (!uniqueByClassroom.has(key)) uniqueByClassroom.set(key, channel);
                 });
             return Array.from(uniqueByClassroom.values());
         }
 
-        const primaryEnrolledClassroomId = user?.enrolledClassroomIds?.[0];
+        const enrolled = Array.isArray(user?.enrolledClassroomIds) ? user.enrolledClassroomIds : [];
+        const enrolledWithChannels = enrolled
+            .filter((c) => c && typeof c === "object" && (c.unofficialChannelId || c.officialChannelId))
+            .map((c) => ({
+                _id: c.unofficialChannelId || c.officialChannelId,
+                name: c.name || "Student Hub",
+                classroomId: c._id || c.classroomId || null,
+                type: "classroom",
+                classroomMode: c.unofficialChannelId ? "unofficial" : "official",
+            }));
+
+        if (enrolledWithChannels.length > 0) {
+            const uniqueByChannel = new Map();
+            enrolledWithChannels.forEach((channel) => {
+                const key = String(channel._id);
+                if (key && !uniqueByChannel.has(key)) uniqueByChannel.set(key, channel);
+            });
+            return Array.from(uniqueByChannel.values());
+        }
+
+        const primaryEnrolledClassroomId = enrolled[0];
         const resolvedPrimaryId = primaryEnrolledClassroomId
             ? String(typeof primaryEnrolledClassroomId === 'object' && primaryEnrolledClassroomId?._id
                 ? primaryEnrolledClassroomId._id

@@ -5,6 +5,7 @@ import { auth } from "../../../firebase/firebase";
 import apiClient from "../../../services/apiClient";
 import { getOrFetchPageCache, setPageCache } from "../../../services/pageCache.service";
 import { uploadAttachment } from "../../../utils/attachmentUpload";
+import LoadingState from "../../../components/ui/LoadingState";
 
 export default function TeacherUploadStudyMaterials() {
   const [classrooms, setClassrooms] = useState([]);
@@ -58,14 +59,6 @@ export default function TeacherUploadStudyMaterials() {
         type: "file",
         name: displayName || uploaded.name || file.name,
         mimeType: uploaded.mimeType || uploaded.type || file.type || "application/octet-stream",
-        url: uploaded.url,
-        downloadUrl: uploaded.downloadUrl || uploaded.url,
-        path: uploaded.path || null,
-        publicId: uploaded.publicId || null,
-        version: uploaded.version || null,
-        resourceType: uploaded.resourceType || null,
-        format: uploaded.format || null,
-        secureUrl: uploaded.secureUrl || uploaded.url || null,
         cloudinary: uploaded.cloudinary || null,
         previewUrl: uploaded.previewUrl || null,
         previewDownloadUrl: uploaded.previewDownloadUrl || null,
@@ -183,7 +176,11 @@ export default function TeacherUploadStudyMaterials() {
   };
 
   if (loading) {
-    return <div className="p-6 text-gray-500">Loading study materials...</div>;
+    return (
+      <div className="p-6 text-gray-500 flex items-center justify-center">
+        <LoadingState size="md" />
+      </div>
+    );
   }
 
   if (!selectedClassroom) {

@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/attachmentUpload";
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
+import LoadingState from "../ui/LoadingState";
 
 export default function OfficialChannel({
   channelId,
@@ -141,22 +142,8 @@ export default function OfficialChannel({
                 type: "file",
                 name: selectedAttachment.name,
                 mimeType: selectedAttachment.mimeType || selectedAttachment.type,
-                url: selectedAttachment.url,
                 size: selectedAttachment.size,
-                downloadUrl: selectedAttachment.downloadUrl || selectedAttachment.url,
-                path: selectedAttachment.path || null,
-                cloudinary: selectedAttachment.cloudinary || {
-                  publicId: selectedAttachment.publicId || null,
-                  version: selectedAttachment.version || null,
-                  resourceType: selectedAttachment.resourceType || null,
-                  format: selectedAttachment.format || null,
-                  secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
-                },
-                publicId: selectedAttachment.publicId || null,
-                version: selectedAttachment.version || null,
-                resourceType: selectedAttachment.resourceType || null,
-                format: selectedAttachment.format || null,
-                secureUrl: selectedAttachment.secureUrl || selectedAttachment.url,
+                cloudinary: selectedAttachment.cloudinary || null,
                 previewUrl: selectedAttachment.previewUrl || null,
                 previewDownloadUrl: selectedAttachment.previewDownloadUrl || null,
                 previewPath: selectedAttachment.previewPath || null,
@@ -217,8 +204,8 @@ export default function OfficialChannel({
         onScroll={handleScroll}
       >
          {isLoadingOlder && (
-            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2">
-              Loading older announcements...
+            <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
+              <LoadingState size="xs" />
             </div>
          )}
          {announcements.filter(post => {
@@ -319,7 +306,7 @@ export default function OfficialChannel({
                                           >
                                             View
                                           </button>
-                                          <a href={post.noteData?.downloadUrl || resolveAttachmentUrl(post.noteData)} download={post.noteData?.name || "file"} className="underline">Download</a>
+                                          <a href={resolveAttachmentUrl(post.noteData)} download={post.noteData?.name || "file"} className="underline">Download</a>
                                       </div>
                                    </div>
                                ) : (

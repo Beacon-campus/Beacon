@@ -3,6 +3,7 @@ import apiClient from "../../services/apiClient";
 import toast from "react-hot-toast";
 import { auth } from "../../firebase/firebase";
 import { getOrFetchPageCache } from "../../services/pageCache.service";
+import LoadingState from "../../components/ui/LoadingState";
 
 export default function ClassroomManagement() {
     const [classrooms, setClassrooms] = useState([]);
@@ -316,7 +317,7 @@ export default function ClassroomManagement() {
 
             {loading ? (
                 <div className="flex-1 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                    <LoadingState size="sm" />
                 </div>
             ) : Object.keys(groupedClassrooms).length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-gray-400">

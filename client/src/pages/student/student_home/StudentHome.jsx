@@ -41,17 +41,19 @@ const getTodoDateInfo = (dateStr) => {
 export default function StudentHome() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [quote, setQuote] = useState({ text: "Loading...", author: "" });
+    const [quote, setQuote] = useState({ text: "", author: "" });
+    const [quoteLoading, setQuoteLoading] = useState(true);
     const [nextEvent, setNextEvent] = useState(null);
     const [loadingEvent, setLoadingEvent] = useState(true);
     const {
         todos,
         notifications,
         universityAnnouncements,
-        fetchAllHomeData,
+        calendarCurrent,
         fetchNotifications,
         toggleTodoComplete,
         setUniversityAnnouncements,
+        homeLoading,
     } = useHomeData();
 
     // Carousel State
@@ -106,10 +108,6 @@ export default function StudentHome() {
         }
     }, [activeNotif, homeNotifications.length]);
 
-    useEffect(() => {
-        if (!user) return;
-        fetchAllHomeData();
-    }, [user, fetchAllHomeData]);
 
     const handleComplete = (id) => {
         if (animatingIds.includes(id)) return;
@@ -158,6 +156,7 @@ export default function StudentHome() {
     // 1. Fetch Random Quote (Persistent)
     useEffect(() => {
         const fetchQuote = async () => {
+            setQuoteLoading(true);
             try {
                 const data = await getOrFetchPageCache(
                     "student:home:quote",
@@ -174,6 +173,8 @@ export default function StudentHome() {
                     text: "Education is the passport to the future.",
                     author: "Malcolm X"
                 });
+            } finally {
+                setQuoteLoading(false);
             }
         };
         fetchQuote();
@@ -181,31 +182,16 @@ export default function StudentHome() {
 
     // 2. Fetch Upcoming Event
     useEffect(() => {
-        const fetchNextEvent = async () => {
-            if (!user) return;
-            try {
-                const data = await getOrFetchPageCache(
-                    "student:home:calendar-current",
-                    userCacheKey,
-                    async () => {
-                        const response = await apiClient.get("/calendar/current");
-                        return response.data;
-                    },
-                    { ttlMs: 60_000 }
-                );
-                if (data?.upcomingEvents?.length > 0) {
-                    setNextEvent(data.upcomingEvents[0]);
-                } else {
-                    setNextEvent(null);
-                }
-            } catch (err) {
-                console.error("Failed to fetch event:", err);
-            } finally {
-                setLoadingEvent(false);
-            }
-        };
-        fetchNextEvent();
-    }, [user, userCacheKey]);
+        if (!calendarCurrent) return;
+        setNextEvent(calendarCurrent?.upcomingEvents?.[0] || null);
+        setLoadingEvent(false);
+    }, [calendarCurrent]);
+
+    useEffect(() => {
+        if (!homeLoading && !calendarCurrent) {
+            setLoadingEvent(false);
+        }
+    }, [homeLoading, calendarCurrent]);
 
     useEffect(() => {
         const onNewAnnouncement = (item) => {
@@ -259,6 +245,7 @@ export default function StudentHome() {
                         quote={quote}
                         theme="green"
                         roleLabel="Student"
+                        loadingQuote={quoteLoading}
                     />
 
                     <div className="flex-[2] flex flex-col gap-4">

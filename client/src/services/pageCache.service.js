@@ -38,6 +38,9 @@ export function getPageCache(pageKey, userId) {
 }
 
 export function setPageCache(pageKey, userId, data, ttlMs = 0) {
+  if (data === null || data === undefined) {
+    return null;
+  }
   const cache = readCache();
   const key = buildKey(userId, pageKey);
   const expiresAt = ttlMs > 0 ? Date.now() + ttlMs : null;
@@ -58,8 +61,16 @@ export async function getOrFetchPageCache(pageKey, userId, fetcher, options = {}
     const cached = getPageCache(pageKey, userId);
     if (cached !== null) return cached;
   }
-  const freshData = await fetcher();
-  return setPageCache(pageKey, userId, freshData, ttlMs);
+  try {
+    const freshData = await fetcher();
+    if (freshData === null || freshData === undefined) {
+      return null;
+    }
+    return setPageCache(pageKey, userId, freshData, ttlMs);
+  } catch (error) {
+    console.error("getOrFetchPageCache failed:", error);
+    return null;
+  }
 }
 
 export function clearPageCache(pageKey, userId) {

@@ -18,6 +18,7 @@ import {
   Legend,
 } from "recharts";
 import { fetchAdminDashboardOverview, fetchAdminDashboardTimeline } from "../../services/university.service";
+import LoadingState from "../../components/ui/LoadingState";
 
 const COLORS = {
   healthy: "#16a34a",
@@ -237,7 +238,7 @@ export default function AdminDashboard() {
     return (
       <div className="h-full w-full p-6 bg-white">
         <div className="h-full w-full flex items-center justify-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+          <LoadingState size="md" />
         </div>
       </div>
     );

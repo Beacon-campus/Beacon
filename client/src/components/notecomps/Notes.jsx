@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import LoadingState from "../ui/LoadingState";
 
 // Modal for viewing and editing
 const EditModal = ({ note, onClose, onUpdate, onAdd }) => {
@@ -156,7 +157,11 @@ export default function Notes() {
     const otherNotes = notes.filter(n => !n.isPinned && (!n.category || !n.category.startsWith("Shared by")));
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading notes...</div>;
+        return (
+            <div className="p-8 text-center text-gray-500">
+                <LoadingState size="md" />
+            </div>
+        );
     }
 
     return (

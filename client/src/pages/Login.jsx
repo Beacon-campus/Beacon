@@ -26,6 +26,13 @@ import UpdateEmailModal from "../components/UpdateEmailModal";
 import toast from "react-hot-toast";
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import studentLottie from '../assets/loading/STUDENT.lottie';
+import { preloadAsset } from "../utils/preloadAsset";
+import LoadingState from "../components/ui/LoadingState";
+
+preloadAsset(studentLottie, {
+  as: "fetch",
+  type: "application/octet-stream",
+});
 import profile1 from "../assets/profile/1.png";
 import profile5 from "../assets/profile/5.png";
 import profile9 from "../assets/profile/9.png";
@@ -68,17 +75,14 @@ export default function Login() {
   const [capsLock, setCapsLock] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [renderStatus, setRenderStatus] = useState("loading");
-  const [dockerStatus, setDockerStatus] = useState("loading");
+  const [, setRenderStatus] = useState("loading");
 
   // Controls the Onboarding Flow State
   const [onboardingStage, setOnboardingStage] = useState(null);
 
   const renderHealthUrl = `${(import.meta.env.VITE_API_BASE_URL || "").replace(/\/api$/, "")}/health`;
-  const dockerHealthUrl = `${(import.meta.env.VITE_DOCKER_BASE_URL || "").replace(/\/+$/, "")}/health`;
 
   const READY_STATUSES = new Set([200, 401, 403, 429, 502, 503]);
-  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const StatusChip = ({ label, status }) => (
     <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-700">
@@ -134,11 +138,8 @@ export default function Login() {
     const checkServices = async () => {
       if (!cancelled) {
         setRenderStatus((prev) => (prev === "up" ? prev : "loading"));
-        setDockerStatus((prev) => (prev === "up" ? prev : "loading"));
       }
       await ping(renderHealthUrl, setRenderStatus);
-      await wait(250);
-      await ping(dockerHealthUrl, setDockerStatus);
     };
 
     checkServices();
@@ -148,7 +149,7 @@ export default function Login() {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [renderHealthUrl, dockerHealthUrl]);
+  }, [renderHealthUrl]);
 
   /* ================= HANDLERS ================= */
   const handleLogout = async () => {
@@ -278,7 +279,13 @@ export default function Login() {
     }
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <LoadingState size="lg" />
+      </div>
+    );
+  }
 
   /* ================= UI RENDER ================= */
 

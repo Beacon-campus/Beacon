@@ -9,7 +9,7 @@ const repoRoot = path.resolve(__dirname, "..", "..");
 dotenv.config({ path: path.resolve(repoRoot, "server", ".env") });
 
 const MONGO_URI = process.env.MONGO_URI || "";
-const TARGET_BASE_URL = process.env.API_URL || "https://streak-api-qs2h.onrender.com";
+const TARGET_BASE_URL = process.env.API_URL || "";
 const DRY_RUN = String(process.env.DRY_RUN || "0") === "1";
 
 const BASE_SOURCE_PATTERNS = [

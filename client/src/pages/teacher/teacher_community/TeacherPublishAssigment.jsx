@@ -14,6 +14,7 @@ import { getOrFetchPageCache } from "../../../services/pageCache.service";
 import socket from "../../../services/socket.service";
 import { exportRowsToXlsx } from "../../../utils/excelExport";
 import { resolveAttachmentUrl } from "../../../utils/cloudinaryUrl";
+import LoadingState from "../../../components/ui/LoadingState";
 
 const EMPTY_FORM = {
   title: "",
@@ -889,16 +890,7 @@ export default function TeacherPublishAssignment() {
     if (typeof value !== "string") return null;
 
     if (value.startsWith("data:")) {
-      const match = value.match(/^data:([^;]+);/);
-      const type = match ? match[1] : "application/octet-stream";
-      return {
-        name: "submission",
-        type,
-        url: value,
-        downloadUrl: value,
-        previewUrl: type === "application/pdf" ? value : null,
-        previewType: type === "application/pdf" ? type : null,
-      };
+      return null;
     }
 
     const name = decodeURIComponent(value.split("/").pop()?.split("?")[0] || "submission");
@@ -925,14 +917,7 @@ export default function TeacherPublishAssignment() {
                         ? "image/webp"
                         : "application/octet-stream";
 
-    return {
-      name,
-      type,
-      url: value,
-      downloadUrl: value,
-      previewUrl: type === "application/pdf" ? value : null,
-      previewType: type === "application/pdf" ? type : null,
-    };
+    return null;
   };
 
   useEffect(() => {
@@ -1305,7 +1290,7 @@ export default function TeacherPublishAssignment() {
                   }
 
                   const resolvedUrl = resolveAttachmentUrl(fileMeta);
-                  const imageUrl = fileMeta.previewUrl || resolvedUrl || fileMeta.url;
+                  const imageUrl = fileMeta.previewUrl || resolvedUrl;
                   const isImage = fileMeta.type?.startsWith("image/");
                   return (
                     <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 flex flex-col gap-3">
@@ -1322,7 +1307,7 @@ export default function TeacherPublishAssignment() {
                             View
                           </button>
                           <a
-                            href={fileMeta.downloadUrl || resolvedUrl || fileMeta.url}
+                            href={resolvedUrl || ""}
                             download={fileMeta.name || "submission"}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                           >
@@ -1473,7 +1458,7 @@ export default function TeacherPublishAssignment() {
           <div className="flex-1 overflow-y-auto pr-2 space-y-3">
             {loadingSubmissions ? (
               <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-500 font-bold">Loading student submissions...</p>
+                <LoadingState size="sm" />
               </div>
             ) : submissions.length === 0 ? (
               <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
@@ -1552,7 +1537,9 @@ export default function TeacherPublishAssignment() {
 
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {loadingDoubts ? (
-                <p className="text-xs text-gray-500">Loading doubts...</p>
+                <div className="py-4 flex items-center justify-center">
+                  <LoadingState size="xs" />
+                </div>
               ) : replyMode === "broadcast" ? (
                 // --- BROADCAST FEED ---
                 (() => {
@@ -1725,7 +1712,7 @@ export default function TeacherPublishAssignment() {
           <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-2 soft-scrollbar pb-4 pr-3 relative">
             {loadingAssignments ? (
               <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <p className="text-gray-400 font-medium">Loading assignments...</p>
+                <LoadingState size="sm" />
               </div>
             ) : classAssignments.length === 0 ? (
               <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
