@@ -16,10 +16,11 @@ export function AuthProvider({ children }) {
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // Fetch MongoDB Profile (Static Data)
-  const fetchMongoProfile = async (firebaseUser) => {
+  const fetchMongoProfile = async (firebaseUser, options = {}) => {
     if (!firebaseUser || !firebaseUser.uid || typeof firebaseUser.getIdToken !== "function") {
       return null;
     }
+    const { force = false } = options;
 
     try {
       if (!didInitialMongoFetchDelay.current) {
@@ -34,7 +35,7 @@ export function AuthProvider({ children }) {
           const response = await apiClient.get("/me");
           return response.data;
         },
-        { ttlMs: 60_000 }
+        { ttlMs: 60_000, force }
       );
       return data;
     } catch (error) {
@@ -139,13 +140,13 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = async (force = true) => {
     if (auth.currentUser) {
       await auth.currentUser.reload(); // Force refresh from Firebase
 
       const [fsSnap, mData] = await Promise.all([
         getDoc(doc(db, "users", auth.currentUser.uid)),
-        fetchMongoProfile(auth.currentUser)
+        fetchMongoProfile(auth.currentUser, { force })
       ]);
 
       if (fsSnap.exists()) {

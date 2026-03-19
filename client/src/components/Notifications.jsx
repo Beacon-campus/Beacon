@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useHomeData } from "../context/HomeDataContext";
 import apiClient from "../services/apiClient";
 import { auth } from "../firebase/firebase";
-import { clearPageCacheByPrefix, getOrFetchPageCache } from "../services/pageCache.service";
+import { clearPageCache, clearPageCacheByPrefix, getOrFetchPageCache } from "../services/pageCache.service";
 import LoadingState from "./ui/LoadingState";
 
 // Standard Icons
@@ -102,12 +102,62 @@ export default function Notifications() {
     return palettes.default;
   };
 
+  const refreshNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      clearPageCacheByPrefix("notifications:", userCacheKey);
+      await fetchNotificationsAll(true);
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchNotificationsAll, userCacheKey]);
+
+  const fetchPendingFriendRequests = useCallback(async (force = false, receivedOverride = null) => {
+    try {
+      if (!auth.currentUser || currentUserInfo?.role !== "student") {
+        setPendingFriendUsers([]);
+        return;
+      }
+
+      const received = receivedOverride || currentUserInfo?.friendRequests?.received || [];
+      if (!received.length) {
+        setPendingFriendUsers([]);
+        return;
+      }
+
+      const data = await getOrFetchPageCache(
+        `notifications:friend-requests:${received.join(",")}`,
+        userCacheKey,
+        async () => (await apiClient.post("/friends/get-users", { userIds: received })).data || [],
+        { ttlMs: 60_000, force }
+      );
+
+      const byId = new Map((data || []).map((u) => [u._id?.toString(), u]));
+      const ordered = received
+        .map((id) => byId.get(id.toString()))
+        .filter(Boolean);
+
+      setPendingFriendUsers(ordered);
+    } catch (error) {
+      console.error("Failed to fetch pending friend requests", error);
+    }
+  }, [currentUserInfo, userCacheKey]);
+
+  const invalidateFriendCaches = useCallback(() => {
+    clearPageCache("auth:me", userCacheKey);
+    clearPageCache("chat:my-channels", userCacheKey);
+    clearPageCacheByPrefix("notifications:", userCacheKey);
+  }, [userCacheKey]);
+
   useEffect(() => {
+    if (!currentUserInfo?._id) return;
     fetchNotificationsAll(true)
       .catch(() => {})
       .finally(() => setLoading(false));
-    fetchPendingFriendRequests();
-  }, [fetchNotificationsAll]);
+    fetchPendingFriendRequests(true);
+  }, [fetchNotificationsAll, currentUserInfo?._id, currentUserInfo?.role, fetchPendingFriendRequests]);
 
   useEffect(() => {
     const nonFriendNotifications = (notificationsAll || []).filter(
@@ -129,18 +179,23 @@ export default function Notifications() {
           "FRIEND_REMOVED",
         ].includes(data.type)
       ) {
-        refreshUser().finally(() => {
+        invalidateFriendCaches();
+        refreshUser(true).finally(() => {
           refreshNotifications();
-          fetchPendingFriendRequests();
+          fetchPendingFriendRequests(true);
         });
       }
     };
 
     const handleNewNotification = (notif) => {
+      if (notif?.type?.startsWith("FRIEND_")) {
+        invalidateFriendCaches();
+        fetchPendingFriendRequests(true);
+        return;
+      }
       refreshNotifications();
       if (!notif?.type) return;
       // Friend request toasts are handled by socket manager; this is for persisted notifications.
-      if (notif.type.startsWith("FRIEND_")) return;
       const message = notif.title || notif.content || "New notification";
       toast(message, { icon: "🔔" });
     };
@@ -151,54 +206,12 @@ export default function Notifications() {
       socket.off("event", handleEvent);
       socket.off("new_notification", handleNewNotification);
     };
-  }, []);
-
-  const refreshNotifications = async () => {
-    try {
-      setLoading(true);
-      await fetchNotificationsAll(true);
-    } catch (error) {
-      console.error("Failed to fetch notifications", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPendingFriendRequests = async () => {
-    try {
-      if (!auth.currentUser || currentUserInfo?.role !== "student") {
-        setPendingFriendUsers([]);
-        return;
-      }
-
-      const received = currentUserInfo?.friendRequests?.received || [];
-      if (!received.length) {
-        setPendingFriendUsers([]);
-        return;
-      }
-
-      const data = await getOrFetchPageCache(
-        `notifications:friend-requests:${received.join(",")}`,
-        userCacheKey,
-        async () => (await apiClient.post("/friends/get-users", { userIds: received })).data || [],
-        { ttlMs: 60_000 }
-      );
-
-      const byId = new Map((data || []).map((u) => [u._id?.toString(), u]));
-      const ordered = received
-        .map((id) => byId.get(id.toString()))
-        .filter(Boolean);
-
-      setPendingFriendUsers(ordered);
-    } catch (error) {
-      console.error("Failed to fetch pending friend requests", error);
-    }
-  };
+  }, [currentUserInfo, refreshUser, userCacheKey, fetchPendingFriendRequests, invalidateFriendCaches, refreshNotifications]);
 
   const deleteAllNotifications = async () => {
     try {
       await apiClient.delete("/notifications/all");
-      clearPageCacheByPrefix("notifications:", userCacheKey);
+      invalidateFriendCaches();
 
       setNotifications([]);
       await refreshNotifications();
@@ -209,6 +222,7 @@ export default function Notifications() {
   };
 
   const openDmWithUser = async (targetId) => {
+    clearPageCache("chat:my-channels", userCacheKey);
     const { data } = await apiClient.post("/chat/create-by-id", { targetId });
     navigate(chatPath, { state: { activeChatId: data._id, timestamp: Date.now() } });
   };
@@ -216,10 +230,11 @@ export default function Notifications() {
   const handleAcceptRequest = async (requesterId, openChatAfter = false) => {
     try {
       await apiClient.post("/friends/accept", { requesterId });
-      clearPageCacheByPrefix("notifications:", userCacheKey);
+      invalidateFriendCaches();
+      setPendingFriendUsers((prev) => prev.filter((user) => user._id !== requesterId));
       toast.success("Friend request accepted!");
-      await refreshUser();
-      await fetchPendingFriendRequests();
+      await refreshUser(true);
+      await fetchPendingFriendRequests(true, []);
       await refreshNotifications();
       if (openChatAfter) {
         await openDmWithUser(requesterId);
@@ -232,10 +247,11 @@ export default function Notifications() {
   const handleDeclineRequest = async (requesterId) => {
     try {
       await apiClient.post("/friends/decline", { requesterId });
-      clearPageCacheByPrefix("notifications:", userCacheKey);
+      invalidateFriendCaches();
+      setPendingFriendUsers((prev) => prev.filter((user) => user._id !== requesterId));
       toast.success("Request removed");
-      await refreshUser();
-      await fetchPendingFriendRequests();
+      await refreshUser(true);
+      await fetchPendingFriendRequests(true, []);
       await refreshNotifications();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to decline");

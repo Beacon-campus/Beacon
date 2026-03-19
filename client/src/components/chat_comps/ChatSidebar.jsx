@@ -61,6 +61,8 @@ export default function ChatSidebar({
   const [isOthersOpen, setIsOthersOpen] = useState(true);
   const [isTeachersOpen, setIsTeachersOpen] = useState(true);
   const { onlineUsers } = useChat();
+  const pendingFriendRequestCount =
+    role === "student" ? currentUserInfo?.friendRequests?.received?.length || 0 : 0;
 
   // --- SPLIT CHATS LOGIC ---
   const { classmateChats, otherChats } = React.useMemo(() => {
@@ -173,9 +175,12 @@ export default function ChatSidebar({
              {/* EXPANDING NEW MESSAGE BUTTON */}
              <button
                  onClick={() => setIsAddChatOpen(true)}
-                 className="group flex items-center bg-[#0F172A] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-700 ease-out h-10 w-10 hover:w-36 overflow-hidden"
+                 className="group relative flex items-center bg-[#0F172A] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-700 ease-out h-10 w-10 hover:w-36 overflow-hidden"
                  title="New Message"
              >
+                 {pendingFriendRequestCount > 0 && (
+                   <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+                 )}
                  <div className="w-10 h-10 flex items-center justify-center shrink-0 transition-transform duration-700">
                       <img src={AddIcon} className="w-5 h-5 invert" alt="+" />
                  </div>

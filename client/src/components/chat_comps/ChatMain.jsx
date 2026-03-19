@@ -112,6 +112,15 @@ export default function Chat({ role }) {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const normalizeEntityId = useCallback((value) => {
+    if (!value) return "";
+    if (typeof value === "string") return value;
+    if (typeof value === "object") {
+      if (value._id) return String(value._id);
+      if (value.id) return String(value.id);
+    }
+    return String(value);
+  }, []);
 
   const isFriendEventRelevant = useCallback((event) => {
     if (!event?.type || role !== "student" || !currentUserInfo?._id) return false;
@@ -138,7 +147,7 @@ export default function Chat({ role }) {
   useEffect(() => {
     const handleFriendEvent = (data) => {
       if (isFriendEventRelevant(data)) {
-        fetchChats();
+        fetchChats(true);
         refreshUser();
       }
     };
@@ -147,11 +156,11 @@ export default function Chat({ role }) {
   }, [refreshUser, fetchChats, isFriendEventRelevant]);
 
   const handleFriendAction = async (unfriendedId) => {
-    await fetchChats();
-    await refreshUser();
+    await fetchChats(true);
+    await refreshUser(true);
     if (unfriendedId && activeChat) {
-      const targetId = unfriendedId.toString();
-      const isParticipant = activeChat.participants.some((p) => p._id?.toString() === targetId);
+      const targetId = normalizeEntityId(unfriendedId);
+      const isParticipant = activeChat.participants.some((p) => normalizeEntityId(p) === targetId);
       if (isParticipant) {
         setActiveChat(null);
         setMessages([]);
@@ -160,7 +169,7 @@ export default function Chat({ role }) {
   };
 
   const handleChatAdded = (newChat) => {
-    fetchChats();
+    fetchChats(true);
     if (newChat) {
       handleOpenChat(newChat);
     }
@@ -529,7 +538,7 @@ export default function Chat({ role }) {
 
         if (!targetChat) {
           console.log("📍 Chat: Target not found in current list, fetching...");
-          const freshChats = await fetchChats();
+          const freshChats = await fetchChats(true);
           targetChat = freshChats?.find(c => c._id === targetId);
         }
 
@@ -561,13 +570,14 @@ export default function Chat({ role }) {
     if (role !== "student") return false;
     if (!activeChat || activeChat.isTeacherChat || activeChat.type === "project_group") return false;
 
-    const otherUser = activeChat.participants.find(p => p._id !== currentUserInfo?._id);
+    const currentUserId = normalizeEntityId(currentUserInfo);
+    const otherUser = activeChat.participants.find((p) => normalizeEntityId(p) !== currentUserId);
     if (!otherUser) return false;
 
-    const otherId = otherUser._id.toString();
+    const otherId = normalizeEntityId(otherUser);
     const isFriend = currentUserInfo?.friends?.some(fid => fid.toString() === otherId);
     return !isFriend;
-  }, [role, activeChat, currentUserInfo]);
+  }, [role, activeChat, currentUserInfo, normalizeEntityId]);
 
   const openDoubtModal = async (announcementMsg) => {
     const announcement = {
@@ -632,19 +642,18 @@ export default function Chat({ role }) {
 
       toast.success("Unfriended successfully");
 
-      const targetId = friendToUnfriend._id?.toString();
-      if (activeChat?.participants?.some((p) => p._id?.toString() === targetId)) {
+      const targetId = normalizeEntityId(friendToUnfriend);
+      if (activeChat?.participants?.some((p) => normalizeEntityId(p) === targetId)) {
         setActiveChat(null);
         setMessages([]);
       }
-      fetchChats();
-      refreshUser();
+      await Promise.all([fetchChats(true), refreshUser(true)]);
       setFriendToUnfriend(null);
     } catch (err) {
       console.error(err);
       toast.error("Failed to unfriend");
     }
-  }, [activeChat, friendToUnfriend, fetchChats, refreshUser, role, setActiveChat, setMessages]);
+  }, [activeChat, friendToUnfriend, fetchChats, normalizeEntityId, refreshUser, role, setActiveChat, setMessages]);
 
   useEffect(() => {
     if (role !== "student") return;

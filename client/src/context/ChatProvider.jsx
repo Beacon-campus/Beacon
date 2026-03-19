@@ -59,7 +59,7 @@ export function ChatProvider({ children }) {
   }, []);
 
   // --- ACTIONS ---
-  const fetchChats = useCallback(async () => {
+  const fetchChats = useCallback(async (force = false) => {
     if (!user) return;
     try {
       setLoading(true);
@@ -77,7 +77,7 @@ export function ChatProvider({ children }) {
           });
           return response.data;
         },
-        { ttlMs: 60_000 }
+        { ttlMs: 60_000, force }
       );
 
       setChats([...(data?.peers || []), ...(data?.teacherChats || [])]);
@@ -545,7 +545,7 @@ export function ChatProvider({ children }) {
             const sent = (user.friendRequests?.sent || []).map((id) => id.toString());
             const friends = (user.friends || []).map((id) => id.toString());
             if (accepterId && (sent.includes(accepterId) || friends.includes(accepterId))) {
-                fetchChats();
+                fetchChats(true);
             }
         }
 
@@ -553,7 +553,7 @@ export function ChatProvider({ children }) {
             const removerId = event.payload?.removerId?.toString();
             const friends = (user.friends || []).map((id) => id.toString());
             if (removerId && friends.includes(removerId)) {
-                fetchChats();
+                fetchChats(true);
             }
         }
     };
