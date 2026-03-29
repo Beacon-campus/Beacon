@@ -11,13 +11,14 @@ export default function AdminLayout() {
   const [isHovered, setIsHovered] = useState(false);
   const { user, loading } = useAuth();
 
-  // Helper for Link styling
   const getLinkClass = ({ isActive }) => {
-    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-3 px-3.5 py-2.5 mx-3"} text-sm font-medium transition-all duration-200 group relative rounded-[12px] border-l-4`;
-    
-    if (isActive) return `${base} bg-green-50 text-green-700 border-l-green-500 font-bold shadow-sm`;
-    
-    return `${base} bg-transparent text-gray-500 border-l-transparent hover:bg-gray-50/50 hover:text-gray-800`;
+    const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative border-l-4 rounded-lg`;
+
+    if (isActive) {
+      return `${base} bg-green-50 text-green-700 border-l-green-500 font-bold`;
+    }
+
+    return `${base} bg-transparent text-gray-500 hover:bg-gray-50/50 hover:text-gray-800 border-l-transparent`;
   };
 
   const getIconClass = (isActive) => {
@@ -224,14 +225,38 @@ export default function AdminLayout() {
 
               </nav>
 
-              {/* Footer / Collapse Button */}
-              <div className="flex flex-col gap-2 mt-auto min-h-[50px] justify-end">
-                <div className="border-t border-gray-200"></div>
+              <div className="flex flex-col gap-2 mt-auto">
+                <div className="pt-4 border-t border-gray-200">
+                  <div
+                    className={`flex items-center gap-3 p-2 rounded-xl transition-all group ${collapsed ? "justify-center" : ""} hover:bg-white/20 hover:backdrop-blur-sm`}
+                  >
+                    {/* Avatar */}
+                    <div className="relative shrink-0">
+                      <img
+                        src={avatarUrl}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full object-cover border-2 border-[#1e293b] shadow-sm"
+                      />
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+
+                    {/* Text Info */}
+                    <div className={`flex flex-col overflow-hidden transition-all duration-200 ${collapsed ? "w-0 opacity-0 hidden" : "w-full opacity-100"
+                      }`}>
+                      <span className="font-bold text-sm text-gray-800 truncate">
+                        {user?.profile?.displayName || "Admin User"}
+                      </span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                        Administrator
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Collapse Button */}
                 <button
                   onClick={() => setCollapsed(!collapsed)}
-                  className="flex items-center justify-center p-2 rounded-full hover:bg-gray-100 transition-colors self-center mt-2 relative z-10"
+                  className="flex items-center justify-center p-2 rounded-full hover:bg-white/20 hover:backdrop-blur-sm transition-colors self-center mt-2 relative z-10"
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -246,7 +271,7 @@ export default function AdminLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
+          <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
             <div className="px-6 pt-4 pb-0">
               <Navbar />
             </div>

@@ -116,7 +116,7 @@ export default function UserModal({ isOpen, onClose, mode, user, onRefresh }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-[#0F172A]/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
 
                 {/* Modal Header */}
@@ -329,7 +329,7 @@ export default function UserModal({ isOpen, onClose, mode, user, onRefresh }) {
                         type="submit"
                         form="user-form"
                         disabled={isSubmitting}
-                        className="px-6 py-2 text-sm font-bold text-white bg-primary hover:bg-black rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                        className="px-6 py-2 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
                     >
                         {isSubmitting ? "Saving..." : (isEdit ? "Save Changes" : "Create User")}
                     </button>

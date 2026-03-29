@@ -385,7 +385,7 @@ export default function TeacherLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
+          <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
             <div className="px-6 pt-4 pb-0">
               <Navbar />
             </div>

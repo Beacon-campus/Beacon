@@ -237,9 +237,9 @@ export default function ClassroomManagement() {
     };
 
     return (
-        <div className="h-full flex flex-col pt-3 bg-gray-50/30">
+        <div className="h-full flex flex-col bg-gray-50/30 rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             {/* Header & Controls Area */}
-            <div className="bg-white border-b border-gray-100 px-8 py-5 flex flex-col gap-5 shrink-0 z-20">
+            <div className="bg-white border-b border-gray-100 px-8 py-6 flex flex-col gap-5 shrink-0 z-20">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-black text-gray-800 tracking-tight">Classroom Network</h1>
@@ -247,7 +247,7 @@ export default function ClassroomManagement() {
                     </div>
                     <button
                         onClick={() => setIsAddModalOpen(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-black text-white font-bold rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-all active:scale-95 whitespace-nowrap"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0F172A] text-white font-bold rounded-xl shadow-[0_8px_16px_rgba(15,23,42,0.15)] hover:bg-[#1e293b] hover:-translate-y-0.5 transition-all active:scale-95 whitespace-nowrap"
                     >
                         <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" /></svg>
                         Create Network
@@ -326,7 +326,7 @@ export default function ClassroomManagement() {
                     <p className="text-sm mt-1">Adjust your filters or query to locate nodes.</p>
                 </div>
             ) : (
-                <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
+                <div className="flex-1 overflow-y-auto no-scrollbar p-6">
 
                     {/* COURSE TILES GRID */}
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 max-w-[1400px] mx-auto mb-8">
@@ -334,7 +334,7 @@ export default function ClassroomManagement() {
                             <div
                                 key={course}
                                 onClick={() => { setExpandedCourse(expandedCourse === course ? null : course); setExpandedClassroom(null); }}
-                                className={`group relative rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden flex flex-col justify-center items-center p-8 text-center min-h-[180px] ${expandedCourse === course ? 'bg-indigo-600 border-indigo-700 shadow-xl shadow-indigo-200 text-white scale-[1.02]' : 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-lg text-gray-800'}`}
+                                className={`group relative rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden flex flex-col justify-center items-center p-8 text-center min-h-[180px] ${expandedCourse === course ? 'bg-[#0F172A] border-[#0F172A] shadow-xl shadow-[#0F172A]/20 text-white scale-[1.02]' : 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-lg text-gray-800'}`}
                             >
                                 {/* Delete Icon on Hover */}
                                 <button
@@ -435,7 +435,7 @@ export default function ClassroomManagement() {
 
             {/* LEVEL 4: CLASSROOM SUBJECT DASHBOARD MODAL/OVERLAY */}
             {expandedClassroom && (
-                <div className="fixed inset-0 bg-black/60 z-50 flex justify-end animate-in fade-in duration-200">
+                <div className="fixed inset-0 bg-[#0F172A]/60 z-50 flex justify-end animate-in fade-in duration-200 backdrop-blur-sm">
                     <div className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
 
                         {/* Dashboard Header */}
@@ -546,7 +546,7 @@ export default function ClassroomManagement() {
                             </div>
                             <div className="flex justify-end gap-2 pt-2">
                                 <button type="button" onClick={() => setSubjectModal({ isOpen: false, classroomId: null, code: '', name: '' })} className="px-4 py-1.5 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                                <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 text-sm font-bold text-white bg-primary hover:bg-black rounded-lg transition-all active:scale-95 disabled:opacity-50">Save Subject</button>
+                                <button type="submit" disabled={isSubmitting} className="px-4 py-1.5 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-lg transition-all active:scale-95 disabled:opacity-50">Save Subject</button>
                             </div>
                         </form>
                     </div>
@@ -587,7 +587,7 @@ export default function ClassroomManagement() {
 
                         <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-2 shrink-0">
                             <button type="button" onClick={() => setTeacherModal({ isOpen: false, classroomId: null, subjectId: null, selectedTeacherIds: [] })} className="px-4 py-1.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
-                            <button onClick={handleAssignTeachers} disabled={isSubmitting} className="px-5 py-1.5 text-sm font-bold text-white bg-primary hover:bg-black rounded-lg transition-all active:scale-95 disabled:opacity-50">
+                            <button onClick={handleAssignTeachers} disabled={isSubmitting} className="px-5 py-1.5 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-lg transition-all active:scale-95 disabled:opacity-50">
                                 Update Assignment
                             </button>
                         </div>
@@ -627,7 +627,7 @@ export default function ClassroomManagement() {
 
                         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 justify-end shrink-0">
                             <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-5 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
-                            <button type="submit" form="create-class-form" disabled={isSubmitting} className="px-6 py-2 text-sm font-bold text-white bg-black hover:bg-gray-800 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50">
+                            <button type="submit" form="create-class-form" disabled={isSubmitting} className="px-6 py-2 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50">
                                 {isSubmitting ? "Building Network..." : "Scaffold Network"}
                             </button>
                         </div>
@@ -682,7 +682,7 @@ export default function ClassroomManagement() {
 
                         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 justify-end shrink-0">
                             <button type="button" onClick={() => setIsAddSingleModalOpen(false)} className="px-5 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
-                            <button type="submit" form="create-single-class-form" disabled={isSubmitting} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50">
+                            <button type="submit" form="create-single-class-form" disabled={isSubmitting} className="px-6 py-2 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50">
                                 {isSubmitting ? "Deploying..." : "Deploy Node"}
                             </button>
                         </div>

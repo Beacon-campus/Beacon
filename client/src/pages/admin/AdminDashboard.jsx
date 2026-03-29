@@ -245,14 +245,14 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="h-full w-full overflow-auto p-6 bg-slate-50">
+    <div className="h-full w-full overflow-auto no-scrollbar p-6 bg-slate-50 rounded-3xl shadow-sm border border-slate-100">
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black text-slate-800">System Health Dashboard</h1>
             <p className="text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
           </div>
-          <button onClick={() => refresh(false, true)} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-bold">
+          <button onClick={() => refresh(false, true)} className="px-4 py-2 rounded-lg bg-[#0F172A] text-white text-sm font-bold hover:bg-[#1e293b] transition-all shadow-md active:scale-95">
             Refresh
           </button>
         </div>
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-black text-white border-black" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+              className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-[#0F172A] text-white border-[#0F172A] shadow-md shadow-[#0F172A]/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
                 }`}
             >
               {tab.label}
