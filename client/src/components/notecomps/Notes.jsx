@@ -203,6 +203,7 @@ export default function Notes() {
 
                 {/* Notes Area (Scrollable within Card) */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 soft-scrollbar">
+                    <h1 className="text-2xl font-bold text-slate-800 mb-6 ml-1">My Notes</h1>
 
                     {/* PINNED SECTION */}
                     {pinnedNotes.length > 0 && (

@@ -76,7 +76,7 @@ export default function AdminLayout() {
 
               {/* HEADER: Logo Area */}
               <div 
-                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-2 px-4 py-3 -ml-4 hover:bg-slate-900 rounded-xl"} mb-2 transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-95`}
+                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 px-4 py-3"} mb-2 transition-transform duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95`}
               >
                 <div className="flex items-center justify-center shrink-0 -mr-1">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
@@ -101,7 +101,7 @@ export default function AdminLayout() {
                       <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
                       <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
                     </g>
-                    <g className="fill-slate-800 stroke-slate-800 transition-colors duration-300 group-hover:fill-white group-hover:stroke-white">
+                    <g className="fill-slate-800 stroke-slate-800 transition-colors duration-300">
                       <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
                       <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
                       <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
@@ -121,7 +121,7 @@ export default function AdminLayout() {
                   </svg>
                 </div>
                 
-                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 transition-all duration-300 group-hover:text-white whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
+                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 transition-all duration-300 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
                   Beacon
                 </span>
               </div>

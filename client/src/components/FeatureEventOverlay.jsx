@@ -76,7 +76,7 @@ export default function FeatureEventOverlay({ open, eventKey, onClose }) {
   if (!open || !media) return null;
 
   return (
-    <div className="fixed inset-0 z-[80] bg-black/65 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[80] bg-slate-900/20 backdrop-blur-lg flex items-center justify-center p-4">
       <div
         className={`w-full rounded-2xl bg-white shadow-2xl border border-gray-200 p-4 ${
           media.visualType === "video" ? "max-w-4xl" : "max-w-md"

@@ -269,7 +269,7 @@ export default function Bot() {
               setDocSize(0);
               setLastActive(new Date());
             }}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-white py-2.5 rounded-xl text-sm font-medium hover:bg-black transition-all shadow-sm active:scale-95"
+            className="w-full flex items-center justify-center gap-2 bg-[#0F172A] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-[#1e293b] transition-all shadow-sm active:scale-95"
           >
             <PlusIcon /> New Chat
           </button>
