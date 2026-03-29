@@ -306,16 +306,15 @@ export default function Calendar() {
   const formattedDate = now.toLocaleDateString('en-GB', dateOptions).replace(',', '');
 
   const getDotColor = (type) => {
-    if (type === "Holiday") return "bg-[#fdba74]"; // Orange
-    if (type === "Exam") return "bg-[#fca5a5]"; // Pink
-    if (type === "Event") return "bg-[#93c5fd]"; // Blue
-    return "bg-[#d1d5db]"; // Grey
+    if (type === "Exam") return "bg-amber-500";
+    if (type === "Community" || type === "Event" || type === "Holiday") return "bg-emerald-500";
+    return "bg-slate-900";
   };
 
-  const getEventSectionColor = (type) => {
-    if (type === "Holiday") return "bg-orange-50 border-orange-100 text-orange-800";
-    if (type === "Exam") return "bg-red-50 border-red-100 text-red-800";
-    return "bg-blue-50 border-blue-100 text-blue-800";
+  const getEventBorderColor = (type) => {
+    if (type === "Exam") return "border-l-amber-500";
+    if (type === "Community" || type === "Event" || type === "Holiday") return "border-l-emerald-500";
+    return "border-l-slate-900";
   };
 
   const calendarEvents = Array.isArray(calendarData?.events)
@@ -821,13 +820,13 @@ export default function Calendar() {
         onClose={() => { setShowCalendar(false); setActiveCell(null); }}
         className="h-[85vh] w-[92vw] max-w-[1100px]"
       >
-        <div className="flex flex-col h-full bg-[#f8f9fa] rounded-[24px] p-8 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col h-full bg-white/85 backdrop-blur-xl border border-white rounded-[24px] p-8 shadow-2xl relative overflow-hidden">
           {/* REFERENCE HEADER */}
           <div className="flex justify-between items-center mb-6 shrink-0 relative z-30 px-2">
             {/* LEFT SIDE: Date Header */}
             {viewMode === "grid" && (
               <div className="flex items-center gap-4">
-                <div className="bg-black text-white px-6 py-2 rounded-full shadow-lg border border-gray-800">
+                <div className="bg-slate-900 text-white px-6 py-2 rounded-full shadow-lg border border-slate-800">
                   <h2 className="text-2xl font-black tracking-tight flex items-center gap-2 relative">
                     <GlitchText text={currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} />
                   </h2>
@@ -838,7 +837,7 @@ export default function Calendar() {
             {/* SLIDING TOGGLE (Centered) */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center bg-gray-50 border border-gray-200 rounded-xl p-1.5 z-40">
               <div
-                className={`absolute left-1.5 top-1.5 bottom-1.5 w-[140px] rounded-xl bg-primary shadow-md transition-transform duration-300 ease-out ${viewMode === "calendar" ? "translate-x-[140px]" : "translate-x-0"
+                className={`absolute left-1.5 top-1.5 bottom-1.5 w-[140px] rounded-xl bg-slate-900 shadow-md transition-transform duration-300 ease-out ${viewMode === "calendar" ? "translate-x-[140px]" : "translate-x-0"
                   }`}
               />
               <button
@@ -888,7 +887,7 @@ export default function Calendar() {
               <div className="relative">
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all shadow-sm border ${showExportMenu ? "bg-black text-white border-black" : "bg-white border-gray-100 text-gray-700 hover:bg-gray-50"
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all shadow-sm border ${showExportMenu ? "bg-slate-900 text-white border-slate-900" : "bg-white border-gray-100 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                   <DownloadIcon /> Export
@@ -1001,7 +1000,7 @@ export default function Calendar() {
                             ${isActive
                               ? "bg-slate-100 border-black/20 shadow-[0_12px_24px_rgba(0,0,0,0.1)] z-20"
                               : isToday
-                                ? "bg-emerald-50 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 hover:shadow-[0_4px_12px_rgba(16,185,129,0.12)]"
+                                ? "bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600 hover:border-emerald-700 hover:shadow-[0_4px_12px_rgba(16,185,129,0.3)]"
                                 : isPastDay
                                   ? "bg-gray-100 border-gray-200 hover:bg-gray-100 text-gray-500"
                                   : "bg-white border-[#f3f4f6] hover:bg-[#f9fafb] hover:border-[#e5e7eb] hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
@@ -1013,15 +1012,15 @@ export default function Calendar() {
                               <div className="flex justify-between items-start w-full">
                                 <span className={`
                                   font-bold transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] 
-                                  ${isActive ? "text-[3rem] text-slate-900" : isToday ? "text-[1.4rem] text-emerald-700" : isPastDay ? "text-[1.4rem] text-gray-400" : "text-[1.4rem] text-[#1f2937]"}
+                                  ${isActive ? "text-[3rem] text-slate-900" : isToday ? "text-[1.4rem] text-white" : isPastDay ? "text-[1.4rem] text-gray-400" : "text-[1.4rem] text-[#1f2937]"}
                                 `}>
                                   {dayNumber}
                                 </span>
 
                                 {allItems.length > 0 && (
                                   <div className={`
-                                    w-2 h-2 rounded-full transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] 
-                                    ${allItems[0].isTodo ? "bg-black" : getDotColor(allItems[0].type)}
+                                    w-2 h-2 rounded-full transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] border border-white/20
+                                    ${allItems[0].isTodo ? "bg-slate-900" : getDotColor(allItems[0].type)}
                                     ${isActive ? "scale-150 mt-4 mr-2" : "mt-2 mr-1"}
                                   `}></div>
                                 )}
@@ -1034,19 +1033,16 @@ export default function Calendar() {
                                     <div
                                       key={idx}
                                       className={`
-                                        p-2.5 pr-4 rounded-xl border-l-4 shadow-sm break-words
-                                        ${ev.isTodo
-                                          ? "bg-black text-white border-slate-400"
-                                          : getEventSectionColor(ev.type)
-                                        }
+                                        p-2.5 pr-4 rounded-xl border-y border-r border-gray-100 shadow-sm break-words bg-white
+                                        ${ev.isTodo ? "border-l-4 border-l-slate-900" : `border-l-4 ${getEventBorderColor(ev.type)}`}
                                       `}
                                     >
-                                      <div className={`text-[10px] font-black uppercase tracking-wider mb-0.5 ${ev.isTodo ? "text-slate-300" : "opacity-70"}`}>
+                                      <div className="text-sm font-medium text-slate-900 leading-tight break-words">{ev.title}</div>
+                                      <div className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${ev.isTodo ? "text-slate-500" : "text-gray-400"}`}>
                                         {ev.type}
                                       </div>
-                                      <div className="text-sm font-bold leading-tight break-words">{ev.title}</div>
                                       {ev.description && (
-                                        <div className={`mt-1.5 text-[11px] font-medium opacity-80 leading-relaxed italic border-t pt-1.5 break-words ${ev.isTodo ? "border-white/10" : "border-black/5"}`}>
+                                        <div className="mt-1.5 text-[11px] font-medium text-gray-500 leading-relaxed italic border-t border-gray-100 pt-1.5 break-words">
                                           {ev.description}
                                         </div>
                                       )}
@@ -1070,13 +1066,14 @@ export default function Calendar() {
             </>
           ) : (
             /* IMAGE VIEW (Scrollable & Zoomable Stack) */
-            <div
-              className={`flex-1 overflow-auto bg-gray-50 flex flex-col items-center p-8 rounded-2xl relative soft-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-            >
+            <div className="w-full bg-slate-50/50 rounded-2xl border border-slate-200/60 overflow-hidden shadow-inner p-2 md:p-4 flex-1 flex flex-col relative">
+              <div
+                className={`flex-1 overflow-auto bg-transparent flex flex-col items-center p-4 rounded-xl relative soft-scrollbar ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
               {cachedImages.isLoading ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-4">
                   <LoadingState size="md" />
@@ -1092,12 +1089,12 @@ export default function Calendar() {
                   className="select-none flex flex-col gap-12 pb-24"
                 >
                   {/* Odd Sem Image */}
-                  <div className="flex flex-col items-center">
-                    <h3 className="text-xl font-bold bg-white px-6 py-2 rounded-xl shadow-sm border border-gray-100 mb-6 text-gray-700">Odd Semester</h3>
+                  <div className="flex flex-col items-center relative w-full max-w-5xl">
+                    <h3 className="absolute top-4 left-4 z-20 text-sm font-bold bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full shadow-sm border border-emerald-100">Odd Semester</h3>
                     <img
                       src={cachedImages.odd}
                       alt="Odd Semester Calendar"
-                      className="max-w-5xl w-full object-contain shadow-2xl rounded-2xl border border-gray-200 pointer-events-none bg-white"
+                      className="w-full object-contain shadow-xl rounded-2xl border border-gray-200 pointer-events-none bg-white"
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/800x1200?text=Odd+Semester+Image+Not+Found"; }}
                     />
                   </div>
@@ -1109,12 +1106,12 @@ export default function Calendar() {
                   </div>
 
                   {/* Even Sem Image */}
-                  <div className="flex flex-col items-center">
-                    <h3 className="text-xl font-bold bg-white px-6 py-2 rounded-xl shadow-sm border border-gray-100 mb-6 text-gray-700">Even Semester</h3>
+                  <div className="flex flex-col items-center relative w-full max-w-5xl">
+                    <h3 className="absolute top-4 left-4 z-20 text-sm font-bold bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full shadow-sm border border-indigo-100">Even Semester</h3>
                     <img
                       src={cachedImages.even}
                       alt="Even Semester Calendar"
-                      className="max-w-5xl w-full object-contain shadow-2xl rounded-2xl border border-gray-200 pointer-events-none bg-white"
+                      className="w-full object-contain shadow-xl rounded-2xl border border-gray-200 pointer-events-none bg-white"
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/800x1200?text=Even+Semester+Image+Not+Found"; }}
                     />
                   </div>
@@ -1122,17 +1119,18 @@ export default function Calendar() {
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-400">Failed to load calendar documents.</div>
               )}
+              </div>
             </div>
           )}
 
           {/* FLOATING ZOOM CONTROLS (Bottom Center, Pinned to Modal Viewport) */}
           {viewMode === "calendar" && !cachedImages.isLoading && cachedImages.odd && cachedImages.even && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-white/70 backdrop-blur-xl border border-white/60 p-2 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.15)] pointer-events-auto">
-              <button onClick={zoomOut} className="p-2 hover:bg-white/90 rounded-xl transition-all text-gray-700 hover:text-black hover:shadow-sm active:scale-95" title="Zoom Out"><ZoomOutIcon /></button>
-              <span className="text-sm font-bold w-14 text-center text-gray-900 bg-white/60 py-1.5 rounded-lg shadow-inner">{Math.round(zoomLevel * 100)}%</span>
-              <button onClick={zoomIn} className="p-2 hover:bg-white/90 rounded-xl transition-all text-gray-700 hover:text-black hover:shadow-sm active:scale-95" title="Zoom In"><ZoomInIcon /></button>
-              <div className="w-px h-6 bg-gray-300 mx-1"></div>
-              <button onClick={resetZoom} className="p-2 hover:bg-white/90 rounded-xl transition-all text-gray-700 hover:text-black hover:shadow-sm active:scale-95" title="Reset"><ResetIcon /></button>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 bg-white/90 backdrop-blur shadow-lg border border-slate-100 rounded-full px-4 py-2 text-slate-700 pointer-events-auto">
+              <button onClick={zoomOut} className="p-1.5 hover:bg-slate-100 rounded-full transition-all text-slate-500 hover:text-slate-900 active:scale-95" title="Zoom Out"><ZoomOutIcon /></button>
+              <span className="text-sm font-black w-12 text-center text-slate-800">{Math.round(zoomLevel * 100)}%</span>
+              <button onClick={zoomIn} className="p-1.5 hover:bg-slate-100 rounded-full transition-all text-slate-500 hover:text-slate-900 active:scale-95" title="Zoom In"><ZoomInIcon /></button>
+              <div className="w-px h-5 bg-slate-200 mx-2"></div>
+              <button onClick={resetZoom} className="p-1.5 hover:bg-slate-100 rounded-full transition-all text-slate-500 hover:text-slate-900 active:scale-95" title="Reset"><ResetIcon /></button>
             </div>
           )}
 
