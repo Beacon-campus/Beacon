@@ -23,7 +23,7 @@ export default function TeacherClassList({ classes, onSelect }) {
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 {classes.map((cls) => (
-                    <div key={cls._id} onClick={() => onSelect(cls)} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer flex flex-col gap-4 group">
+                    <div key={cls._id} onClick={() => onSelect(cls)} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 premium-transition cursor-pointer flex flex-col gap-4 group">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg overflow-hidden border border-black/10 shrink-0" style={{ backgroundColor: getClassroomColor(cls._id) }}>
                                 <img src={BookIcon} className="w-7 h-7 object-contain opacity-90" alt="" />

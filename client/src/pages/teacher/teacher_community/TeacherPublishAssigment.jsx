@@ -1417,7 +1417,7 @@ export default function TeacherPublishAssignment() {
               <div
                 key={cls.id}
                 onClick={() => handleClassSelect(cls)}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center justify-center text-center h-40 gap-2"
+                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 premium-transition cursor-pointer flex flex-col items-center justify-center text-center h-40 gap-2"
               >
                 <div className="flex items-center gap-2">
                    <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1723,7 +1723,7 @@ export default function TeacherPublishAssignment() {
                 <div
                   key={assign._id}
                   onClick={() => setSelectedAssignment(assign)}
-                  className={`p-6 rounded-2xl border cursor-pointer transition-all ${String(selectedAssignment?._id) === String(assign._id)
+                  className={`p-6 rounded-2xl border cursor-pointer premium-transition ${String(selectedAssignment?._id) === String(assign._id)
                     ? "border-slate-300 bg-white shadow-md -translate-y-1"
                     : "border-slate-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-1"
                     }`}

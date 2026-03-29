@@ -95,6 +95,13 @@ h6,
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 }
 
+.premium-transition {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+  transform: translateZ(0); 
+}
+
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
@@ -115,6 +122,9 @@ h6,
 
 .animate-blob {
   animation: blob 10s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .animation-delay-2000 {

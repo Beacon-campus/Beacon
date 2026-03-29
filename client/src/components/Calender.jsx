@@ -947,8 +947,8 @@ export default function Calendar() {
                   `}
                   style={{
                     transitionProperty: 'grid-template-columns, grid-template-rows',
-                    transitionDuration: '500ms',
-                    transitionTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)',
+                    transitionDuration: '400ms',
+                    transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
                     gridTemplateColumns: activeCell
                       ? Array.from({ length: 7 }, (_, i) => i === activeCell.col ? '3.5fr' : '1fr').join(' ')
                       : '1fr 1fr 1fr 1fr 1fr 1fr 1fr',
@@ -995,7 +995,7 @@ export default function Calendar() {
                           key={i}
                           onClick={() => isActualDay && setActiveCell(isActive ? null : { row, col })}
                           className={`
-                            day-cell group relative border transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] overflow-hidden rounded-[16px] p-4 flex flex-col items-stretch
+                            day-cell group relative border transition-all duration-[400ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)] overflow-hidden rounded-[16px] p-4 flex flex-col items-stretch
                             ${isActualDay ? "cursor-pointer" : "opacity-0 pointer-events-none"}
                             ${isActive
                               ? "bg-slate-100 border-black/20 shadow-[0_12px_24px_rgba(0,0,0,0.1)] z-20"
@@ -1011,7 +1011,7 @@ export default function Calendar() {
                             <>
                               <div className="flex justify-between items-start w-full">
                                 <span className={`
-                                  font-bold transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] 
+                                  font-bold transition-all duration-[400ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)] 
                                   ${isActive ? "text-[3rem] text-slate-900" : isToday ? "text-[1.4rem] text-white" : isPastDay ? "text-[1.4rem] text-gray-400" : "text-[1.4rem] text-[#1f2937]"}
                                 `}>
                                   {dayNumber}
@@ -1019,7 +1019,7 @@ export default function Calendar() {
 
                                 {allItems.length > 0 && (
                                   <div className={`
-                                    w-2 h-2 rounded-full transition-all duration-[500ms] ease-[cubic-bezier(0.65, 0, 0.35, 1)] border border-white/20
+                                    w-2 h-2 rounded-full transition-all duration-[400ms] ease-[cubic-bezier(0.4, 0, 0.2, 1)] border border-white/20
                                     ${allItems[0].isTodo ? "bg-slate-900" : getDotColor(allItems[0].type)}
                                     ${isActive ? "scale-150 mt-4 mr-2" : "mt-2 mr-1"}
                                   `}></div>
@@ -1082,7 +1082,7 @@ export default function Calendar() {
                 <div
                   style={{
                     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoomLevel})`,
-                    transition: isDragging ? "none" : "transform 0.2s ease-out",
+                    transition: isDragging ? "none" : "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
                     cursor: isDragging ? "grabbing" : "grab",
                     transformOrigin: "top center"
                   }}
