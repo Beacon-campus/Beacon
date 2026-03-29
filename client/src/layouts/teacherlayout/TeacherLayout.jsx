@@ -126,7 +126,7 @@ export default function TeacherLayout() {
               <div 
                 className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 px-4 py-3"} mb-2 transition-transform duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95`}
               >
-                <div className="flex items-center justify-center shrink-0 -mr-1">
+                <div className="flex items-center justify-center min-w-[40px] w-[40px] flex-shrink-0 -mr-1">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
                     <defs>
                       <linearGradient id="beam-left" x1="1" y1="0" x2="0" y2="0">
@@ -169,7 +169,7 @@ export default function TeacherLayout() {
                   </svg>
                 </div>
                 
-                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 transition-all duration-300 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
+                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out origin-left ${collapsed ? "w-0 opacity-0 -translate-x-2" : "w-24 opacity-100 translate-x-0"}`}>
                   Beacon
                 </span>
               </div>
@@ -321,7 +321,18 @@ export default function TeacherLayout() {
                         </>
                       )}
                     </NavLink>
-
+                    <NavLink to="/teacher/notif" className={getLinkClass}>
+                      {({ isActive }) => (
+                        <>
+                          <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" className={getIconClass(isActive)}>
+                              <path d="M4.068,18H19.724a3,3,0,0,0,2.821-4.021L19.693,6.094A8.323,8.323,0,0,0,11.675,0h0A8.321,8.321,0,0,0,3.552,6.516l-2.35,7.6A3,3,0,0,0,4.068,18Z" /><path d="M7.1,20a5,5,0,0,0,9.8,0Z" />
+                            </svg>
+                          </div>
+                          <span className={`whitespace-nowrap transition-all duration-200 ${collapsed ? "hidden opacity-0 w-0" : "block opacity-100"}`}>Notifications</span>
+                        </>
+                      )}
+                    </NavLink>
                   </>
                 )}
               </nav>

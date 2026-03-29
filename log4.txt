@@ -1,0 +1,79 @@
+commit fc562fd4dbfaba6a8c2afe91c758f94caf008a13
+Author: Charan <charan.r.tech@gmail.com>
+Date:   Sun Mar 8 19:53:52 2026 +0530
+
+    message bubble spacing fixed - charan
+
+diff --git a/client/src/components/community_comps/TeacherClassList.jsx b/client/src/components/community_comps/TeacherClassList.jsx
+index 434975a..bbcdc39 100644
+--- a/client/src/components/community_comps/TeacherClassList.jsx
++++ b/client/src/components/community_comps/TeacherClassList.jsx
+@@ -16,7 +16,7 @@ const getClassroomColor = (id) => {
+ 
+ export default function TeacherClassList({ classes, onSelect }) {
+   return (
+-    <div className="p-6 h-full overflow-y-auto">
++    <div className="p-6 h-full overflow-y-auto no-scrollbar">
+         <h2 className="text-2xl font-bold text-gray-800 mb-6">Classrooms</h2>
+         {classes.length === 0 ? (
+             <p className="text-gray-400">No official classrooms found.</p>
+
+commit 872252a230ef226f88e88e38cf6cc29a8d3fc81b
+Author: Denzil <denzilpreston@gmail.com>
+Date:   Fri Mar 6 18:44:12 2026 +0530
+
+    added both server and client folders to the deployment repo -Denzil
+
+diff --git a/client/src/components/community_comps/TeacherClassList.jsx b/client/src/components/community_comps/TeacherClassList.jsx
+new file mode 100644
+index 0000000..434975a
+--- /dev/null
++++ b/client/src/components/community_comps/TeacherClassList.jsx
+@@ -0,0 +1,46 @@
++import React from "react";
++import BookIcon from "../../assets/classroom/book.svg";
++import SendIcon from "../../assets/send.svg";
++
++const AESTHETIC_COLORS = ["#FFD1DC", "#FFABAB", "#FFC3A0", "#FF677D", "#D4A5A5", "#B5EAD7", "#C7CEEA", "#E2F0CB", "#FF9AA2", "#FFDAC1"];
++const getClassroomColor = (id) => {
++  try {
++    const stored = JSON.parse(localStorage.getItem("classroomColors") || "{}");
++    if (stored[id]) return stored[id];
++    const color = AESTHETIC_COLORS[Math.floor(Math.random() * AESTHETIC_COLORS.length)];
++    stored[id] = color;
++    localStorage.setItem("classroomColors", JSON.stringify(stored));
++    return color;
++  } catch { return "#E2F0CB"; }
++};
++
++export default function TeacherClassList({ classes, onSelect }) {
++  return (
++    <div className="p-6 h-full overflow-y-auto">
++        <h2 className="text-2xl font-bold text-gray-800 mb-6">Classrooms</h2>
++        {classes.length === 0 ? (
++            <p className="text-gray-400">No official classrooms found.</p>
++        ) : (
++            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
++                {classes.map((cls) => (
++                    <div key={cls._id} onClick={() => onSelect(cls)} className="p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-blue-200 cursor-pointer transition-all flex flex-col gap-4 group">
++                        <div className="flex items-center gap-3">
++                            <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg overflow-hidden border border-black/10 shrink-0" style={{ backgroundColor: getClassroomColor(cls._id) }}>
++                                <img src={BookIcon} className="w-7 h-7 object-contain opacity-90" alt="" />
++                            </div>
++                            <div>
++                                <h3 className="font-bold text-gray-800 text-lg">{cls.name}</h3>
++                                <p className="text-xs text-gray-500 uppercase tracking-wide">Official Channel</p>
++                            </div>
++                        </div>
++                        <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center text-sm font-medium text-gray-600">
++                            <span>View Chat</span>
++                            <img src={SendIcon} className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" alt="" />
++                        </div>
++                    </div>
++                ))}
++            </div>
++        )}
++    </div>
++  );
++}
+\ No newline at end of file
