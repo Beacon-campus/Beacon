@@ -30,7 +30,7 @@ export default function NotificationsWidget({
     const activePalette = getTypePalette(activeItem);
 
     return (
-        <div className="premium-card p-6 flex-1 flex flex-col items-center justify-center gap-2 relative">
+        <div className="premium-card p-6 flex-1 flex flex-col items-center justify-center gap-2 relative min-h-[180px] sm:min-h-[250px]">
             <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest w-full text-center z-10 mb-1">
                 Notifications
             </h3>

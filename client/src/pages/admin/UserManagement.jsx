@@ -184,7 +184,7 @@ export default function UserManagement() {
             </div>
 
             {/* Table Area */}
-            <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
+            <div className="flex-1 overflow-y-auto soft-scrollbar">
                 {loading ? (
                     <div className="h-full flex items-center justify-center">
                         <LoadingState size="sm" />
@@ -196,7 +196,8 @@ export default function UserManagement() {
                         <p className="text-sm">Try adjusting your filters or search criteria</p>
                     </div>
                 ) : (
-                    <table className="w-full text-left border-collapse">
+                    <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[520px]">
                         <thead className="sticky top-0 bg-white shadow-[0_1px_0_rgba(229,231,235,1)] z-10">
                             <tr>
                                 <th className="px-8 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Register No.</th>
@@ -265,6 +266,7 @@ export default function UserManagement() {
                             ))}
                         </tbody>
                     </table>
+                    </div>
                 )}
             </div>
 

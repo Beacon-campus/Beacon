@@ -320,7 +320,7 @@ export default function Login() {
 
   // 🟢 2. NEW SPLIT LOGIN LAYOUT
   return (
-    <div className="h-screen w-full flex bg-[#F8FAFC] font-sans text-primary overflow-hidden relative">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F8FAFC] font-sans text-primary overflow-x-hidden relative">
       
       {/* Ambient Aurora Background */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/60 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob"></div>
@@ -355,7 +355,7 @@ export default function Login() {
       </div>
 
       {/* RIGHT PANEL - Form */}
-      <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
+      <div className="w-full lg:w-[40%] min-h-screen flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
 
         <div className="w-full max-w-sm space-y-7 relative z-10">
 

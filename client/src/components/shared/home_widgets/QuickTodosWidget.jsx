@@ -15,7 +15,7 @@ export default function QuickTodosWidget({
     };
 
     return (
-        <div className="premium-card p-6 w-[35%] flex flex-col">
+        <div className="premium-card p-4 sm:p-6 w-full sm:w-[35%] shrink-0 flex flex-col min-h-[250px] sm:min-h-[300px]">
             <h2 className="text-xl font-black text-primary mb-3 flex items-center gap-2 tracking-tight">
                 <span className={`w-2 h-6 rounded-full ${getThemeColorClass()}`}></span>
                 Quick To-Dos

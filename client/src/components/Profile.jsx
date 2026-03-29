@@ -275,16 +275,16 @@ export default function ProfileLayout() {
   ];
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="w-full h-auto sm:h-full p-4 sm:p-6 pb-24 sm:pb-6">
 
 
-      <div className="flex gap-6 h-full w-full items-stretch">
+      <div className="flex flex-col sm:flex-row gap-6 h-auto sm:h-full w-full items-stretch">
 
         {/* ================= LEFT PANEL ================= */}
-        <div className="flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden relative">
+        <div className="flex-none sm:flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden relative">
 
           {activeSection === "profile" && (
-            <div className="relative h-full overflow-y-auto no-scrollbar bg-gray-50/30">
+            <div className="relative h-auto sm:h-full overflow-y-visible sm:overflow-y-auto no-scrollbar bg-gray-50/30">
 
               {/* Decorative Header Banner */}
               <div className={`h-40 bg-gradient-to-r ${bannerGradient} relative shrink-0 transition-colors duration-500`}>
@@ -531,7 +531,7 @@ export default function ProfileLayout() {
         </div>
 
         {/* ================= RIGHT PANEL (Navigation with Icons) ================= */}
-        <div className="w-1/3 max-w-xs p-4 h-full overflow-y-auto no-scrollbar">
+        <div className="w-full sm:w-1/3 sm:max-w-xs p-4 sm:h-full overflow-y-auto no-scrollbar">
           <div className="border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden">
             {sections.map((item) => (
               <button
