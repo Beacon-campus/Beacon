@@ -5,13 +5,13 @@ import ChangePasswordModal from "../../components/ChangePasswordModal";
 import UpdateEmailModal from "../../components/UpdateEmailModal";
 import Breadcrumb from "../../components/ui/Breadcrumb";
 import { useAuth } from "../../context/AuthContext";
+import MobileBottomNav from "../../components/ui/MobileBottomNav";
 import toast from "react-hot-toast";
 
 // SVG Imports removed (using inline)
 
 export default function TeacherLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const location = useLocation();
   const { user, loading } = useAuth();
@@ -33,16 +33,6 @@ export default function TeacherLayout() {
     const base = "w-3.5 h-3.5 transition-all duration-200 fill-current";
     return isActive ? `${base} opacity-100` : `${base} group-hover:opacity-100`;
   };
-
-  /* ================= BODY LOCK FOR MOBILE DRAWER ================= */
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.classList.add('drawer-open');
-    } else {
-      document.body.classList.remove('drawer-open');
-    }
-    return () => document.body.classList.remove('drawer-open');
-  }, [mobileOpen]);
 
   /* ================= OFFLINE DETECTION ================= */
   useEffect(() => {
@@ -126,23 +116,13 @@ export default function TeacherLayout() {
         <div className="absolute top-[20%] right-[-5%] w-[35%] h-[40%] bg-green-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-4000"></div>
 
-        {/* ===== MOBILE DRAWER BACKDROP ===== */}
-        {mobileOpen && (
-          <div
-            className="drawer-backdrop sm:hidden"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-
-        {/* Sidebar / Drawer */}
+        {/* Sidebar */}
         <div
           className={`
-            fixed top-0 bottom-0 left-0 z-[60] h-full
-            sm:top-4 sm:bottom-4 sm:left-4 sm:rounded-3xl sm:h-auto
-            ${collapsed ? 'sm:w-20' : 'sm:w-56'}
-            w-72
-            glass-panel p-4 flex flex-col justify-between transition-all duration-300
-            ${mobileOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}
+            hidden md:flex flex-col justify-between p-4
+            fixed top-4 bottom-4 left-4 z-[60] h-auto rounded-3xl glass-panel shadow-sm
+            transition-all duration-300
+            ${collapsed ? 'w-20' : 'w-56'}
           `}
         >
           <div className="flex flex-col h-full">
@@ -421,17 +401,8 @@ export default function TeacherLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ml-0 sm:ml-28 ${collapsed ? 'lg:ml-28' : 'lg:ml-64'}`}>
+          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ml-0 md:ml-32 ${collapsed ? 'xl:ml-28' : 'xl:ml-64'}`}>
             <div className="px-4 sm:px-6 pt-4 pb-0 relative flex items-center w-full">
-              <button
-                onClick={() => setMobileOpen(true)}
-                className="absolute left-4 z-20 sm:static sm:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors shrink-0 bg-white/80 backdrop-blur-sm shadow-sm border border-gray-100"
-                aria-label="Open menu"
-              >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-gray-800">
-                  <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                </svg>
-              </button>
               <div className="w-full">
                 <Navbar />
               </div>
@@ -444,57 +415,8 @@ export default function TeacherLayout() {
             </div>
           </div>
 
-          {/* ===== BOTTOM NAV BAR — mobile only ===== */}
-          <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-white/60 flex items-center justify-around pb-safe">
-            {isCommunity ? (
-              <>
-                <a href="/teacher/community" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M19.675,2.758A11.936,11.936,0,0,0,10.474.1,12,12,0,0,0,12.018,24H19a5.006,5.006,0,0,0,5-5V11.309l0-.063A12.044,12.044,0,0,0,19.675,2.758ZM8,7h4a1,1,0,0,1,0,2H8A1,1,0,0,1,8,7Zm8,10H8a1,1,0,0,1,0-2h8a1,1,0,0,1,0,2Zm0-4H8a1,1,0,0,1,0-2h8a1,1,0,0,1,0,2Z"/></svg>
-                  Messages
-                </a>
-                <a href="/teacher/community/classrooms" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m23,24h-5c-.4,0-.761-.238-.919-.605s-.082-.794.194-1.084c.792-.833,1.967-1.311,3.225-1.311s2.433.478,3.225,1.311c.276.29.352.717.194,1.084s-.519.605-.919.605Z"/></svg>
-                  Classroom
-                </a>
-                <a href="/teacher/community/groups" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m7.5 13a4.5 4.5 0 1 1 4.5-4.5 4.505 4.505 0 0 1 -4.5 4.5zm6.5 11h-13a1 1 0 0 1 -1-1v-.5a7.5 7.5 0 0 1 15 0v.5a1 1 0 0 1 -1 1z"/></svg>
-                  Groups
-                </a>
-                <a href="/teacher/community/publish-assignment" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M16.4,13.17c-.74-.74-1.73-1.15-2.77-1.15h-1.63v1.63c0,1.04,.41,2.04,1.15,2.77l6.84,6.84c.85,.85,2.24,1.01,3.17,.25,1.07-.88,1.13-2.46,.18-3.41l-6.93-6.93Z"/></svg>
-                  Assign
-                </a>
-                <button onClick={() => setMobileOpen(true)} className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-                  More
-                </button>
-              </>
-            ) : (
-              <>
-                <a href="/teacher/home" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Z"/></svg>
-                  Dashboard
-                </a>
-                <a href="/teacher/todo" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m13.27 7.48c-.813.813-1.27 1.915-1.27 3.065v.955c0 .276.224.5.5.5h.955c1.149 0 2.252-.457 3.064-1.269l6.715-6.715c.85-.85 1.013-2.236.252-3.167-.875-1.07-2.456-1.129-3.409-.176z"/></svg>
-                  To-dos
-                </a>
-                <a href="/teacher/notes" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 512 512" className="w-5 h-5 fill-current"><path d="M320,170.667h139.52c-7.448-19.736-19.019-37.656-33.941-52.565l-74.325-74.368c-14.927-14.905-32.852-26.468-52.587-33.92v139.52C298.667,161.115,308.218,170.667,320,170.667z"/></svg>
-                  Notes
-                </a>
-                <a href="/teacher/researchbot" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m22.5,9h-.5v-1c0-2.757-2.243-5-5-5h-4V1c0-.552-.447-1-1-1s-1,.448-1,1v2h-4c-2.757,0-5,2.243-5,5v1h-.5c-.827,0-1.5.673-1.5,1.5v3c0,.827.673,1.5,1.5,1.5h.5v1c0,2.757,2.243,5,5,5h7.697l3.963,2.642c.36.24.775.361,1.191.361.348,0,.696-.084,1.015-.255.699-.375,1.134-1.1,1.134-1.894v-6.855h.5c.827,0,1.5-.673,1.5-1.5v-3c0-.827-.673-1.5-1.5-1.5Z"/></svg>
-                  Bot
-                </a>
-                <button onClick={() => setMobileOpen(true)} className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-                  More
-                </button>
-              </>
-            )}
-          </nav>
         </div>
+      <MobileBottomNav />
     </>
   );
 }

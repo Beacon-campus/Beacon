@@ -312,7 +312,7 @@ export default function QuizActive() {
       </header>
 
       <main className="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto w-full">
-        <div className="space-y-6 pb-20">
+        <div className="space-y-6 pb-6">
           {questions.map((q, idx) => (
             <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h3 className="font-bold text-lg text-gray-800 mb-4">{idx + 1}. {q.question}</h3>

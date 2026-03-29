@@ -23,7 +23,7 @@ export default function WelcomeCard({ user, quote, theme = "green", roleLabel = 
                     Welcome, <span className={`font-medium ${getTextColorClass()}`}>{user?.profile?.displayName || roleLabel}</span>
                 </h1>
 
-                <div className="pt-4 sm:pt-6 relative max-w-xl">
+                <div className="hidden md:block pt-4 sm:pt-6 relative max-w-xl">
                     {loadingQuote ? (
                         <LoadingState size="sm" align="start" className="items-start" />
                     ) : (

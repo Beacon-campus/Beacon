@@ -5,10 +5,10 @@ import ChangePasswordModal from "../../components/ChangePasswordModal";
 import UpdateEmailModal from "../../components/UpdateEmailModal";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import MobileBottomNav from "../../components/ui/MobileBottomNav";
 
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { user, loading } = useAuth();
 
@@ -25,16 +25,6 @@ export default function AdminLayout() {
     const base = "w-3.5 h-3.5 transition-all duration-200 fill-current";
     return isActive ? `${base} opacity-100` : `${base} group-hover:opacity-100`;
   };
-
-  /* ================= BODY LOCK FOR MOBILE DRAWER ================= */
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.classList.add('drawer-open');
-    } else {
-      document.body.classList.remove('drawer-open');
-    }
-    return () => document.body.classList.remove('drawer-open');
-  }, [mobileOpen]);
 
   /* ================= LOADING ================= */
   if (loading) {
@@ -78,23 +68,13 @@ export default function AdminLayout() {
         <div className="absolute top-[20%] right-[-5%] w-[35%] h-[40%] bg-green-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-4000"></div>
 
-        {/* ===== MOBILE DRAWER BACKDROP ===== */}
-        {mobileOpen && (
-          <div
-            className="drawer-backdrop sm:hidden"
-            onClick={() => setMobileOpen(false)}
-          />
-        )}
-
-        {/* Sidebar / Drawer */}
+        {/* Sidebar */}
         <div
           className={`
-            fixed top-0 bottom-0 left-0 z-[60] h-full
-            sm:top-4 sm:bottom-4 sm:left-4 sm:rounded-3xl sm:h-auto
-            ${collapsed ? 'sm:w-20' : 'sm:w-56'}
-            w-72
-            glass-panel p-4 flex flex-col justify-between transition-all duration-300
-            ${mobileOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}
+            hidden md:flex flex-col justify-between p-4
+            fixed top-4 bottom-4 left-4 z-[60] h-auto rounded-3xl glass-panel shadow-sm
+            transition-all duration-300
+            ${collapsed ? 'w-20' : 'w-56'}
           `}
         >
             <div className="flex flex-col h-full">
@@ -271,17 +251,8 @@ export default function AdminLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ml-0 sm:ml-28 ${collapsed ? 'lg:ml-28' : 'lg:ml-64'}`}>
+          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ml-0 md:ml-32 ${collapsed ? 'xl:ml-28' : 'xl:ml-64'}`}>
             <div className="px-4 sm:px-6 pt-4 pb-0 relative flex items-center w-full">
-              <button
-                onClick={() => setMobileOpen(true)}
-                className="absolute left-4 z-20 sm:static sm:hidden flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors shrink-0 bg-white/80 backdrop-blur-sm shadow-sm border border-gray-100"
-                aria-label="Open menu"
-              >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-gray-800">
-                  <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                </svg>
-              </button>
               <div className="w-full">
                 <Navbar />
               </div>
@@ -293,30 +264,8 @@ export default function AdminLayout() {
             </div>
           </div>
 
-          {/* ===== BOTTOM NAV BAR — mobile only ===== */}
-          <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-white/60 flex items-center justify-around pb-safe">
-            <a href="/admin/dashboard" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Z"/></svg>
-              Dashboard
-            </a>
-            <a href="/admin/user-management" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M12 2A5 5 0 1 0 17 7 5 5 0 0 0 12 2Zm0 8A3 3 0 1 1 15 7 3 3 0 0 1 12 10ZM21 21v1H3v-1A7 7 0 0 1 10 14h4a7 7 0 0 1 7 7Z"/></svg>
-              Users
-            </a>
-            <a href="/admin/classroom-management" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M20 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4v3a1 1 0 0 0 1.6.8L13.5 18H20a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/></svg>
-              Classes
-            </a>
-            <a href="/admin/announcements" className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M20 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4v3a1 1 0 0 0 1.6.8L13.5 18H20a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/></svg>
-              Announce
-            </a>
-            <button onClick={() => setMobileOpen(true)} className="flex flex-col items-center gap-0.5 py-2 px-3 text-gray-500 hover:text-green-600 text-[10px] font-medium">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-              More
-            </button>
-          </nav>
         </div>
+      <MobileBottomNav />
     </>
   );
 }

@@ -32,7 +32,7 @@ export default function Breadcrumb({ extra = [] }) {
   }
 
   return (
-    <div className="flex items-center text-xs select-none font-bold uppercase tracking-widest pl-1">
+    <div className="hidden md:flex items-center text-xs select-none font-bold uppercase tracking-widest pl-1">
       <span className="text-slate-400">{config.label}</span>
       <span className="mx-2 text-slate-300">/</span>
       <span className="text-slate-800">{pageLabel}</span>

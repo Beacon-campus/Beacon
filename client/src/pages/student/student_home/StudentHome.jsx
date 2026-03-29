@@ -235,11 +235,11 @@ export default function StudentHome() {
     if (relativeTime === "Tomorrow") widgetHeader = "Tomorrow's Event";
 
     return (
-        <div className="h-auto sm:h-full w-full pt-1 pb-20 sm:pb-0 animate-fade-in-up">
-            <div className="flex flex-col sm:h-full gap-4">
+        <div className="h-auto md:h-full w-full pt-1 pb-4 md:pb-0 animate-fade-in-up">
+            <div className="flex flex-col md:h-full gap-4">
 
                 {/* TOP SECTION */}
-                <div className="flex-none sm:flex-[3] flex flex-col sm:flex-row gap-4 sm:min-h-0">
+                <div className="flex-none md:flex-[3] flex flex-col md:flex-row gap-4 md:min-h-0">
                     <WelcomeCard
                         user={user}
                         quote={quote}
@@ -248,7 +248,7 @@ export default function StudentHome() {
                         loadingQuote={quoteLoading}
                     />
 
-                    <div className="flex-none sm:flex-[2] flex flex-col gap-4">
+                    <div className="flex-none md:flex-[2] flex flex-col gap-4">
                         <EventWidget
                             nextEvent={nextEvent}
                             loadingEvent={loadingEvent}
@@ -271,7 +271,7 @@ export default function StudentHome() {
                 </div>
 
                 {/* BOTTOM SECTION */}
-                <div className="flex-none sm:flex-[2] flex flex-col sm:flex-row gap-4 sm:min-h-0">
+                <div className="flex-none md:flex-[2] flex flex-col md:flex-row gap-4 md:min-h-0">
                     <QuickTodosWidget
                         quickTodos={quickTodos}
                         animatingIds={animatingIds}
