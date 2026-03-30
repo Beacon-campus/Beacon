@@ -170,7 +170,7 @@ export default function UserModal({ isOpen, onClose, mode, user, onRefresh }) {
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="John Doe"
+                                    placeholder="Duke Dennis"
                                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 />
                             </div>

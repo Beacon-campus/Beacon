@@ -31,6 +31,16 @@ export const createFirestoreUser = async (uid, data) => {
   });
 };
 
+export const updateFirestoreUser = async (uid, data) => {
+  await admin.firestore().collection("users").doc(uid).set(
+    {
+      ...data,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+};
+
 export const deleteFirestoreUser = async (uid) => {
   await admin.firestore().collection("users").doc(uid).delete();
 };
