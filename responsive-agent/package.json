@@ -1,0 +1,21 @@
+{
+  "name": "responsive-agent",
+  "version": "1.0.0",
+  "description": "AI Agent that analyzes frontend codebases and fixes responsiveness issues",
+  "type": "module",
+  "bin": {
+    "responsive-agent": "./bin/cli.js"
+  },
+  "scripts": {
+    "analyze": "node bin/cli.js analyze",
+    "fix": "node bin/cli.js fix",
+    "report": "node bin/cli.js report"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "glob": "^10.3.10",
+    "postcss": "^8.4.38",
+    "postcss-scss": "^4.0.9"
+  }
+}
