@@ -40,7 +40,7 @@ export default function ProfileCard({ user, profileData, onClose }) {
   const gradientClass = BANNER_COLORS[colorKey] || BANNER_COLORS.default;
 
   return (
-    <div className="w-[340px] bg-white rounded-[30px] overflow-hidden font-sans text-gray-800 shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] border border-gray-100 relative group transition-all hover:shadow-[0_25px_50px_-10px_rgba(0,0,0,0.15)]">
+    <div className="w-full max-w-[340px] bg-white rounded-[30px] overflow-hidden font-sans text-gray-800 shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] border border-gray-100 relative group transition-all hover:shadow-[0_25px_50px_-10px_rgba(0,0,0,0.15)]">
       
       {/* --- BANNER (Custom Tint) --- */}
       <div 

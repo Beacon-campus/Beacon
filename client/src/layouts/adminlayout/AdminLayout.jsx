@@ -7,9 +7,21 @@ import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
 export default function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
   const [isHovered, setIsHovered] = useState(false);
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getLinkClass = ({ isActive }) => {
     const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative border-l-4 rounded-lg`;
@@ -68,10 +80,18 @@ export default function AdminLayout() {
         <div className="absolute top-[20%] right-[-5%] w-[35%] h-[40%] bg-green-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[40%] h-[40%] bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-50 animate-blob animation-delay-4000"></div>
 
+        {/* Mobile Overlay */}
+        {!collapsed && (
+          <div 
+            className="fixed inset-0 bg-black/20 z-40 md:hidden backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setCollapsed(true)}
+          />
+        )}
+
         {/* Sidebar */}
         <div
-          className={`fixed top-4 bottom-4 left-4 z-50 ${collapsed ? "w-20" : "w-56"
-            } glass-panel rounded-3xl p-4 flex flex-col justify-between transition-all duration-300`}
+          className={`fixed top-4 bottom-4 left-4 z-50 ${collapsed ? "-translate-x-[150%] md:translate-x-0 md:w-20" : "translate-x-0 w-[calc(100%-2rem)] md:w-56"
+            } glass-panel rounded-3xl p-4 flex flex-col justify-between transition-all duration-300 shadow-2xl md:shadow-none`}
         >
             <div className="flex flex-col h-full">
 
@@ -271,9 +291,17 @@ export default function AdminLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
-            <div className="px-6 pt-4 pb-0">
-              <Navbar />
+          <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "md:ml-28" : "md:ml-64"} ml-0`}>
+            <div className="px-4 md:px-6 pt-4 pb-0 flex items-center gap-3">
+              <button 
+                className="md:hidden glass-panel p-2 rounded-xl text-gray-600 hover:text-primary transition-colors focus:outline-none z-10"
+                onClick={() => setCollapsed(false)}
+              >
+                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
+                  <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z" />
+                </svg>
+              </button>
+              <div className="flex-1 min-w-0"><Navbar /></div>
             </div>
 
             <div className="flex-1 px-6 pb-6 overflow-hidden flex flex-col">

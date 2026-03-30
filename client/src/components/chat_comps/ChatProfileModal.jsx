@@ -79,7 +79,7 @@ export default function ChatProfileModal({ user, onClose, onUnfriend, role }) {
            <div className="relative pointer-events-auto">
              {/* LOADING STATE */}
              {loading ? (
-                <div className="w-[340px] h-[400px] bg-white rounded-[30px] flex items-center justify-center shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)]">
+                <div className="w-full max-w-[340px] h-[400px] bg-white rounded-[30px] flex items-center justify-center shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)]">
                     <LoadingState size="sm" />
                 </div>
              ) : (

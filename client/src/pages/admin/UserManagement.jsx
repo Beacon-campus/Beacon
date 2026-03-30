@@ -196,75 +196,77 @@ export default function UserManagement() {
                         <p className="text-sm">Try adjusting your filters or search criteria</p>
                     </div>
                 ) : (
-                    <table className="w-full text-left border-collapse">
-                        <thead className="sticky top-0 bg-white shadow-[0_1px_0_rgba(229,231,235,1)] z-10">
-                            <tr>
-                                <th className="px-8 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Register No.</th>
-                                <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Name</th>
-                                {activeTab === "student" && (
-                                    <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Semester</th>
-                                )}
-                                <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Status</th>
-                                <th className="px-8 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {paginatedUsers.map((u) => (
-                                <tr key={u._id} className="hover:bg-gray-50/80 transition-colors group">
-
-                                    {/* Register No. */}
-                                    <td className="px-8 py-4 whitespace-nowrap">
-                                        <span className="text-sm font-bold text-gray-600 tracking-wide">
-                                            {u.regno}
-                                        </span>
-                                    </td>
-
-                                    {/* Name & Email & Temp Pass Context */}
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-sm font-bold text-gray-800">{u.displayName}</span>
-                                            <span className="text-xs font-medium text-gray-400">{u.email}</span>
-                                        </div>
-                                    </td>
-
-                                    {/* Semester / Department */}
+                    <div className="w-full overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead className="sticky top-0 bg-white shadow-[0_1px_0_rgba(229,231,235,1)] z-10">
+                                <tr>
+                                    <th className="px-8 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Register No.</th>
+                                    <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Name</th>
                                     {activeTab === "student" && (
+                                        <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Semester</th>
+                                    )}
+                                    <th className="px-4 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase">Status</th>
+                                    <th className="px-8 py-4 text-[10px] font-black tracking-widest text-gray-400 uppercase text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {paginatedUsers.map((u) => (
+                                    <tr key={u._id} className="hover:bg-gray-50/80 transition-colors group">
+
+                                        {/* Register No. */}
+                                        <td className="px-8 py-4 whitespace-nowrap">
+                                            <span className="text-sm font-bold text-gray-600 tracking-wide">
+                                                {u.regno}
+                                            </span>
+                                        </td>
+
+                                        {/* Name & Email & Temp Pass Context */}
                                         <td className="px-4 py-4 whitespace-nowrap">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-gray-600">
-                                                    {u.role === 'student' ? (u.semester ? `Sem ${u.semester}` : 'N/A') : 'N/A'}
-                                                </span>
-                                                {/* Optionally show course/department below it if not 'All' */}
-                                                <span className="text-xs font-medium text-gray-400 truncate max-w-[150px]">
-                                                    {u.course || 'N/A'}
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-sm font-bold text-gray-800">{u.displayName}</span>
+                                                <span className="text-xs font-medium text-gray-400">{u.email}</span>
+                                            </div>
+                                        </td>
+
+                                        {/* Semester / Department */}
+                                        {activeTab === "student" && (
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-gray-600">
+                                                        {u.role === 'student' ? (u.semester ? `Sem ${u.semester}` : 'N/A') : 'N/A'}
+                                                    </span>
+                                                    {/* Optionally show course/department below it if not 'All' */}
+                                                    <span className="text-xs font-medium text-gray-400 truncate max-w-[150px]">
+                                                        {u.course || 'N/A'}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        )}
+
+                                        {/* Status */}
+                                        <td className="px-4 py-4 whitespace-nowrap">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full ${u.disabled ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+                                                <span className={`text-xs font-bold ${u.disabled ? 'text-red-600' : 'text-emerald-600'}`}>
+                                                    {u.disabled ? 'Disabled' : 'Active'}
                                                 </span>
                                             </div>
                                         </td>
-                                    )}
 
-                                    {/* Status */}
-                                    <td className="px-4 py-4 whitespace-nowrap">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${u.disabled ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
-                                            <span className={`text-xs font-bold ${u.disabled ? 'text-red-600' : 'text-emerald-600'}`}>
-                                                {u.disabled ? 'Disabled' : 'Active'}
-                                            </span>
-                                        </div>
-                                    </td>
-
-                                    {/* Action */}
-                                    <td className="px-8 py-4 whitespace-nowrap text-right">
-                                        <button
-                                            onClick={() => setModalState({ isOpen: true, mode: "edit", user: u })}
-                                            className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-primary shadow-sm active:scale-95"
-                                        >
-                                            Manage
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        {/* Action */}
+                                        <td className="px-8 py-4 whitespace-nowrap text-right">
+                                            <button
+                                                onClick={() => setModalState({ isOpen: true, mode: "edit", user: u })}
+                                                className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all border bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-primary shadow-sm active:scale-95"
+                                            >
+                                                Manage
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
 
