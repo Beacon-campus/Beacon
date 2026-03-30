@@ -658,7 +658,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
           disabled={isSubmitting}
           className="w-full py-3.5 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl transition-all disabled:opacity-60"
         >
-          {isSubmitting ? "Publishing..." : "Assignments"}
+          {isSubmitting ? "Publishing..." : "Publish Assignment"}
         </button>
       </div>
 

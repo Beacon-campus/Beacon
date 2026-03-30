@@ -237,3 +237,117 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ========================================================= */
+/* BEACON LOADING SPINNER — Premium "Spin to Suit" System    */
+/* ========================================================= */
+
+/* 1. Guided Spin — cubic-bezier easing for premium feel */
+@keyframes beacon-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 2. Arc Grow/Shrink — green segment lengthens then shrinks */
+@keyframes beacon-arc {
+  0%   { stroke-dasharray: 1, 200;   stroke-dashoffset: 0; }
+  50%  { stroke-dasharray: 89, 200;  stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 1, 200;   stroke-dashoffset: -124; }
+}
+
+/* 3. Ring Scale Pulse — subtle breathing effect */
+@keyframes beacon-scale-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+/* 4. Beacon Flash — amber gold pulse at center */
+@keyframes beacon-flash {
+  0%, 80%, 100% { opacity: 0; transform: scale(0.3); }
+  90%           { opacity: 1; transform: scale(1);    }
+}
+
+/* 5. Glow Ring — outer halo soft pulse */
+@keyframes beacon-glow {
+  0%, 100% { opacity: 0.15; filter: blur(8px); }
+  50%      { opacity: 0.35; filter: blur(12px); }
+}
+
+/* 6. Full-screen mesh gradient background */
+@keyframes mesh-drift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.beacon-mesh-bg {
+  background: linear-gradient(
+    135deg,
+    #06b6d4 0%,       /* cyan-500 */
+    #a78bfa 25%,       /* violet-400 */
+    #f59e0b 50%,       /* amber-500 */
+    #a78bfa 75%,       /* violet-400 */
+    #06b6d4 100%       /* cyan-500 */
+  );
+  background-size: 400% 400%;
+  animation: mesh-drift 12s ease infinite;
+}
+
+/* Soft, pastel mesh background for transitions */
+.soft-mesh-bg {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 100% 0%, rgba(187, 247, 208, 0.4) 0px, transparent 50%), 
+    radial-gradient(at 100% 100%, rgba(216, 180, 254, 0.3) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(199, 210, 254, 0.3) 0px, transparent 50%);
+  background-size: 100% 100%;
+}
+
+/* Spinner container classes */
+.beacon-spinner-container {
+  animation: beacon-scale-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.beacon-spinner-rotation {
+  animation: beacon-spin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center center;
+}
+
+.beacon-spinner-track {
+  stroke: #0f172a;
+  stroke-opacity: 0.15;
+}
+
+.beacon-spinner-arc {
+  stroke: #7EF640;
+  animation: beacon-arc 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(126, 246, 64, 0.4));
+}
+
+.beacon-flash-dot {
+  animation: beacon-flash 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.beacon-glow-ring {
+  animation: beacon-glow 2s ease-in-out infinite;
+}
+
+/* Skeleton Loading Patterns */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+.skeleton-dark {
+  background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+}

@@ -27,7 +27,8 @@ import toast from "react-hot-toast";
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import studentLottie from '../assets/loading/STUDENT.lottie';
 import { preloadAsset } from "../utils/preloadAsset";
-import LoadingState from "../components/ui/LoadingState";
+import { LoginSkeleton } from "../components/ui/LayoutSkeleton";
+import axios from "axios";
 
 preloadAsset(studentLottie, {
   as: "fetch",
@@ -280,11 +281,7 @@ export default function Login() {
   };
 
   if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <LoadingState size="lg" />
-      </div>
-    );
+    return <LoginSkeleton />;
   }
 
   /* ================= UI RENDER ================= */
