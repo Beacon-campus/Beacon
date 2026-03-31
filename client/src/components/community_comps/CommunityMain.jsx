@@ -225,17 +225,19 @@ export default function Community({ role }) {
 
   return (
     <div className="w-full h-full relative flex flex-col bg-white overflow-hidden min-[769px]:rounded-2xl min-[769px]:border min-[769px]:border-gray-100 min-[769px]:shadow-sm">
-      {/* Mobile/Tablet top header — shows "Classroom" title + toggle side by side */}
-      <div className="shrink-0 px-4 pt-4 pb-3 min-[426px]:px-5 min-[426px]:pt-5 min-[426px]:pb-4 min-[769px]:hidden bg-white border-b border-gray-100 flex items-center justify-between gap-3">
-        <h1 className="text-[24px] font-black tracking-tight text-[#0F172A]">Classroom</h1>
-        {role === 'student' && isClassView && (
-          <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 shrink-0">
-            <div className={`absolute top-1 bottom-1 w-[72px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[72px]' : 'translate-x-0'}`} />
-            <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
-            <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
-          </div>
-        )}
-      </div>
+      {/* Mobile/Tablet top header for students — shows "Classroom" title + toggle side by side */}
+      {role === 'student' && (
+        <div className="shrink-0 px-4 pt-4 pb-3 min-[426px]:px-5 min-[426px]:pt-5 min-[426px]:pb-4 min-[769px]:hidden bg-white border-b border-gray-100 flex items-center justify-between gap-3">
+          <h1 className="text-[1.4rem] font-black tracking-tight text-primary leading-tight">Classroom</h1>
+          {isClassView && (
+            <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 shrink-0">
+              <div className={`absolute top-1 bottom-1 w-[72px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[72px]' : 'translate-x-0'}`} />
+              <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
+              <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
+            </div>
+          )}
+        </div>
+      )}
 
       {role === "teacher" && teacherViewMode === "list" && (
         <TeacherClassList
@@ -251,11 +253,11 @@ export default function Community({ role }) {
             className="shrink-0 px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:py-4 min-[769px]:px-5 bg-white border-b border-gray-100 flex items-center justify-between gap-3 cursor-pointer group"
             onClick={() => setShowInfoModal(true)}
           >
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex-1 flex items-center gap-2 min-w-0">
               {role === 'teacher' && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setTeacherViewMode("list"); }}
-                  className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1 shrink-0"
+                  className="p-1.5 -ml-1 hover:bg-gray-100 rounded-full transition-colors shrink-0"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                 </button>
@@ -264,11 +266,11 @@ export default function Community({ role }) {
                 <img src={BookIcon} className="w-5 h-5 object-contain opacity-80" alt="Logo" />
               </div>
               <div className="flex flex-col items-start gap-0.5 min-w-0">
-                <div className="flex items-center gap-1.5 max-w-full">
-                  <h2 className="text-[14px] min-[426px]:text-sm font-black text-gray-800 leading-tight truncate group-hover:text-black transition-colors">{activeClassroom?.name || "Classroom"}</h2>
-                  <div className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-serif font-bold italic shrink-0 transition-all group-hover:border-black group-hover:text-black">i</div>
-                </div>
-                {role === 'teacher' ? (
+                <h2 className="text-[14px] min-[426px]:text-sm font-black text-gray-800 leading-tight truncate group-hover:text-black transition-colors">
+                  <span className="hidden min-[376px]:inline">{activeClassroom?.name || "Classroom"}</span>
+                  <span className="min-[376px]:hidden">{(activeClassroom?.name || "Classroom").replace(/\s*-\s*Official$/, "")}</span>
+                </h2>
+                {role === 'teacher' && (
                   teacherSubjectsLoading ? (
                     <LoadingState
                       size="xs"
@@ -277,10 +279,11 @@ export default function Community({ role }) {
                       messageClassName="text-[10px] font-bold text-gray-400 uppercase tracking-wider"
                     />
                   ) : (
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors">YOU ARE TEACHING {teacherSubjects}</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors">
+                      <span className="hidden min-[376px]:inline">YOU ARE TEACHING {teacherSubjects}</span>
+                      <span className="min-[376px]:hidden">YOU TEACH {teacherSubjects}</span>
+                    </span>
                   )
-                ) : (
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors">Tap to view info</span>
                 )}
               </div>
             </div>

@@ -17,7 +17,7 @@ const getClassroomColor = (id) => {
 export default function TeacherClassList({ classes, onSelect }) {
   return (
     <div className="px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-6 h-full overflow-y-auto no-scrollbar">
-        <h2 className="text-xl min-[426px]:text-2xl font-bold text-gray-800 mb-4 min-[769px]:mb-6">Classrooms</h2>
+        <h1 className="text-[1.4rem] min-[769px]:text-2xl font-black min-[769px]:font-bold tracking-tight text-primary min-[769px]:text-gray-800 leading-tight mb-4 min-[769px]:mb-6">Classrooms</h1>
         {classes.length === 0 ? (
             <p className="text-gray-400">No official classrooms found.</p>
         ) : (

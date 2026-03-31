@@ -65,7 +65,7 @@ export default function Groups() {
             {/* SIDEBAR: Project List */}
             <div className={`${showListPane ? "flex" : "hidden"} ${isCompactView ? "w-full" : "w-80"} border-r border-gray-100 flex-col bg-gray-50/20`}>
                 <div className="px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                    <h2 className="text-[24px] min-[769px]:text-lg font-black text-[#0F172A] min-[769px]:text-gray-800 tracking-tight min-[769px]:uppercase min-[769px]:tracking-tighter">Groups</h2>
+                    <h2 className="text-[1.4rem] min-[769px]:text-lg font-black text-primary min-[769px]:text-gray-800 tracking-tight leading-tight min-[769px]:uppercase min-[769px]:tracking-tighter">Groups</h2>
                     <button
                         onClick={() => setShowCreate(true)}
                         className="group/plus w-9 h-9 bg-transparent border-2 border-[#0F172A] text-[#0F172A] hover:bg-[#0F172A] hover:text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
@@ -142,38 +142,26 @@ export default function Groups() {
                 ) : (
                     <>
                         <div
-                            className="shrink-0 h-[72px] min-[769px]:h-[76px] bg-white border-b border-gray-100 flex items-center px-4 min-[426px]:px-5 min-[769px]:px-6 cursor-pointer group"
+                            className="shrink-0 h-[68px] min-[769px]:h-[72px] bg-white border-b border-gray-100 flex items-center px-3 min-[426px]:px-4 min-[769px]:px-5 cursor-pointer group gap-2.5"
                             onClick={() => setShowInfo(true)}
                         >
                             {isCompactView && (
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setActiveGroupId(null); }}
-                                    className="p-2 -ml-2 mr-2 rounded-full hover:bg-gray-100 transition-colors shrink-0"
+                                    className="p-1.5 -ml-1 rounded-full hover:bg-gray-100 transition-colors shrink-0"
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                                 </button>
                             )}
-                            <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-black/5 shadow-inner shrink-0 transition-transform group-hover:scale-105">
+                            <div className="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-black/5 shadow-inner shrink-0 transition-transform group-hover:scale-105">
                                 <span className="font-black text-black/30 text-sm uppercase">
                                     {activeGroup?.name?.[0]}
                                 </span>
                             </div>
-                            <div className="flex flex-col ml-4 min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                    <h2 className="text-sm font-black text-gray-800 leading-tight truncate group-hover:text-black transition-colors">
-                                        {activeGroup?.name}
-                                    </h2>
-                                    <div className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-serif font-bold italic shrink-0 transition-all group-hover:border-black group-hover:text-black">i</div>
-                                </div>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
-                                        {activeGroup?.participants?.length} Members
-                                    </span>
-                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider truncate group-hover:text-gray-700 transition-colors">
-                                        Goal: {activeGroup?.goal}
-                                    </span>
-                                </div>
+                            <div className="flex flex-col min-w-0 justify-center">
+                                <h2 className="text-[16px] min-[769px]:text-[18px] font-black min-[769px]:font-bold text-gray-800 leading-tight truncate group-hover:text-black transition-colors">
+                                    {activeGroup?.name}
+                                </h2>
                             </div>
                         </div>
 

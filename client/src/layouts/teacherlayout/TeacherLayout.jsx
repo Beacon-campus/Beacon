@@ -17,8 +17,10 @@ export default function TeacherLayout() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState("home"); // "home" | "community"
+  const [breadcrumbExtra, setBreadcrumbExtra] = useState([]);
 
   const isCommunity = location.pathname.startsWith("/teacher/community");
+
 
   const getLinkClass = ({ isActive }) => {
     const base = `flex items-center ${collapsed ? "justify-center w-10 h-10 p-0 mx-auto" : "gap-2.5 px-3.5 py-2"} text-sm font-medium transition-all duration-200 group relative border-l-4 rounded-lg`;
@@ -406,11 +408,11 @@ export default function TeacherLayout() {
 
           <div className="flex-1 px-6 max-[768px]:px-0 pb-6 max-[768px]:pb-0 overflow-hidden flex flex-col">
             <div className="shrink-0 mb-3 pb-0 hidden min-[769px]:block">
-              <Breadcrumb />
+              <Breadcrumb extra={breadcrumbExtra} />
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto w-full no-scrollbar flex flex-col bg-transparent" style={{ backgroundColor: "transparent" }}>
-              <Outlet />
+              <Outlet context={{ setBreadcrumbExtra }} />
             </div>
           </div>
         </div>
