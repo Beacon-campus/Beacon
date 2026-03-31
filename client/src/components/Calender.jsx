@@ -861,14 +861,21 @@ export default function Calendar() {
     </section>
   );
 
-  const compactCalendarOverlay = isMobileView && showCalendar ? (
+  const compactCalendarOverlay = isCompactView && showCalendar ? (
     <div className="fixed inset-0 z-[140] bg-white flex flex-col">
-      <div className="shrink-0 border-b border-gray-100 px-4 py-3 flex items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-black text-primary truncate">Calendar</h2>
-          <p className="text-xs font-medium text-gray-500">Full schedule</p>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="shrink-0 border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            onClick={() => { setShowCalendar(false); setActiveCell(null); }}
+            className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-600 flex items-center justify-center shadow-sm"
+            aria-label="Back to calendar"
+          >
+            <ChevronLeftIcon className="w-5 h-5" />
+          </button>
+          <div className="min-w-0 flex-1 text-center">
+            <h2 className="text-lg font-black text-primary truncate">Calendar</h2>
+            <p className="text-xs font-medium text-gray-500">Full schedule</p>
+          </div>
           <button
             onClick={handleDownloadPdf}
             disabled={isDownloading}
@@ -877,35 +884,19 @@ export default function Calendar() {
           >
             <DownloadIcon />
           </button>
-          <button
-            onClick={() => { setShowCalendar(false); setActiveCell(null); }}
-            className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-600 flex items-center justify-center shadow-sm"
-            aria-label="Close calendar"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
         </div>
-      </div>
 
-      <div className="shrink-0 px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-3">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-1 flex items-center gap-1">
+        <div className="mt-3 flex justify-center">
           <button
-            onClick={() => setViewMode("grid")}
-            className={`px-4 h-10 rounded-[18px] text-sm font-bold transition-colors ${viewMode === "grid" ? "bg-slate-900 text-white shadow-sm" : "text-gray-600"}`}
+            onClick={() => setViewMode((prev) => prev === "grid" ? "calendar" : "grid")}
+            className="px-4 h-10 rounded-2xl border border-gray-200 bg-white text-sm font-bold text-gray-700 shadow-sm"
           >
-            Grid View
-          </button>
-          <button
-            onClick={() => setViewMode("calendar")}
-            className={`px-4 h-10 rounded-[18px] text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-slate-900 text-white shadow-sm" : "text-gray-600"}`}
-          >
-            Document View
+            {viewMode === "grid" ? "Docs View" : "Grid View"}
           </button>
         </div>
+
         {viewMode === "grid" && (
-          <div className="flex items-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-3">
             <button
               onClick={() => {
                 const next = new Date(currentDate);
@@ -917,8 +908,8 @@ export default function Calendar() {
             >
               <ChevronLeftIcon />
             </button>
-            <div className="text-center min-w-[120px]">
-              <p className="text-sm font-black text-primary">{currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+            <div className="text-center min-w-[148px]">
+              <p className="text-sm min-[426px]:text-base font-black text-primary">{currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
             </div>
             <button
               onClick={() => {
@@ -935,15 +926,15 @@ export default function Calendar() {
         )}
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden bg-gray-50">
+      <div className="flex-1 overflow-y-auto bg-white">
         {viewMode === "grid" ? (
-          <div className="h-full p-3 flex flex-col">
-            <div className="grid grid-cols-7 gap-1 px-1 pb-2">
+          <div className="p-4">
+            <div className="grid grid-cols-7 border border-gray-200 overflow-hidden">
               {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
-                <div key={day} className="text-[10px] font-black text-center text-gray-400 tracking-[0.18em]">{day}</div>
+                <div key={day} className="bg-white py-2 text-[11px] min-[426px]:text-[12px] font-black text-center text-gray-400 tracking-widest border-r last:border-r-0 border-gray-200">{day}</div>
               ))}
             </div>
-            <div className="grid grid-cols-7 gap-1 auto-rows-fr flex-1 min-h-0">
+            <div className="grid grid-cols-7 auto-rows-fr border-x border-b border-gray-200 overflow-hidden">
               {(() => {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
@@ -971,7 +962,7 @@ export default function Calendar() {
                       type="button"
                       disabled={!isActualDay}
                       onClick={() => isActualDay && setActiveCell(activeCell === i ? null : i)}
-                      className={`min-h-[56px] rounded-xl border px-2 py-1.5 text-left align-top transition-all ${isActualDay ? "bg-white border-gray-200" : "opacity-0 pointer-events-none"} ${isToday ? "!bg-emerald-500 !border-emerald-600 text-white" : "text-gray-700"}`}
+                      className={`min-h-[64px] min-[426px]:min-h-[74px] px-2 py-2 text-left align-top transition-colors border-r border-b last:border-r-0 border-gray-200 ${isActualDay ? "bg-white" : "opacity-0 pointer-events-none"} ${isToday ? "!bg-emerald-500 text-white" : "text-gray-700 hover:bg-gray-50"}`}
                     >
                       <div className="text-xs font-black">{dayNumber}</div>
                       {count > 0 && (
@@ -985,7 +976,7 @@ export default function Calendar() {
               })()}
             </div>
             {activeCell !== null && (
-              <div className="mt-3 rounded-[24px] border border-gray-200 bg-white p-4 shadow-sm overflow-y-auto max-h-[34vh]">
+              <div className="mt-4 pb-4">
                 {(() => {
                   const year = currentDate.getFullYear();
                   const month = currentDate.getMonth();
@@ -1003,9 +994,9 @@ export default function Calendar() {
                   }
 
                   return (
-                    <div className="space-y-2.5">
+                    <div className="space-y-3">
                       {items.map((item, idx) => (
-                        <div key={idx} className={`rounded-2xl border border-gray-100 bg-gray-50 p-3 ${item.isTodo ? "border-l-4 border-l-slate-900" : getEventBorderColor(item.type)}`}>
+                        <div key={idx} className={`border-l-4 pl-3 py-1 ${item.isTodo ? "border-l-slate-900" : item.type === "Exam" ? "border-l-amber-500" : item.type === "Community" || item.type === "Event" || item.type === "Holiday" ? "border-l-emerald-500" : "border-l-slate-900"}`}>
                           <p className="text-sm font-bold text-gray-800">{item.title}</p>
                           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400 mt-1">{item.type}</p>
                           {item.description && <p className="text-xs text-gray-500 mt-2">{item.description}</p>}
@@ -1018,13 +1009,13 @@ export default function Calendar() {
             )}
           </div>
         ) : (
-          <div className="h-full overflow-auto soft-scrollbar p-3">
+          <div className="h-full overflow-auto soft-scrollbar p-4">
             {cachedImages.isLoading ? (
               <div className="h-full flex items-center justify-center"><LoadingState size="md" /></div>
             ) : (cachedImages.odd && cachedImages.even) ? (
-              <div className="flex flex-col gap-5 pb-12">
-                <img src={cachedImages.odd} alt="Odd Semester Calendar" className="w-full rounded-[24px] border border-gray-200 bg-white shadow-sm" />
-                <img src={cachedImages.even} alt="Even Semester Calendar" className="w-full rounded-[24px] border border-gray-200 bg-white shadow-sm" />
+              <div className="flex flex-col gap-5 pb-8">
+                <img src={cachedImages.odd} alt="Odd Semester Calendar" className="w-full border border-gray-200 bg-white" />
+                <img src={cachedImages.even} alt="Even Semester Calendar" className="w-full border border-gray-200 bg-white" />
               </div>
             ) : (
               <div className="h-full flex items-center justify-center text-gray-400">Failed to load calendar documents.</div>
@@ -1198,7 +1189,7 @@ export default function Calendar() {
 
       )}
 
-      {!isMobileView && (
+      {!isCompactView && (
       <Modal
         isOpen={showCalendar}
         onClose={() => { setShowCalendar(false); setActiveCell(null); }}

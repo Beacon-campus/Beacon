@@ -25,6 +25,7 @@ export default function Notifications() {
   const [filter, setFilter] = useState("all"); // "all" | "friend_request"
   const [loading, setLoading] = useState(true);
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -158,6 +159,14 @@ export default function Notifications() {
       .finally(() => setLoading(false));
     fetchPendingFriendRequests(true);
   }, [fetchNotificationsAll, currentUserInfo?._id, currentUserInfo?.role, fetchPendingFriendRequests]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleChange = (event) => setIsCompactView(event.matches);
+    setIsCompactView(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     const nonFriendNotifications = (notificationsAll || []).filter(
@@ -356,24 +365,25 @@ export default function Notifications() {
   }
 
   return (
-    <div className="min-h-full h-auto min-[769px]:h-full w-full p-2">
-      <div className="min-h-full min-[769px]:h-full w-full premium-card p-4 min-[426px]:p-5 min-[769px]:p-6 flex flex-col gap-5 min-[769px]:gap-6 overflow-hidden">
+    <div className={`min-h-full h-auto min-[769px]:h-full w-full ${isCompactView ? "p-0" : "p-2"}`}>
+      <div className={`min-h-full min-[769px]:h-full w-full ${isCompactView ? "bg-transparent p-4 max-[425px]:px-3 max-[425px]:pt-3 max-[425px]:pb-4" : "premium-card p-4 min-[426px]:p-5 min-[769px]:p-6"} flex flex-col gap-5 min-[769px]:gap-6 overflow-hidden`}>
 
         {/* ================= HEADER ================= */}
         <div className="flex flex-col gap-4 pb-4 border-b border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <BellIcon />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 leading-none">Notifications</h1>
-                <p className="text-xs text-gray-500 mt-1">You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
-              </div>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 leading-none">Notifications</h1>
+              <p className="text-xs text-gray-500 mt-1">You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
             </div>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-3 min-[426px]:gap-4">
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={deleteAllNotifications}
+                className="flex items-center justify-center gap-2 px-3 min-[400px]:px-4 h-10 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all w-auto">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"></path></svg>
+                <span className="hidden min-[400px]:inline">Delete all</span>
+              </button>
+
             {/* ================= ICON-ONLY PILL FILTERS ================= */}
             {!isTeacher && (
               <div className="bg-gray-100 p-1 rounded-full flex items-center shadow-inner gap-1">
@@ -400,13 +410,7 @@ export default function Notifications() {
                 )}
               </div>
             )}
-
-            <button
-              onClick={deleteAllNotifications}
-              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all w-full min-[426px]:w-auto">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              Delete all
-            </button>
+            </div>
           </div>
         </div>
 
