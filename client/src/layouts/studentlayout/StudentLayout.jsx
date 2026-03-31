@@ -19,6 +19,7 @@ export default function StudentLayout() {
   const [mobileTab, setMobileTab] = useState("home"); // "home" | "community"
 
   const isCommunity = location.pathname.startsWith("/student/community");
+  const homeMobileContentPadding = isCommunity ? "max-[768px]:px-3 max-[425px]:px-2" : "max-[768px]:px-0";
 
 
   const getLinkClass = ({ isActive }) => {
@@ -391,11 +392,11 @@ export default function StudentLayout() {
 
           {/* Content Area */}
           <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "min-[769px]:ml-28 ml-0" : "min-[769px]:ml-64 ml-0"} pb-20 min-[769px]:pb-0 pt-[64px] min-[769px]:pt-0`}>
-            <div className="px-6 pt-4 pb-0 max-[768px]:px-3 max-[425px]:px-2">
+            <div className={`px-6 pt-4 pb-0 max-[768px]:px-0 max-[768px]:pt-0 ${isCommunity ? "max-[768px]:px-3 max-[425px]:px-2 max-[768px]:pt-4" : ""}`}>
               <Navbar />
             </div>
 
-            <div className="flex-1 px-6 max-[768px]:px-3 max-[425px]:px-2 pb-6 overflow-hidden flex flex-col">
+            <div className={`flex-1 px-6 max-[768px]:px-0 ${isCommunity ? "max-[768px]:px-3 max-[425px]:px-2" : ""} pb-6 max-[768px]:pb-0 overflow-hidden flex flex-col`}>
               <div className="shrink-0 mb-3 pb-0 hidden min-[769px]:block">
                 <Breadcrumb />
               </div>

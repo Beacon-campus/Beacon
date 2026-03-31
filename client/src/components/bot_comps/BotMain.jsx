@@ -44,12 +44,14 @@ export default function Bot() {
   // ✅ NEW: Inline Editing State (Replaces prompt)
   const [editingId, setEditingId] = useState(null); // Which chat ID is being edited?
   const [editValue, setEditValue] = useState("");   // The text being typed
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
 
   const bottomRef = useRef(null);
   const WARNING_THRESHOLD = 14 * 1024 * 1024; // 14 MB
 
   const botType = user?.role === "teacher" ? "teacher" : "student";
-  const botName = botType === "teacher" ? "Research Assistant" : "Study Bot";
+  const botName = botType === "teacher" ? "Research Bot" : "Study Bot";
   const userCacheKey = user?.uid || "guest";
 
   /* ================= HELPERS ================= */
@@ -70,6 +72,20 @@ export default function Bot() {
       });
     }
   }, [messages, loading]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleChange = (event) => {
+      setIsCompactView(event.matches);
+      if (!event.matches) {
+        setShowHistoryDrawer(false);
+      }
+    };
+
+    setIsCompactView(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   /* ================= LOAD HISTORY ================= */
   const fetchHistory = async (force = false) => {
@@ -249,11 +265,11 @@ export default function Bot() {
   return (
     <>
 
-    <div className="relative w-full h-full">
-      <div className="absolute inset-0 premium-card flex overflow-hidden">
+    <div className="relative w-full min-h-full h-auto min-[769px]:h-full">
+      <div className={`absolute inset-0 flex flex-col min-[769px]:flex-row overflow-hidden ${isCompactView ? "bg-transparent" : "premium-card"}`}>
 
         {/* ================= LEFT PANEL ================= */}
-        <div className="w-64 bg-gray-50 p-5 flex flex-col gap-6 border-r border-gray-100">
+        <div className={`w-full min-[769px]:w-64 bg-gray-50 p-4 min-[426px]:p-5 flex flex-col gap-4 min-[769px]:gap-6 border-b min-[769px]:border-b-0 min-[769px]:border-r border-gray-100 max-h-[220px] min-[769px]:max-h-none ${isCompactView ? "hidden" : ""}`}>
 
           <div className="flex items-center gap-3 px-2">
             <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
@@ -275,7 +291,7 @@ export default function Bot() {
           </button>
 
           {/* History List */}
-          <div className="flex-1 overflow-y-auto soft-scrollbar pr-1">
+          <div className="flex-1 overflow-y-auto soft-scrollbar pr-1 min-h-0">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">Recent</p>
             <div className="space-y-1">
               {history.map((chat) => (
@@ -331,14 +347,25 @@ export default function Bot() {
         </div>
 
         {/* ================= RIGHT PANEL ================= */}
-        <div className="flex-1 flex flex-col bg-white relative">
+        <div className={`flex-1 flex flex-col bg-white relative min-h-0 border border-gray-200 shadow-sm overflow-hidden ${isCompactView ? "rounded-none border-0 shadow-none" : "rounded-[28px] min-[769px]:rounded-none min-[769px]:border-0 min-[769px]:shadow-none"}`}>
 
           {/* Chat Header */}
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
-            <h2 className="text-lg font-bold text-gray-800">
-              {sessionId ? (history.find(h => h._id === sessionId)?.title || "Chat Session") : "New Conversation"}
-            </h2>
-            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm">
+          <div className="px-4 min-[426px]:px-5 min-[769px]:px-6 py-3.5 min-[769px]:py-4 border-b border-gray-100 flex items-center justify-between gap-3 bg-white/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              {isCompactView && (
+                <button
+                  onClick={() => setShowHistoryDrawer(true)}
+                  className="h-10 flex items-center justify-center text-gray-600 shrink-0 px-1"
+                  aria-label="Open chat history"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7h16M4 12h16M4 17h16" />
+                  </svg>
+                </button>
+              )}
+              <h2 className="text-[1.4rem] font-black text-primary tracking-tight truncate">{botName}</h2>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] min-[426px]:text-xs text-gray-500 font-semibold bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm whitespace-nowrap">
               <ClockIcon />
               <span>Deletes in {getDaysRemaining()} days</span>
             </div>
@@ -346,8 +373,8 @@ export default function Bot() {
 
           {/* Warning */}
           {docSize > WARNING_THRESHOLD && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 animate-in slide-in-from-top-4 fade-in duration-300">
-              <div className="bg-amber-50 border border-amber-200 shadow-lg text-amber-800 px-4 py-2.5 rounded-full text-xs font-semibold flex items-center gap-2">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 animate-in slide-in-from-top-4 fade-in duration-300 w-[calc(100%-2rem)] max-w-[min(92vw,36rem)]">
+              <div className="bg-amber-50 border border-amber-200 shadow-lg text-amber-800 px-4 py-2.5 rounded-2xl min-[426px]:rounded-full text-xs font-semibold flex items-center gap-2">
                 <div className="p-1 bg-amber-100 rounded-full">
                   <WarningIcon />
                 </div>
@@ -357,7 +384,7 @@ export default function Bot() {
           )}
 
           {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 soft-scrollbar">
+          <div className="flex-1 overflow-y-auto p-3 min-[426px]:p-4 min-[769px]:p-6 space-y-3 min-[769px]:space-y-6 soft-scrollbar">
             {messages.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 opacity-60">
                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
@@ -373,7 +400,7 @@ export default function Bot() {
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex gap-2 max-w-[70%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+                className={`flex gap-2 max-w-[88%] min-[426px]:max-w-[78%] min-[769px]:max-w-[70%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
                   }`}
               >
                 <div className={`w-8 h-8 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center ${msg.role === "user" ? "border-2 border-white shadow-sm" : "bg-gray-100 border border-gray-200"
@@ -425,7 +452,7 @@ export default function Bot() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-100 shrink-0">
+          <div className="p-3 min-[426px]:p-4 bg-white border-t border-gray-100 shrink-0">
             <div className="max-w-4xl mx-auto">
               <div className="relative flex items-center bg-gray-50 rounded-2xl focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
                 <input
@@ -450,17 +477,76 @@ export default function Bot() {
                 </button>
               </div>
 
-              <div className="text-center mt-3">
-                <p className="text-[11px] text-gray-400 font-medium">
+              {!isCompactView && (
+                <div className="text-center mt-3">
+                  <p className="text-[11px] text-gray-400 font-medium">
                   AI can make mistakes. Please double-check important information. 
                   <span className="mx-2 opacity-50">•</span> 
                   Chat history deletes automatically after 7 days.
-                </p>
-              </div>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {isCompactView && (
+        <div
+          className={`absolute inset-0 z-30 backdrop-blur-sm transition-all duration-300 ${showHistoryDrawer ? "bg-black/30 opacity-100 pointer-events-auto" : "bg-black/0 opacity-0 pointer-events-none"}`}
+          onClick={() => setShowHistoryDrawer(false)}
+        >
+          <div
+            className={`absolute left-0 top-0 h-full w-[82vw] max-w-[300px] bg-white border-r border-gray-200 shadow-2xl p-4 flex flex-col gap-4 transition-transform duration-300 ease-out ${showHistoryDrawer ? "translate-x-0" : "-translate-x-full"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-black text-primary">{botName}</h3>
+              </div>
+              <button
+                onClick={() => setShowHistoryDrawer(false)}
+                className="w-10 h-10 rounded-2xl bg-gray-50 border border-gray-200 text-gray-500 flex items-center justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <button
+              onClick={() => {
+                setMessages([]);
+                setSessionId(null);
+                setDocSize(0);
+                setLastActive(new Date());
+                setShowHistoryDrawer(false);
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-[#0F172A] text-white py-2.5 rounded-xl text-sm font-medium hover:bg-[#1e293b] transition-all shadow-sm active:scale-95"
+            >
+              <PlusIcon /> New Chat
+            </button>
+
+            <div className="flex-1 overflow-y-auto soft-scrollbar pr-1">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">Recent</p>
+              <div className="space-y-1">
+                {history.map((chat) => (
+                  <div
+                    key={chat._id}
+                    onClick={() => {
+                      loadSession(chat._id);
+                      setShowHistoryDrawer(false);
+                    }}
+                    className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer text-sm truncate transition-colors ${sessionId === chat._id ? "bg-gray-100 text-primary font-medium" : "text-gray-600 hover:bg-gray-100"}`}
+                  >
+                    <span className="truncate flex-1">{chat.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

@@ -1,33 +1,50 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-// import { X } from 'lucide-react'; // Removed dependency
 
-const MarkdownHelp = ({ isOpen, onClose }) => {
+const MarkdownHelp = ({ isOpen, onClose, fullScreen = false }) => {
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div className={`fixed inset-0 z-[130] ${fullScreen ? "bg-white" : "flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"}`}>
             <div
-                className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200"
+                className={fullScreen
+                    ? "h-full w-full bg-white flex flex-col animate-in slide-in-from-right duration-200"
+                    : "bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200"
+                }
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h2 className="text-xl font-bold text-gray-800 tracking-tight">Markdown Guide</h2>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-500 hover:text-gray-900"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 6 6 18" />
-                            <path d="m6 6 12 12" />
-                        </svg>
-                    </button>
+                <div className={`border-b border-gray-100 ${fullScreen ? "px-4 py-4 sticky top-0 bg-white z-10" : "p-6 bg-gray-50/50"}`}>
+                    {fullScreen ? (
+                        <div className="flex items-center gap-3 max-w-3xl w-full mx-auto">
+                            <button
+                                onClick={onClose}
+                                className="w-10 h-10 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600"
+                                aria-label="Back"
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <h2 className="text-[1.4rem] font-black text-slate-800 tracking-tight">Markdown Guide</h2>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-800 tracking-tight">Markdown Guide</h2>
+                            <button
+                                onClick={onClose}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-500 hover:text-gray-900"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6 6 18" />
+                                    <path d="m6 6 12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-6">
-                    <div className="space-y-6">
+                <div className={`flex-1 overflow-y-auto soft-scrollbar space-y-6 ${fullScreen ? "px-4 py-5" : "pr-2"}`}>
+                    <div className={`space-y-6 ${fullScreen ? "max-w-3xl w-full mx-auto pb-8" : ""}`}>
                         <p className="text-gray-600">
                             Notes support Markdown formatting. Here is a comprehensive guide:
                         </p>
@@ -212,15 +229,16 @@ const MarkdownHelp = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-2 bg-black text-white rounded-xl font-medium hover:bg-gray-900 transition-colors shadow-lg shadow-gray-200"
-                    >
-                        Got it
-                    </button>
-                </div>
+                {!fullScreen && (
+                    <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2 bg-black text-white rounded-xl font-medium hover:bg-gray-900 transition-colors shadow-lg shadow-gray-200"
+                        >
+                            Got it
+                        </button>
+                    </div>
+                )}
             </div>
         </div>,
         document.body

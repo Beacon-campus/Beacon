@@ -51,7 +51,7 @@ export default function Modal({
 
   return createPortal(
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 ${overlayClassName}`}
+      className={`fixed inset-0 z-[120] flex items-center justify-center p-4 animate-in fade-in duration-200 ${overlayClassName}`}
       role="dialog"
       aria-modal="true"
     >

@@ -4,6 +4,7 @@ import MarkdownHelp from './MarkdownHelp';
 // import { Info } from 'lucide-react'; // Removed dependency
 import NoteCard from "./NoteCard.jsx";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -126,11 +127,25 @@ import ShareNoteModal from './ShareNoteModal';
 // ... imports
 
 export default function Notes() {
+    const location = useLocation();
     const { notes, addNote, updateNote, deleteNote, loading } = useNotes();
     const [editingNote, setEditingNote] = useState(null);
     const [sharingNote, setSharingNote] = useState(null); // SHARE STATE
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
+    const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
+    const isNotesRoute = /\/(student|teacher)\/notes$/.test(location.pathname);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+        const handleChange = (event) => {
+            setIsCompactView(event.matches);
+        };
+
+        setIsCompactView(mediaQuery.matches);
+        mediaQuery.addEventListener("change", handleChange);
+        return () => mediaQuery.removeEventListener("change", handleChange);
+    }, []);
 
     // Sync editingNote with latest notes state
     useEffect(() => {
@@ -165,22 +180,39 @@ export default function Notes() {
     }
 
     return (
-        <div className="w-full h-full p-4 flex flex-col">
-            <div className="flex-1 flex flex-col premium-card overflow-hidden relative">
+        <div className="w-full min-h-full min-[769px]:h-full p-0 min-[769px]:p-4 flex flex-col">
+            <div className={`flex-1 flex flex-col overflow-hidden relative ${isCompactView ? "bg-transparent" : "premium-card"}`}>
+
+                {isCompactView && (
+                    <div className="pb-4 flex items-center justify-between gap-3">
+                        <h1 className="text-[1.4rem] font-black text-slate-800 tracking-tight">Notes</h1>
+                        <button
+                            onClick={() => setIsHelpOpen(true)}
+                            className="w-10 h-10 rounded-2xl bg-white text-gray-700 shadow-sm border border-gray-200 hover:border-[#10B981] hover:text-[#15803D] hover:bg-[#F0FDF4] transition-all active:scale-95 flex items-center justify-center"
+                            title="Markdown Guide"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 16v-4" />
+                                <path d="M12 8h.01" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
 
                 {/* Header Actions - Now floating to remove structural gap */}
-                <div className="absolute top-4 right-6 z-20 flex items-center justify-end">
-                    <div className="flex items-center gap-3">
+                <div className={`relative min-[769px]:absolute min-[769px]:top-4 min-[769px]:right-6 z-20 flex items-center justify-end px-4 pt-4 min-[769px]:px-0 min-[769px]:pt-0 ${isCompactView ? "hidden" : ""}`}>
+                    <div className="flex items-center justify-end gap-3 w-full min-[769px]:w-auto">
                         {/* Create Note Button (Moved from FAB) */}
                         <button
                             onClick={() => setIsCreateOpen(true)}
-                            className="group flex items-center bg-white text-gray-700 rounded-full shadow-sm hover:shadow-md border border-gray-200 hover:border-[#10B981] hover:text-[#15803D] hover:bg-[#F0FDF4] transition-all duration-500 ease-out h-10 w-10 hover:w-40 overflow-hidden active:scale-95"
+                            className="group flex items-center justify-center min-[769px]:justify-start bg-white text-gray-700 rounded-full shadow-sm hover:shadow-md border border-gray-200 hover:border-[#10B981] hover:text-[#15803D] hover:bg-[#F0FDF4] transition-all duration-500 ease-out h-10 px-4 min-[769px]:px-0 w-auto min-[769px]:w-10 min-[769px]:hover:w-40 overflow-hidden active:scale-95"
                             title="Create Note"
                         >
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 w-0 group-hover:w-auto whitespace-nowrap text-sm font-bold pl-0 group-hover:pl-4">
+                            <span className="opacity-100 min-[769px]:opacity-0 min-[769px]:group-hover:opacity-100 transition-opacity duration-500 w-auto min-[769px]:w-0 min-[769px]:group-hover:w-auto whitespace-nowrap text-sm font-bold pl-0 min-[769px]:group-hover:pl-4">
                                 Create Note
                             </span>
-                            <div className="w-10 h-10 flex items-center justify-center shrink-0 ml-auto group-hover:rotate-90 transition-transform duration-500">
+                            <div className="w-10 h-10 hidden min-[769px]:flex items-center justify-center shrink-0 ml-auto group-hover:rotate-90 transition-transform duration-500">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
                                 </svg>
@@ -202,14 +234,14 @@ export default function Notes() {
                 </div>
 
                 {/* Notes Area (Scrollable within Card) */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 soft-scrollbar">
-                    <h1 className="text-2xl font-bold text-slate-800 mb-6 ml-1">My Notes</h1>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-0 min-[769px]:p-6 pt-0 min-[769px]:pt-6 soft-scrollbar">
+                    <h1 className={`text-xl min-[426px]:text-2xl font-bold text-slate-800 mb-6 ml-1 ${isCompactView ? "hidden" : ""}`}>My Notes</h1>
 
                     {/* PINNED SECTION */}
                     {pinnedNotes.length > 0 && (
                         <div className="mb-6">
                             <h2 className="text-sm font-extrabold text-gray-700 tracking-wide mb-4 ml-1">Pinned Notes</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1024px]:grid-cols-3 xl:grid-cols-4 gap-4 min-[769px]:gap-6">
                                 {pinnedNotes.map(note => (
                                     <NoteCard
                                         key={note.id}
@@ -233,7 +265,7 @@ export default function Notes() {
                                     {sharedNotes.length}
                                 </span>
                             </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1024px]:grid-cols-3 xl:grid-cols-4 gap-4 min-[769px]:gap-6">
                                 {sharedNotes.map(note => (
                                     <NoteCard
                                         key={note.id}
@@ -253,7 +285,7 @@ export default function Notes() {
                         <h2 className="text-sm font-extrabold text-gray-700 tracking-wide mb-4 ml-1">Other Notes</h2>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1024px]:grid-cols-3 xl:grid-cols-4 gap-4 min-[769px]:gap-6">
                         {otherNotes.map(note => (
                             <NoteCard
                                 key={note.id}
@@ -274,6 +306,19 @@ export default function Notes() {
                     )}
                 </div>
             </div>
+
+            {isCompactView && isNotesRoute && (
+                <button
+                    onClick={() => setIsCreateOpen(true)}
+                    className="fixed bottom-24 right-4 z-30 w-12 h-12 rounded-2xl bg-[#0F172A] text-white shadow-lg shadow-[#0F172A]/25 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
+                    title="Create note"
+                    aria-label="Create note"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </button>
+            )}
 
             {/* Edit Modal */}
             {editingNote && (
@@ -306,6 +351,7 @@ export default function Notes() {
             <MarkdownHelp
                 isOpen={isHelpOpen}
                 onClose={() => setIsHelpOpen(false)}
+                fullScreen={isCompactView}
             />
         </div>
     );

@@ -219,7 +219,7 @@ export default function TeacherHome() {
     if (relativeTime === "Tomorrow") widgetHeader = "Tomorrow's Event";
 
     return (
-        <div className="min-h-full h-auto w-full pt-1 pb-2 animate-fade-in-up min-[769px]:h-full">
+        <div className="min-h-full h-auto w-full px-4 max-[425px]:px-3 pt-0 pb-0 animate-fade-in-up min-[769px]:h-full min-[769px]:px-0 min-[769px]:pt-1 min-[769px]:pb-2">
             <div className="flex flex-col gap-4 min-h-full min-[769px]:h-full">
 
                 {/* MOBILE + TABLET */}
