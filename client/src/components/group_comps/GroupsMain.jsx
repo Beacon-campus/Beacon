@@ -141,43 +141,40 @@ export default function Groups() {
                     </div>
                 ) : (
                     <>
-                        <div className="shrink-0 h-[72px] min-[769px]:h-[76px] bg-white border-b border-gray-100 flex items-center px-4 min-[426px]:px-5 min-[769px]:px-6 justify-between">
-                            <div className="flex items-center gap-4">
-                                {isCompactView && (
-                                    <button
-                                        onClick={() => setActiveGroupId(null)}
-                                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
-                                    </button>
-                                )}
-                                <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-black/5 shadow-inner">
-                                    <span className="font-black text-black/30 text-sm uppercase">
-                                        {activeGroup?.name?.[0]}
-                                    </span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <h2 className="text-sm font-black text-gray-800 leading-tight">
+                        <div
+                            className="shrink-0 h-[72px] min-[769px]:h-[76px] bg-white border-b border-gray-100 flex items-center px-4 min-[426px]:px-5 min-[769px]:px-6 cursor-pointer group"
+                            onClick={() => setShowInfo(true)}
+                        >
+                            {isCompactView && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setActiveGroupId(null); }}
+                                    className="p-2 -ml-2 mr-2 rounded-full hover:bg-gray-100 transition-colors shrink-0"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                                </button>
+                            )}
+                            <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-black/5 shadow-inner shrink-0 transition-transform group-hover:scale-105">
+                                <span className="font-black text-black/30 text-sm uppercase">
+                                    {activeGroup?.name?.[0]}
+                                </span>
+                            </div>
+                            <div className="flex flex-col ml-4 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                    <h2 className="text-sm font-black text-gray-800 leading-tight truncate group-hover:text-black transition-colors">
                                         {activeGroup?.name}
                                     </h2>
-                                    <div className="flex items-center gap-2 mt-0.5">
-                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                                            {activeGroup?.participants?.length} Members
-                                        </span>
-                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                                            Goal: {activeGroup?.goal}
-                                        </span>
-                                    </div>
+                                    <div className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-serif font-bold italic shrink-0 transition-all group-hover:border-black group-hover:text-black">i</div>
+                                </div>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
+                                        {activeGroup?.participants?.length} Members
+                                    </span>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider truncate group-hover:text-gray-700 transition-colors">
+                                        Goal: {activeGroup?.goal}
+                                    </span>
                                 </div>
                             </div>
-
-                            <button
-                                onClick={() => setShowInfo(true)}
-                                className="w-10 h-10 rounded-xl border-2 border-gray-100 flex items-center justify-center text-gray-300 font-serif font-bold italic text-lg hover:border-black hover:text-black hover:bg-gray-50 transition-all"
-                            >
-                                i
-                            </button>
                         </div>
 
                         <GroupChatWindow
