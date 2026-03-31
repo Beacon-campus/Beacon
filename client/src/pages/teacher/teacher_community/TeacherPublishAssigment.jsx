@@ -34,7 +34,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
   const clockRef = useRef(null);
   const [quizMode, setQuizMode] = useState("manual");
   const [questions, setQuestions] = useState([
-    { id: 1, question: "", options: ["", "", "", ""], answer: "" },
+    { id: 1, question: "", options: ["", "", "", ""], answer: "", marks: 1 },
   ]);
   const [excelFile, setExcelFile] = useState(null);
   const [excelErrors, setExcelErrors] = useState([]);
@@ -62,7 +62,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
   const addQuestion = () => {
     setQuestions((prev) => [
       ...prev,
-      { id: Date.now(), question: "", options: ["", "", "", ""], answer: "" },
+      { id: Date.now(), question: "", options: ["", "", "", ""], answer: "", marks: 1 },
     ]);
   };
 
@@ -104,6 +104,13 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
     const nextDeadline = buildDeadlineISO(deadlineDate, deadlineHour, deadlineMinute);
     setFormData((prev) => ({ ...prev, deadline: nextDeadline }));
   }, [deadlineDate, deadlineHour, deadlineMinute]);
+
+  useEffect(() => {
+    if (assignmentType === "quiz") {
+      const total = questions.reduce((sum, q) => sum + (Number(q.marks) || 0), 0);
+      setFormData((prev) => ({ ...prev, totalMarks: total }));
+    }
+  }, [questions, assignmentType]);
 
   const isPm = deadlineHour >= 12;
   const displayHour = ((deadlineHour + 11) % 12) + 1;
@@ -223,6 +230,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
         question,
         options,
         answer,
+        marks: 1,
       });
     }
 
@@ -318,6 +326,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
         question,
         options,
         answer,
+        marks: 1,
       });
     }
 
@@ -335,6 +344,41 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
       reader.onerror = () => reject(reader.error || new Error("Failed to read file."));
       reader.readAsText(file);
     });
+
+  const handleDownloadSample = async () => {
+    const rows = [
+      {
+        Question: "What is the capital of France?",
+        "Option A": "London",
+        "Option B": "Berlin",
+        "Option C": "Paris",
+        "Option D": "Madrid",
+        "Correct Answer": "C",
+      },
+      {
+        Question: "Which planet is known as the Red Planet?",
+        "Option A": "Earth",
+        "Option B": "Mars",
+        "Option C": "Jupiter",
+        "Option D": "Venus",
+        "Correct Answer": "Mars",
+      },
+    ];
+
+    await exportRowsToXlsx({
+      rows,
+      fileName: "Quiz_Sample_Format.xlsx",
+      sheetName: "Questions",
+      columns: [
+        { header: "Question", key: "Question", width: 40 },
+        { header: "Option A", key: "Option A", width: 20 },
+        { header: "Option B", key: "Option B", width: 20 },
+        { header: "Option C", key: "Option C", width: 20 },
+        { header: "Option D", key: "Option D", width: 20 },
+        { header: "Correct Answer", key: "Correct Answer", width: 20 },
+      ],
+    });
+  };
 
   const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0] || null;
@@ -382,9 +426,9 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
     if (assignmentType === "quiz") {
       if (quizMode === "manual") {
         const isValid = questions.every(
-          (q) => q.question.trim() && q.options.every((o) => o.trim()) && q.answer
+          (q) => q.question.trim() && q.options.every((o) => o.trim()) && q.answer && q.marks > 0
         );
-        if (!isValid) return "Please complete all quiz questions and answers.";
+        if (!isValid) return "Please complete all quiz questions, answers, and assign at least 1 mark for each.";
       }
       if (quizMode === "excel" && !excelFile) {
         return "Please upload an Excel file for quiz mode.";
@@ -502,15 +546,16 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1">
-                Total Marks {assignmentType === "offline" ? <span className="text-gray-400">(optional)</span> : <span className="text-red-500">*</span>}
+                Total Marks {assignmentType === "offline" ? <span className="text-gray-400">(optional)</span> : assignmentType === "quiz" ? <span className="text-gray-400">(auto-calculated)</span> : <span className="text-red-500">*</span>}
               </label>
               <input
                 type="number"
                 name="totalMarks"
                 value={formData.totalMarks}
                 onChange={handleInputChange}
-                className="w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                className={`w-full bg-[#F9FAFB] border border-gray-200 rounded-lg px-3 py-2 text-sm ${assignmentType === "quiz" ? "cursor-not-allowed opacity-75" : ""}`}
                 placeholder="20"
+                disabled={assignmentType === "quiz"}
               />
             </div>
           </div>
@@ -560,18 +605,28 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                         />
                       ))}
                     </div>
-                    <select
-                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs"
-                      value={q.answer}
-                      onChange={(e) => handleQuestionChange(q.id, "answer", e.target.value)}
-                    >
-                      <option value="">Select Correct Answer</option>
-                      {q.options.map((opt, i) => (
-                        <option key={i} value={opt}>
-                          {opt || `Option ${String.fromCharCode(65 + i)}`}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="flex gap-3">
+                      <select
+                        className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs"
+                        value={q.answer}
+                        onChange={(e) => handleQuestionChange(q.id, "answer", e.target.value)}
+                      >
+                        <option value="">Select Correct Answer</option>
+                        {q.options.map((opt, i) => (
+                          <option key={i} value={opt}>
+                            {opt || `Option ${String.fromCharCode(65 + i)}`}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Marks"
+                        className="w-24 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs"
+                        value={q.marks}
+                        onChange={(e) => handleQuestionChange(q.id, "marks", e.target.value ? Number(e.target.value) : "")}
+                      />
+                    </div>
                   </div>
                 ))}
                 <button
@@ -594,7 +649,19 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
                   <p className="mt-2 text-xs font-bold text-green-700">Selected: {excelFile.name}</p>
                 )}
                 <div className="mt-4 rounded-lg border border-green-100 bg-white/70 p-3 text-left text-[11px] text-green-800">
-                  <div className="font-bold mb-1">Format Guide</div>
+                  <div className="font-bold mb-2 flex justify-between items-center">
+                    <span className="text-sm">Format Guide</span>
+                    <button
+                      type="button"
+                      onClick={handleDownloadSample}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 text-xs font-bold rounded-md transition-all cursor-pointer"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download Sample Format
+                    </button>
+                  </div>
                   <div className="text-green-700">
                     Format: [Question], [Option A], [Option B], [Option C], [Option D], [Correct Answer (A/B/C/D, 1/2/3/4, or exact text)]
                   </div>
