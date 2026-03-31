@@ -466,10 +466,46 @@ function ProfileResponsiveView({
   const desktopProfileRef = useRef(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    mobileSectionRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    desktopSectionRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    desktopProfileRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    const scrollableNodes = [];
+    const collectScrollableAncestors = (node) => {
+      let current = node;
+      while (current) {
+        if (current instanceof HTMLElement) {
+          const styles = window.getComputedStyle(current);
+          const canScrollY = /(auto|scroll)/.test(styles.overflowY) && current.scrollHeight > current.clientHeight;
+          if (canScrollY) {
+            scrollableNodes.push(current);
+          }
+        }
+        current = current?.parentElement || null;
+      }
+    };
+
+    collectScrollableAncestors(mobileSectionRef.current);
+    collectScrollableAncestors(desktopSectionRef.current);
+    collectScrollableAncestors(desktopProfileRef.current);
+
+    const scrollAllToTop = () => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      document.scrollingElement?.scrollTo({ top: 0, behavior: "auto" });
+      mobileSectionRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      desktopSectionRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      desktopProfileRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      scrollableNodes.forEach((node) => node.scrollTo({ top: 0, behavior: "auto" }));
+    };
+
+    let secondFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      scrollAllToTop();
+      secondFrame = requestAnimationFrame(scrollAllToTop);
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      if (secondFrame) {
+        cancelAnimationFrame(secondFrame);
+      }
+    };
   }, [activeSection]);
 
   return (
@@ -478,29 +514,34 @@ function ProfileResponsiveView({
         <div className="lg:hidden">
           {activeSection === "profile" ? (
             <div className="space-y-4">
-              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.07)]">
-                <div className={`relative h-24 bg-gradient-to-r ${bannerGradient} transition-colors duration-500`}>
+              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-none">
+                <div className={`relative h-28 bg-gradient-to-b ${bannerGradient} transition-colors duration-500`}>
                   <div className="absolute inset-0 bg-white/10" />
-                  <div className="absolute right-4 top-4 flex items-center gap-2">
-                    <button
-                      onClick={onPreviewProfile}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/75 text-gray-700 shadow-sm backdrop-blur-md transition hover:bg-white"
-                      aria-label="Preview profile"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={onEditProfile}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/85 text-gray-800 shadow-sm backdrop-blur-md transition hover:bg-white"
-                      aria-label="Edit profile"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
+                  <div className="absolute inset-x-4 top-4 flex items-center justify-between gap-3">
+                    <div className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                      {user.role}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={onPreviewProfile}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/75 text-gray-700 shadow-sm backdrop-blur-md transition hover:bg-white"
+                        aria-label="Preview profile"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={onEditProfile}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/85 text-gray-800 shadow-sm backdrop-blur-md transition hover:bg-white"
+                        aria-label="Edit profile"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -509,61 +550,56 @@ function ProfileResponsiveView({
                     <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg ring-1 ring-black/5">
                       <img src={getAvatarUrl(profileData.profileImageId)} alt="Avatar" className="h-full w-full object-cover" />
                     </div>
-                    <h1 className="mt-3 text-[34px] font-black leading-none tracking-tight text-gray-900">
+                    <h1 className="mt-3 text-[32px] font-black leading-none tracking-tight text-gray-900">
                       {profileData.displayName || "Student"}
                     </h1>
-                    <p className="mt-1 text-sm font-medium leading-5 text-gray-500">
-                      {user.profile?.name || "Official Name"}
-                    </p>
-                    <div className="mt-3 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600">
-                      {user.role}
-                    </div>
 
-                    <div className="mt-4 w-full rounded-[24px] border border-black/5 bg-[#f8f8f8] px-4 py-3.5 text-left">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">About Me</p>
-                      <p className="mt-2 text-sm leading-6 text-gray-600">
-                        {profileData.about || <span className="italic text-gray-400">No description provided.</span>}
-                      </p>
-                    </div>
-
-                    <div className="mt-3 grid w-full grid-cols-2 gap-3 text-left">
-                      <div className="rounded-[22px] border border-black/5 bg-white px-3 py-3 shadow-sm">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Registration ID</p>
-                        <p className="mt-2 break-words text-[13px] font-semibold leading-5 text-gray-800">
+                    <div className="mt-4 w-full max-w-[280px] space-y-2 text-left">
+                      <div className="flex items-baseline gap-2">
+                        <p className="min-w-[94px] text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Reg:</p>
+                        <p className="break-words text-[14px] font-semibold leading-5 text-gray-800">
                           {user.regno || user.profile?.regno || "N/A"}
                         </p>
                       </div>
-                      <div className="rounded-[22px] border border-black/5 bg-white px-3 py-3 shadow-sm">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Contact</p>
-                        <p className="mt-2 break-all text-[13px] font-semibold leading-5 text-gray-800" title={user.email}>
+                      <div className="flex items-baseline gap-2">
+                        <p className="min-w-[94px] text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Contact:</p>
+                        <p className="break-all text-[13px] font-medium leading-5 text-gray-600" title={user.email}>
                           {user.email}
+                        </p>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <p className="min-w-[94px] text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">Original Name:</p>
+                        <p className="text-[14px] font-semibold leading-5 text-gray-600">
+                          {user.name || user.officialName || profileData.displayName || "Student"}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-3 w-full rounded-[26px] border border-black/5 bg-[#f4f4f5] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
-                      <div className={`grid ${statGridClass} gap-2`}>
-                        <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
-                          <p className="break-words text-[17px] font-black leading-5 text-gray-900">{primaryStatValue}</p>
-                          <p className="mt-1 text-[11px] font-medium text-gray-500">{primaryStatLabel}</p>
+                    <div className="mt-4 flex w-full items-center justify-center rounded-[22px] border border-black/5 bg-[#f8f8f8] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                      <div className={`grid w-full ${statGridClass} items-start gap-2`}>
+                        <div className="min-w-0 px-1">
+                          <p className="break-words text-[15px] font-black leading-5 text-gray-900">{primaryStatValue}</p>
+                          <p className="mt-1 text-[10px] font-medium text-gray-500">{primaryStatLabel}</p>
                         </div>
                         {user.role === "student" && (
-                          <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
-                            <p className="text-[17px] font-black leading-5 text-gray-900">{user.profile?.semester || "-"}</p>
-                            <p className="mt-1 text-[11px] font-medium text-gray-500">Semester</p>
+                          <div className="min-w-0 border-l border-r border-black/5 px-1">
+                            <p className="text-[15px] font-black leading-5 text-gray-900">{user.profile?.semester || "-"}</p>
+                            <p className="mt-1 text-[10px] font-medium text-gray-500">Semester</p>
                           </div>
                         )}
-                        <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
-                          <p className="break-words text-[17px] font-black leading-5 text-gray-900">{user.profile?.shift || "N/A"}</p>
-                          <p className="mt-1 text-[11px] font-medium text-gray-500">Shift</p>
+                        <div className={`min-w-0 px-1 ${user.role !== "student" ? "border-l border-black/5" : ""}`}>
+                          <p className="break-words text-[15px] font-black leading-5 text-gray-900">{user.profile?.shift || "N/A"}</p>
+                          <p className="mt-1 text-[10px] font-medium text-gray-500">Shift</p>
                         </div>
                       </div>
                     </div>
+
+                    <MobileAboutSection about={profileData.about} />
                   </div>
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-none">
                 <div className="border-b border-black/5 px-5 py-4">
                   <p className="text-sm font-semibold text-gray-500">Settings</p>
                 </div>
@@ -589,7 +625,7 @@ function ProfileResponsiveView({
               </div>
             </div>
           ) : (
-            <div className="flex h-full flex-col overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            <div key={activeSection} className="flex h-full flex-col overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-none">
               <div className="grid grid-cols-[auto_1fr_auto] items-center border-b border-black/5 px-4 py-4">
                 <button
                   onClick={onBackToProfile}
@@ -624,7 +660,7 @@ function ProfileResponsiveView({
 
         <div className="hidden lg:flex lg:h-full lg:flex-1 lg:flex-col">
           {activeSection === "profile" ? (
-            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-none">
               <div ref={desktopProfileRef} className="relative h-full overflow-y-auto no-scrollbar bg-gray-50/30">
                 <div className={`relative h-40 shrink-0 bg-gradient-to-r ${bannerGradient} transition-colors duration-500`}>
                   <div className="absolute inset-0 bg-white/10" />
@@ -761,7 +797,7 @@ function ProfileResponsiveView({
               </div>
             </div>
           ) : (
-            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-none">
               <div className="border-b border-black/5 px-8 py-6">
                 <button
                   onClick={onBackToProfile}
@@ -790,7 +826,7 @@ function ProfileResponsiveView({
         </div>
 
         <div className="hidden lg:block lg:h-full lg:w-1/3 lg:max-w-xs">
-          <div className="flex h-full flex-col overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+          <div className="flex h-full flex-col overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-none">
             <div className="border-b border-black/5 px-6 py-5">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">Settings</p>
               <h2 className="mt-2 text-xl font-black tracking-tight text-gray-900">Profile Menu</h2>
@@ -832,6 +868,41 @@ function ProfileResponsiveView({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function MobileAboutSection({ about }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const aboutText = typeof about === "string" ? about.trim() : "";
+  const shouldShowToggle = aboutText.length > 110;
+  const collapsedPreview = shouldShowToggle
+    ? `${aboutText.slice(0, 88).trimEnd()}...`
+    : aboutText;
+
+  return (
+    <div className="mt-4 w-full border-t border-black/5 px-1 pt-4 text-left">
+      <h3 className="text-lg font-bold text-gray-900">About Me</h3>
+      {aboutText ? (
+        <>
+          <p className="mt-3 text-[14px] leading-7 text-gray-500">
+            {isExpanded ? aboutText : collapsedPreview}{" "}
+            {shouldShowToggle && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded((expanded) => !expanded)}
+                className="inline font-semibold text-[#f59e0b] transition hover:text-[#d97706]"
+              >
+                {isExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
+          </p>
+        </>
+      ) : (
+        <p className="mt-3 text-[14px] italic leading-7 text-gray-400">
+          No description provided.
+        </p>
+      )}
     </div>
   );
 }
