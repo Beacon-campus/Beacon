@@ -54,7 +54,7 @@ export default function Navbar() {
   };
 
   const getTabClass = (isActive) => {
-    const base = "relative z-10 flex items-center justify-center gap-2 w-36 px-4 py-2 rounded-full text-sm font-bold text-center transition-all duration-200";
+    const base = "relative z-10 flex items-center justify-center gap-2 w-32 min-[1025px]:w-36 px-4 py-2 rounded-full text-sm font-bold text-center transition-all duration-200";
     return isActive ? `${base} text-white` : `${base} text-[#64748B] hover:text-[#0F172A] hover:bg-gray-200/50`;
   };
 
@@ -145,11 +145,11 @@ export default function Navbar() {
         {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
         {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
         {role !== "admin" && (
-          <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center glass-panel rounded-full p-1 shadow-sm">
+          <div className="hidden min-[769px]:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center glass-panel rounded-full p-1 shadow-sm">
 
             {/* THE SLIDING PILL BACKGROUND */}
             <div
-              className={`absolute left-1 top-1 bottom-1 w-36 rounded-full bg-[#0F172A] shadow-sm transition-transform duration-300 ease-out border border-gray-800 ${isCommunity ? "translate-x-[9.5rem]" : "translate-x-0"
+              className={`absolute left-1 top-1 bottom-1 w-32 min-[1025px]:w-36 rounded-full bg-[#0F172A] shadow-sm transition-transform duration-300 ease-out border border-gray-800 ${isCommunity ? "translate-x-[8.5rem] min-[1025px]:translate-x-[9.5rem]" : "translate-x-0"
                 }`}
             />
 

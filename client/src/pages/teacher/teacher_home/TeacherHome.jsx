@@ -219,20 +219,22 @@ export default function TeacherHome() {
     if (relativeTime === "Tomorrow") widgetHeader = "Tomorrow's Event";
 
     return (
-        <div className="h-full w-full pt-1 animate-fade-in-up">
-            <div className="flex flex-col h-full gap-4">
+        <div className="min-h-full h-auto w-full pt-1 pb-2 animate-fade-in-up">
+            <div className="flex flex-col gap-4 min-h-full">
 
                 {/* ================= TOP SECTION ================= */}
-                <div className="flex-[3] flex gap-4 min-h-0">
-                    <WelcomeCard
-                        user={user}
-                        quote={quote}
-                        theme="blue"
-                        roleLabel="Teacher"
-                        loadingQuote={quoteLoading}
-                    />
+                <div className="grid grid-cols-1 gap-4 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-5">
+                    <div className="min-[426px]:col-span-2 min-[1025px]:col-span-3">
+                        <WelcomeCard
+                            user={user}
+                            quote={quote}
+                            theme="blue"
+                            roleLabel="Teacher"
+                            loadingQuote={quoteLoading}
+                        />
+                    </div>
 
-                    <div className="flex-[2] flex flex-col gap-4">
+                    <div className="grid grid-cols-1 gap-4 min-[426px]:col-span-2 min-[426px]:grid-cols-2 min-[1025px]:col-span-2 min-[1025px]:grid-cols-1">
                         <EventWidget
                             nextEvent={nextEvent}
                             loadingEvent={loadingEvent}
@@ -255,7 +257,7 @@ export default function TeacherHome() {
                 </div>
 
                 {/* ================= BOTTOM SECTION - SPLIT ================= */}
-                <div className="flex-[2] flex gap-4 min-h-0">
+                <div className="grid grid-cols-1 gap-4 min-[426px]:grid-cols-2">
                     <QuickTodosWidget
                         quickTodos={quickTodos}
                         animatingIds={animatingIds}

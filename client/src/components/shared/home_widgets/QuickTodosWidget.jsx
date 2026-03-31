@@ -15,11 +15,11 @@ export default function QuickTodosWidget({
     };
 
     return (
-        <div className="premium-card p-6 w-[35%] flex flex-col">
-            <h2 className="text-xl font-black text-primary mb-3 flex items-center gap-2 tracking-tight">
+        <div className="premium-card min-h-[240px] min-[1025px]:min-h-[280px] p-4 min-[426px]:p-5 min-[1025px]:p-6 w-full flex flex-col">
+            <h2 className="text-xl min-[426px]:text-[1.4rem] min-[1025px]:text-xl font-black text-primary mb-3 flex items-center gap-2 tracking-tight">
                 <span className={`w-2 h-6 rounded-full ${getThemeColorClass()}`}></span>
                 Quick To-Dos
-                {quickTodos.length > 0 && <span className="text-xs font-normal text-gray-500">(click to complete)</span>}
+                {quickTodos.length > 0 && <span className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs font-normal text-gray-500">(click to complete)</span>}
             </h2>
 
             <div className="flex-1 overflow-hidden flex flex-col gap-2">
@@ -44,13 +44,13 @@ export default function QuickTodosWidget({
                                         {isAnimating && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
                                     </div>
 
-                                    <span className={`text-sm font-semibold truncate max-w-[150px] transition-colors ${isAnimating ? 'text-gray-400 line-through' : 'text-[#0F172A]'}`}>
+                                    <span className={`text-[15px] min-[426px]:text-base min-[1025px]:text-sm font-semibold truncate max-w-full transition-colors ${isAnimating ? 'text-gray-400 line-through' : 'text-[#0F172A]'}`}>
                                         {todo.title}
                                     </span>
                                 </div>
 
                                 {dateText && (
-                                    <span className="shrink-0 bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                    <span className="shrink-0 bg-gray-100 text-gray-500 text-[11px] min-[426px]:text-xs min-[1025px]:text-[11px] font-bold px-2 py-0.5 rounded shadow-sm">
                                         {dateText}
                                     </span>
                                 )}
@@ -62,10 +62,10 @@ export default function QuickTodosWidget({
                         onClick={() => navigate(navigateTo)}
                         className="flex-1 flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-primary/30 transition-all group"
                     >
-                        <p className="text-gray-400 text-sm font-medium group-hover:text-primary transition-colors">
+                        <p className="text-gray-400 text-[15px] min-[426px]:text-base min-[1025px]:text-sm font-medium group-hover:text-primary transition-colors">
                             No Quick Tasks
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs text-gray-400 mt-1">
                             {emptyMessage}
                         </p>
                     </div>

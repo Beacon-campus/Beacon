@@ -68,15 +68,15 @@ export default function AnnouncementsWidget({
     };
 
     return (
-        <div className="premium-card p-6 flex-1 flex flex-col relative overflow-hidden">
-            <h2 className="text-xl font-black text-primary mb-4 flex items-center gap-2 px-1 tracking-tight">
+        <div className="premium-card min-h-[240px] min-[1025px]:min-h-[280px] p-4 min-[426px]:p-5 min-[1025px]:p-6 flex-1 flex flex-col relative overflow-hidden">
+            <h2 className="text-xl min-[426px]:text-[1.4rem] min-[1025px]:text-xl font-black text-primary mb-4 flex items-center gap-2 px-1 tracking-tight">
                 <span className="w-2 h-6 bg-green-500 rounded-full"></span>
                 University Announcements
             </h2>
 
-            <div className="flex-1 flex flex-col justify-center items-center px-4 overflow-hidden">
+            <div className="flex-1 flex flex-col justify-center items-center px-1 min-[426px]:px-4 overflow-hidden">
                 {list.length === 0 ? (
-                    <p className="text-sm font-medium text-gray-400">No announcements yet.</p>
+                    <p className="text-[15px] min-[426px]:text-base min-[1025px]:text-sm font-medium text-gray-400 text-center">No announcements yet.</p>
                 ) : (
                 <>
 
@@ -92,16 +92,16 @@ export default function AnnouncementsWidget({
                         className="flex-1 cursor-pointer hover:opacity-95 transition-opacity max-w-2xl"
                         onClick={handleAnnouncementClick}
                     >
-                        <div key={`text-${activeAnnounce}`} className="relative bg-gray-50 border border-gray-200 p-4 rounded-2xl animate-fade-in-right shadow-sm min-h-[124px]">
+                        <div key={`text-${activeAnnounce}`} className="relative bg-gray-50 border border-gray-200 p-3 min-[426px]:p-4 rounded-2xl animate-fade-in-right shadow-sm min-h-[140px] min-[1025px]:min-h-[124px]">
                             <div className="relative z-10">
-                                <p className="text-xs font-bold text-green-600 mb-1">{current?.sender || current?.createdBy?.name || "Admin"}</p>
-                                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs font-bold text-green-600 mb-1">{current?.sender || current?.createdBy?.name || "Admin"}</p>
+                                <p className="text-[15px] min-[426px]:text-base min-[1025px]:text-sm text-gray-700 leading-relaxed font-medium line-clamp-4 min-[1025px]:line-clamp-none">
                                     {enableAdvancedPreview ? shortMessage : message}
                                 </p>
                                 {enableAdvancedPreview && isLongMessage && (
                                     <button
                                         type="button"
-                                        className="mt-2 text-xs font-semibold text-blue-600 hover:underline"
+                                        className="mt-2 text-xs min-[426px]:text-[13px] min-[1025px]:text-xs font-semibold text-blue-600 hover:underline"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setTextModalOpen(true);
@@ -113,7 +113,7 @@ export default function AnnouncementsWidget({
                                 {current?.attachment?.kind === "file" && (
                                     <button
                                         type="button"
-                                        className="mt-2 inline-block text-xs font-semibold text-blue-600 hover:underline"
+                                        className="mt-2 inline-block text-xs min-[426px]:text-[13px] min-[1025px]:text-xs font-semibold text-blue-600 hover:underline"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (enableAdvancedPreview) openDocPreview();

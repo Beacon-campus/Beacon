@@ -30,12 +30,12 @@ export default function NotificationsWidget({
     const activePalette = getTypePalette(activeItem);
 
     return (
-        <div className="premium-card p-6 flex-1 flex flex-col items-center justify-center gap-2 relative">
-            <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest w-full text-center z-10 mb-1">
+        <div className="premium-card min-h-[168px] min-[1025px]:min-h-[180px] p-4 min-[426px]:p-5 min-[1025px]:p-6 flex-1 flex flex-col items-center justify-center gap-2 relative">
+            <h3 className="text-[11px] min-[426px]:text-[13px] min-[1025px]:text-xs font-black text-gray-500 uppercase tracking-widest w-full text-center z-10 mb-1">
                 Notifications
             </h3>
 
-            <div className="flex-1 w-full flex items-center gap-3 px-2 z-10">
+            <div className="flex-1 w-full flex items-center gap-2 min-[426px]:gap-3 px-1 min-[426px]:px-2 z-10">
                 <div className="flex flex-col items-center gap-1 z-20 shrink-0">
                     {/* Up Arrow */}
                     <button
@@ -78,15 +78,15 @@ export default function NotificationsWidget({
                             onClick={() => navigate(onClickRoute)}
                         >
                             <div key={activeNotif} className="animate-fade-in-up">
-                                <p className={`text-xs font-bold uppercase mb-1 ${activePalette.text}`}>
+                                <p className={`text-[11px] min-[426px]:text-[13px] min-[1025px]:text-xs font-bold uppercase mb-1 ${activePalette.text}`}>
                                     {String(activeItem?.type || "info").replace('_', ' ')}
                                 </p>
-                                <p className="text-sm font-bold text-gray-800 line-clamp-1">{activeItem?.title || "Notification"}</p>
-                                <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{activeItem?.desc || ""}</p>
+                                <p className="text-[15px] min-[426px]:text-base min-[1025px]:text-[15px] font-bold text-gray-800 line-clamp-2">{activeItem?.title || "Notification"}</p>
+                                <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs text-gray-500 line-clamp-2 mt-0.5">{activeItem?.desc || ""}</p>
                             </div>
                         </div>
                     ) : (
-                        <p className="pl-2 text-xs text-gray-400 font-medium">No notifications yet.</p>
+                        <p className="pl-2 text-xs min-[426px]:text-[13px] min-[1025px]:text-xs text-gray-400 font-medium">No notifications yet.</p>
                     )}
                 </div>
             </div>

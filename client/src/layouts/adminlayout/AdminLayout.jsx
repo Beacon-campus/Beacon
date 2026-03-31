@@ -260,12 +260,12 @@ export default function AdminLayout() {
         </div>
 
         {/* Content Area */}
-        <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "min-[769px]:ml-28 ml-0" : "min-[769px]:ml-64 ml-0"} pb-16 min-[769px]:pb-0 pt-[64px] min-[769px]:pt-0`}>
-          <div className="px-6 pt-4 pb-0 max-[425px]:px-2">
+        <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "min-[769px]:ml-28 ml-0" : "min-[769px]:ml-64 ml-0"} pb-20 min-[769px]:pb-0 pt-[64px] min-[769px]:pt-0`}>
+          <div className="px-6 pt-4 pb-0 max-[768px]:px-3 max-[425px]:px-2">
             <Navbar />
           </div>
 
-          <div className="flex-1 px-6 max-[425px]:px-2 pb-6 overflow-hidden flex flex-col">
+          <div className="flex-1 px-6 max-[768px]:px-3 max-[425px]:px-2 pb-6 overflow-hidden flex flex-col">
             <div className="flex-1 min-h-0 overflow-y-auto w-full no-scrollbar">
               <Outlet />
             </div>
@@ -277,7 +277,7 @@ export default function AdminLayout() {
           <div className="max-[768px]:block hidden fixed inset-0 z-[60] bg-black/10 transition-opacity" onClick={() => setMobileMenuOpen(false)}></div>
         )}
 
-        <div className="max-[768px]:flex hidden fixed bottom-0 left-0 right-0 z-[70] bg-white border-t border-gray-200 px-2 sm:px-6 py-2 flex justify-around items-center shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+        <div className="max-[768px]:flex hidden fixed bottom-0 left-0 right-0 z-[70] bg-white border-t border-gray-200 px-3 sm:px-6 py-2.5 flex justify-around items-end shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
           {/* Mobile Menu Overlay absolutely positioned above */}
           {mobileMenuOpen && (
             <div className="absolute bottom-[100%] left-0 right-0 min-h-[30vh] max-h-[60vh] overflow-hidden flex flex-col">
@@ -300,19 +300,19 @@ export default function AdminLayout() {
             </div>
           )}
 
-          <Link to="/admin/dashboard" className={`flex flex-col items-center gap-1 transition-colors text-gray-500 hover:text-gray-800 px-4 py-1 max-[425px]:px-2`}>
-            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-5 max-[425px]:h-5 fill-current"><path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Zm10,15h-4c-1.103,0-2-.897-2-2v-5c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v2c0,2.757-2.243,5-5,5Zm3-11h-7c-1.103,0-2-.897-2-2V2c0-1.103.897-2,2-2h4c2.757,0,5,2.243,5,5v6c0,1.103-.897,2-2,2Zm-13,11h-4c-2.757,0-5-2.243-5-5v-6c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v9c0,1.103-.897,2-2,2Z" /></svg>
-            <span className="text-[10px] max-[425px]:text-[8px] font-bold">Dashboard</span>
+          <Link to="/admin/dashboard" className={`flex flex-col items-center gap-1.5 transition-colors text-gray-500 hover:text-gray-800 px-5 py-1 max-[425px]:px-3`}>
+            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-[22px] max-[425px]:h-[22px] fill-current"><path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Zm10,15h-4c-1.103,0-2-.897-2-2v-5c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v2c0,2.757-2.243,5-5,5Zm3-11h-7c-1.103,0-2-.897-2-2V2c0-1.103.897-2,2-2h4c2.757,0,5,2.243,5,5v6c0,1.103-.897,2-2,2Zm-13,11h-4c-2.757,0-5-2.243-5-5v-6c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v9c0,1.103-.897,2-2,2Z" /></svg>
+            <span className="text-[11px] max-[425px]:text-[9px] font-bold">Dashboard</span>
           </Link>
 
-          <Link to="/admin" className="relative -top-3 glass-panel p-1 rounded-full shadow-md border border-gray-100 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
-            <img src={avatarUrl} alt="Profile" className="w-12 h-12 max-[425px]:w-10 max-[425px]:h-10 rounded-full object-cover border-2 border-slate-700 bg-white" />
+          <Link to="/admin" className="relative -top-1.5 max-[425px]:-top-1 glass-panel p-1.5 rounded-full shadow-md border border-gray-100 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+            <img src={avatarUrl} alt="Profile" className="w-12 h-12 max-[425px]:w-11 max-[425px]:h-11 rounded-full object-cover border-2 border-slate-700 bg-white" />
             <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
           </Link>
 
-          <button onClick={() => setMobileMenuOpen(true)} className={`flex flex-col items-center gap-1 transition-colors px-4 py-1 max-[425px]:px-2 ${mobileMenuOpen ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}>
-            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-5 max-[425px]:h-5 fill-current"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" /></svg>
-            <span className="text-[10px] max-[425px]:text-[8px] font-bold">Menu</span>
+          <button onClick={() => setMobileMenuOpen(true)} className={`flex flex-col items-center gap-1.5 transition-colors px-5 py-1 max-[425px]:px-3 ${mobileMenuOpen ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}>
+            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-[22px] max-[425px]:h-[22px] fill-current"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" /></svg>
+            <span className="text-[11px] max-[425px]:text-[9px] font-bold">Menu</span>
           </button>
         </div>
       </div>
