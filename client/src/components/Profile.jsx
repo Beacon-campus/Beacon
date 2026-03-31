@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../services/apiClient";
@@ -275,283 +275,28 @@ export default function ProfileLayout() {
   ];
 
   return (
-    <div className="w-full h-full p-6">
-
-
-      <div className="flex gap-6 h-full w-full items-stretch">
-
-        {/* ================= LEFT PANEL ================= */}
-        <div className="flex-1 border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden relative">
-
-          {activeSection === "profile" && (
-            <div className="relative h-full overflow-y-auto no-scrollbar bg-gray-50/30">
-
-              {/* Decorative Header Banner */}
-              <div className={`h-40 bg-gradient-to-r ${bannerGradient} relative shrink-0 transition-colors duration-500`}>
-                <div className="absolute inset-0 backdrop-blur-[2px] opacity-20"></div> {/* Optional subtle frost for depth */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <button
-                    onClick={() => setIsEditModalOpen(true)}
-                    className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/50 backdrop-blur-md border border-white/30 shadow-sm rounded-full text-xs font-semibold text-gray-800 hover:text-blue-700 hover:bg-white/60 transition-all hover:shadow-md"
-                  >
-                    <svg className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => setIsPreviewModalOpen(true)}
-                    className="group flex items-center gap-1.5 px-3 py-1.5 bg-white/50 backdrop-blur-md border border-white/30 shadow-sm rounded-full text-xs font-semibold text-gray-800 hover:text-purple-700 hover:bg-white/60 transition-all hover:shadow-md"
-                  >
-                    <svg className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    Preview
-                  </button>
-                </div>
-              </div>
-
-              <div className="px-8 pb-8 -mt-16 relative z-10">
-
-                {/* Header Row */}
-                <div className="flex items-end gap-6 mb-8">
-                  {/* Large Avatar Circle (No Box) */}
-                  <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0 bg-gray-100">
-                    <img
-                      src={getAvatarUrl(profileData.profileImageId)}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="pb-2 min-w-0">
-                    <h1 className="text-3xl font-black text-gray-800 tracking-tight truncate leading-tight">
-                      {profileData.displayName || "Student"}
-                    </h1>
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                      <span className="truncate">{user.profile?.name || "Official Name"}</span>
-                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                      <span className="uppercase text-xs tracking-wider font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">{user.role}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Info Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                  {/* About Me Card */}
-                  <div className="md:col-span-2 group bg-white rounded-2xl p-5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.05)] border border-gray-100 transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-gray-200">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="p-1.5 rounded-lg bg-orange-50 text-orange-500">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                      </div>
-                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">About Me</h3>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed font-medium pl-1">
-                      {profileData.about || <span className="text-gray-400 italic">No description provided.</span>}
-                    </p>
-                  </div>
-
-                  {/* ID Card */}
-                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 transition-all hover:shadow-md group">
-                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0h4" /></svg>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Registration ID</p>
-                      <p className="text-sm font-bold text-gray-800 font-mono truncate">{user.regno || user.profile?.regno || "N/A"}</p>
-                    </div>
-                  </div>
-
-                  {/* Email Card */}
-                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 transition-all hover:shadow-md group">
-                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-purple-50 group-hover:text-purple-500 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Contact</p>
-                      <p className="text-sm font-semibold text-gray-700 truncate" title={user.email}>{user.email}</p>
-                    </div>
-                  </div>
-
-                  {/* Academic Info Row */}
-                  <div className={`md:col-span-2 grid grid-cols-2 ${user.role === 'student' ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
-
-                    {/* Course */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:border-blue-100 block group relative overflow-hidden">
-                      <div className="absolute -right-2 -top-2 w-16 h-16 bg-blue-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
-                      <div className="flex items-center gap-2 mb-2 relative z-10">
-                        <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                        </svg>
-                        <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.role === 'teacher' ? 'Dept' : 'Course'}</span>
-                      </div>
-                      <span className="text-lg font-black text-gray-800 relative z-10 block truncate pr-2">{user.role === 'teacher' ? (user.profile?.department || "N/A") : (user.profile?.course || "N/A")}</span>
-                    </div>
-
-                    {/* Semester */}
-                    {user.role === 'student' && (
-                      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:border-pink-100 block group relative overflow-hidden">
-                        <div className="absolute -right-2 -top-2 w-16 h-16 bg-pink-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
-                        <div className="flex items-center gap-2 mb-2 relative z-10">
-                          <svg className="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
-                          </svg>
-                          <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest">Semester</span>
-                        </div>
-                        <span className="text-lg font-black text-gray-800 relative z-10 block pl-1">{user.profile?.semester || "-"}</span>
-                      </div>
-                    )}
-
-                    {/* Shift */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:border-amber-100 block group relative overflow-hidden">
-                      <div className="absolute -right-2 -top-2 w-16 h-16 bg-amber-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
-                      <div className="flex items-center gap-2 mb-2 relative z-10">
-                        <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest">Shift</span>
-                      </div>
-                      <span className="text-lg font-black text-gray-800 truncate relative z-10 block pl-1">{user.profile?.shift || "N/A"}</span>
-                    </div>
-
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-          )}
-
-
-
-          {/* ================= SECTION CONTENT (Guidelines, Credits, etc.) ================= */}
-          {activeSection !== "profile" && (
-            <div className="flex flex-col h-full p-6">
-              <div className="mb-4 shrink-0 border-b pb-4">
-
-                {/* Go Back Button */}
-                <button
-                  onClick={() => setActiveSection("profile")}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all font-medium mb-4 group w-fit"
-                >
-                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current group-hover:-translate-x-1 transition-transform">
-                    <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
-                  </svg>
-                  <span className="text-sm">Go back</span>
-                </button>
-
-                <h1 className="text-2xl font-bold text-primary">{sections.find((s) => s.key === activeSection)?.label}</h1>
-              </div>
-
-              <div className="flex-1 overflow-y-auto no-scrollbar pr-2">
-                {/* === CONTENT SWITCHER === */}
-                {activeSection === "guidelines" ? (
-                  <div className="space-y-6 text-gray-700 text-sm leading-7">
-                    <p className="font-medium">
-                      These guidelines define acceptable usage, responsibilities,
-                      and limitations of the platform.
-                    </p>
-                    <Section title="General Rules" items={["Accounts are personal.", "Access is role-based.", "Activity is logged."]} />
-                    <Section title="Home Rules" items={["Dashboard is auto-generated.", "To-do lists are private."]} />
-                    <Section title="AI Rules" items={["AI is for assistance only.", "Check generated content."]} />
-                    <Section title="Privacy" items={["Data is secured.", "Do not share passwords."]} />
-                  </div>
-                ) : activeSection === "credits" ? (
-                  <div className="text-gray-700">
-                    <p className="mb-4">Developed by:</p>
-                    <FeatureList
-                      unlocked={featureUnlocked}
-                      onNameClick={(name) => {
-                        const eventKey = FEATURE_EVENT_BY_NAME[name];
-                        if (!eventKey) return;
-                        setActiveFeatureEvent(eventKey);
-                        setIsFeatureEventOpen(true);
-                      }}
-                    />
-                  </div>
-                ) : activeSection === "security" ? (
-                  <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h3 className="text-lg font-bold text-primary mb-4">Password & Authentication</h3>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-700">Change Password</p>
-                          <p className="text-sm text-gray-500">Update your password to keep your account secure.</p>
-                        </div>
-                        <button
-                          onClick={() => setIsPasswordModalOpen(true)}
-                          className="px-4 py-2 bg-[#0F172A] text-white rounded-lg text-sm font-medium hover:bg-[#1e293b] transition-all shadow-md active:scale-95"
-                        >
-                          Change Password
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                ) : activeSection === "open" ? (
-                  <div className="space-y-6 text-gray-700 text-sm leading-7">
-                    <p className="font-medium">
-                      This project uses open-source libraries and third-party assets. Thanks to the
-                      creators and communities behind these tools.
-                    </p>
-
-                    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                      <h3 className="text-sm font-bold text-gray-800 mb-3">Libraries & Assets</h3>
-                      <ul className="space-y-3">
-                        {openSourceAttributions.map((item) => (
-                          <li key={item.name} className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-gray-800">{item.name}</span>
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
-                              >
-                                Source
-                              </a>
-                            </div>
-                            <div className="text-xs text-gray-500">{item.usage}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="text-xs text-gray-500 italic">
-                      If any attribution is missing or incorrect, let us know and we will update it
-                      promptly.
-                    </div>
-                  </div>
-
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 italic">
-                    Content for {activeSection} coming soon.
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ================= RIGHT PANEL (Navigation with Icons) ================= */}
-        <div className="w-1/3 max-w-xs p-4 h-full overflow-y-auto no-scrollbar">
-          <div className="border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col overflow-hidden">
-            {sections.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => handleSectionNavigation(item.key)}
-                className={`w-full flex items-center gap-3 py-4 px-5 text-sm font-medium transition-all duration-200 text-left group
-                  ${activeSection === item.key 
-                    ? "bg-green-50 text-green-700 border-l-4 border-l-green-500" 
-                    : "bg-white text-gray-500 hover:bg-gray-50/50 hover:text-gray-800 border-l-4 border-l-transparent"}
-                  border-b border-black/5 last:border-b-0
-                `}
-              >
-                {renderIcon(item.key, activeSection === item.key)}
-                <span className="whitespace-nowrap">{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-      </div >
+    <div className="h-full w-full">
+      <ProfileResponsiveView
+        activeSection={activeSection}
+        bannerGradient={bannerGradient}
+        featureUnlocked={featureUnlocked}
+        handleSectionNavigation={handleSectionNavigation}
+        onBackToProfile={() => setActiveSection("profile")}
+        onEditProfile={() => setIsEditModalOpen(true)}
+        onOpenFeatureEvent={(name) => {
+          const eventKey = FEATURE_EVENT_BY_NAME[name];
+          if (!eventKey) return;
+          setActiveFeatureEvent(eventKey);
+          setIsFeatureEventOpen(true);
+        }}
+        onOpenPasswordModal={() => setIsPasswordModalOpen(true)}
+        onPreviewProfile={() => setIsPreviewModalOpen(true)}
+        openSourceAttributions={openSourceAttributions}
+        profileData={profileData}
+        renderIcon={renderIcon}
+        sections={sections}
+        user={user}
+      />
 
       <FeatureEventOverlay
         open={isFeatureEventOpen}
@@ -690,7 +435,524 @@ export default function ProfileLayout() {
         />
       </Modal>
 
-    </div >
+    </div>
+  );
+}
+
+function ProfileResponsiveView({
+  activeSection,
+  bannerGradient,
+  featureUnlocked,
+  handleSectionNavigation,
+  onBackToProfile,
+  onEditProfile,
+  onOpenFeatureEvent,
+  onOpenPasswordModal,
+  onPreviewProfile,
+  openSourceAttributions,
+  profileData,
+  renderIcon,
+  sections,
+  user,
+}) {
+  const activeLabel = sections.find((section) => section.key === activeSection)?.label;
+  const statGridClass = user.role === "student" ? "grid-cols-3" : "grid-cols-2";
+  const primaryStatLabel = user.role === "teacher" ? "Dept" : "Course";
+  const primaryStatValue = user.role === "teacher"
+    ? (user.profile?.department || "N/A")
+    : (user.profile?.course || "N/A");
+  const mobileSectionRef = useRef(null);
+  const desktopSectionRef = useRef(null);
+  const desktopProfileRef = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    mobileSectionRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    desktopSectionRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    desktopProfileRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [activeSection]);
+
+  return (
+    <div className="h-full w-full px-4 py-4 lg:p-6">
+      <div className="mx-auto flex h-full w-full max-w-md flex-col lg:max-w-none lg:flex-row lg:items-stretch lg:gap-6">
+        <div className="lg:hidden">
+          {activeSection === "profile" ? (
+            <div className="space-y-4">
+              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.07)]">
+                <div className={`relative h-24 bg-gradient-to-r ${bannerGradient} transition-colors duration-500`}>
+                  <div className="absolute inset-0 bg-white/10" />
+                  <div className="absolute right-4 top-4 flex items-center gap-2">
+                    <button
+                      onClick={onPreviewProfile}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/75 text-gray-700 shadow-sm backdrop-blur-md transition hover:bg-white"
+                      aria-label="Preview profile"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={onEditProfile}
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-white/85 text-gray-800 shadow-sm backdrop-blur-md transition hover:bg-white"
+                      aria-label="Edit profile"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative px-4 pb-4">
+                  <div className="-mt-10 flex flex-col items-center text-center">
+                    <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg ring-1 ring-black/5">
+                      <img src={getAvatarUrl(profileData.profileImageId)} alt="Avatar" className="h-full w-full object-cover" />
+                    </div>
+                    <h1 className="mt-3 text-[34px] font-black leading-none tracking-tight text-gray-900">
+                      {profileData.displayName || "Student"}
+                    </h1>
+                    <p className="mt-1 text-sm font-medium leading-5 text-gray-500">
+                      {user.profile?.name || "Official Name"}
+                    </p>
+                    <div className="mt-3 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                      {user.role}
+                    </div>
+
+                    <div className="mt-4 w-full rounded-[24px] border border-black/5 bg-[#f8f8f8] px-4 py-3.5 text-left">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">About Me</p>
+                      <p className="mt-2 text-sm leading-6 text-gray-600">
+                        {profileData.about || <span className="italic text-gray-400">No description provided.</span>}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 grid w-full grid-cols-2 gap-3 text-left">
+                      <div className="rounded-[22px] border border-black/5 bg-white px-3 py-3 shadow-sm">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Registration ID</p>
+                        <p className="mt-2 break-words text-[13px] font-semibold leading-5 text-gray-800">
+                          {user.regno || user.profile?.regno || "N/A"}
+                        </p>
+                      </div>
+                      <div className="rounded-[22px] border border-black/5 bg-white px-3 py-3 shadow-sm">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Contact</p>
+                        <p className="mt-2 break-all text-[13px] font-semibold leading-5 text-gray-800" title={user.email}>
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 w-full rounded-[26px] border border-black/5 bg-[#f4f4f5] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                      <div className={`grid ${statGridClass} gap-2`}>
+                        <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
+                          <p className="break-words text-[17px] font-black leading-5 text-gray-900">{primaryStatValue}</p>
+                          <p className="mt-1 text-[11px] font-medium text-gray-500">{primaryStatLabel}</p>
+                        </div>
+                        {user.role === "student" && (
+                          <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
+                            <p className="text-[17px] font-black leading-5 text-gray-900">{user.profile?.semester || "-"}</p>
+                            <p className="mt-1 text-[11px] font-medium text-gray-500">Semester</p>
+                          </div>
+                        )}
+                        <div className="rounded-[18px] bg-white px-2 py-3 text-center shadow-sm">
+                          <p className="break-words text-[17px] font-black leading-5 text-gray-900">{user.profile?.shift || "N/A"}</p>
+                          <p className="mt-1 text-[11px] font-medium text-gray-500">Shift</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+                <div className="border-b border-black/5 px-5 py-4">
+                  <p className="text-sm font-semibold text-gray-500">Settings</p>
+                </div>
+                <div className="divide-y divide-black/5">
+                  {sections.map((item) => (
+                    <button
+                      key={item.key}
+                      onClick={() => handleSectionNavigation(item.key)}
+                      className="group flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-gray-50"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-100 text-gray-600">
+                        {renderIcon(item.key, false)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-gray-800">{item.label}</p>
+                      </div>
+                      <svg className="h-4 w-4 text-gray-400 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col overflow-hidden rounded-[30px] border border-black/5 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+              <div className="grid grid-cols-[auto_1fr_auto] items-center border-b border-black/5 px-4 py-4">
+                <button
+                  onClick={onBackToProfile}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                  aria-label="Go back"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
+                  </svg>
+                </button>
+                <h1 className="text-center text-xl font-black tracking-tight text-gray-900">{activeLabel}</h1>
+                <span className="invisible flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium">
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
+                  </svg>
+                </span>
+              </div>
+
+              <div ref={mobileSectionRef} className="flex-1 overflow-y-auto no-scrollbar px-4 py-5">
+                <ProfileSectionContent
+                  activeSection={activeSection}
+                  compact={true}
+                  featureUnlocked={featureUnlocked}
+                  onOpenFeatureEvent={onOpenFeatureEvent}
+                  onOpenPasswordModal={onOpenPasswordModal}
+                  openSourceAttributions={openSourceAttributions}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden lg:flex lg:h-full lg:flex-1 lg:flex-col">
+          {activeSection === "profile" ? (
+            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+              <div ref={desktopProfileRef} className="relative h-full overflow-y-auto no-scrollbar bg-gray-50/30">
+                <div className={`relative h-40 shrink-0 bg-gradient-to-r ${bannerGradient} transition-colors duration-500`}>
+                  <div className="absolute inset-0 bg-white/10" />
+                  <div className="absolute right-6 top-6 flex items-center gap-3">
+                    <button
+                      onClick={onPreviewProfile}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white/75 text-gray-700 shadow-sm backdrop-blur-md transition hover:bg-white"
+                      aria-label="Preview profile"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={onEditProfile}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white/85 text-gray-800 shadow-sm backdrop-blur-md transition hover:bg-white"
+                      aria-label="Edit profile"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative z-10 -mt-16 px-8 pb-8">
+                  <div className="mb-8 flex items-end gap-6">
+                    <div className="h-36 w-36 shrink-0 overflow-hidden rounded-full border-4 border-white bg-gray-100 shadow-lg">
+                      <img
+                        src={getAvatarUrl(profileData.profileImageId)}
+                        alt="Avatar"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+
+                    <div className="min-w-0 pb-2">
+                      <h1 className="truncate text-3xl font-black leading-tight tracking-tight text-gray-800">
+                        {profileData.displayName || "Student"}
+                      </h1>
+                      <div className="mt-3 flex items-center gap-2 text-sm font-medium text-gray-500">
+                        <span className="truncate">{user.profile?.name || "Official Name"}</span>
+                        <span className="h-1 w-1 rounded-full bg-gray-300" />
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-blue-500">
+                          {user.role}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div className="group md:col-span-2 rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.05)] transition-all hover:border-gray-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+                      <div className="mb-3 flex items-center gap-2">
+                        <div className="rounded-lg bg-orange-50 p-1.5 text-orange-500">
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                            <path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">About Me</h3>
+                      </div>
+                      <p className="pl-1 text-sm font-medium leading-relaxed text-gray-600">
+                        {profileData.about || <span className="italic text-gray-400">No description provided.</span>}
+                      </p>
+                    </div>
+
+                    <div className="group flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors group-hover:bg-blue-50 group-hover:text-blue-500">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0h4" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Registration ID</p>
+                        <p className="truncate font-mono text-sm font-bold text-gray-800">{user.regno || user.profile?.regno || "N/A"}</p>
+                      </div>
+                    </div>
+
+                    <div className="group flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors group-hover:bg-purple-50 group-hover:text-purple-500">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Contact</p>
+                        <p className="truncate text-sm font-semibold text-gray-700" title={user.email}>{user.email}</p>
+                      </div>
+                    </div>
+
+                    <div className={`grid grid-cols-2 gap-4 md:col-span-2 ${user.role === "student" ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+                      <div className="group relative block overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-blue-100 hover:shadow-md">
+                        <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-blue-50 opacity-50 transition-transform group-hover:scale-110" />
+                        <div className="relative z-10 mb-2 flex items-center gap-2">
+                          <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                          </svg>
+                          <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">{primaryStatLabel}</span>
+                        </div>
+                        <span className="relative z-10 block truncate pr-2 text-lg font-black text-gray-800">{primaryStatValue}</span>
+                      </div>
+
+                      {user.role === "student" && (
+                        <div className="group relative block overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-pink-100 hover:shadow-md">
+                          <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-pink-50 opacity-50 transition-transform group-hover:scale-110" />
+                          <div className="relative z-10 mb-2 flex items-center gap-2">
+                            <svg className="h-4 w-4 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                              <line x1="16" x2="16" y1="2" y2="6" />
+                              <line x1="8" x2="8" y1="2" y2="6" />
+                              <line x1="3" x2="21" y1="10" y2="10" />
+                            </svg>
+                            <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">Semester</span>
+                          </div>
+                          <span className="relative z-10 block pl-1 text-lg font-black text-gray-800">{user.profile?.semester || "-"}</span>
+                        </div>
+                      )}
+
+                      <div className="group relative block overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:border-amber-100 hover:shadow-md">
+                        <div className="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-amber-50 opacity-50 transition-transform group-hover:scale-110" />
+                        <div className="relative z-10 mb-2 flex items-center gap-2">
+                          <svg className="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">Shift</span>
+                        </div>
+                        <span className="relative z-10 block truncate pl-1 text-lg font-black text-gray-800">{user.profile?.shift || "N/A"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col overflow-hidden rounded-[34px] border border-black/5 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
+              <div className="border-b border-black/5 px-8 py-6">
+                <button
+                  onClick={onBackToProfile}
+                  className="mb-4 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
+                  </svg>
+                  <span>Go back</span>
+                </button>
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">Settings</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-900">{activeLabel}</h1>
+              </div>
+              <div ref={desktopSectionRef} className="flex-1 overflow-y-auto no-scrollbar px-8 py-8">
+                <ProfileSectionContent
+                  activeSection={activeSection}
+                  compact={false}
+                  featureUnlocked={featureUnlocked}
+                  onOpenFeatureEvent={onOpenFeatureEvent}
+                  onOpenPasswordModal={onOpenPasswordModal}
+                  openSourceAttributions={openSourceAttributions}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden lg:block lg:h-full lg:w-1/3 lg:max-w-xs">
+          <div className="flex h-full flex-col overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <div className="border-b border-black/5 px-6 py-5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">Settings</p>
+              <h2 className="mt-2 text-xl font-black tracking-tight text-gray-900">Profile Menu</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4">
+              <div className="space-y-1">
+                {sections.map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => handleSectionNavigation(item.key)}
+                    className={`group flex w-full items-center gap-3 border-l-4 px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                      activeSection === item.key
+                        ? "border-l-green-500 bg-green-50 text-green-700"
+                        : "border-l-transparent bg-white text-gray-500 hover:bg-gray-50/60 hover:text-gray-800"
+                    }`}
+                  >
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                      activeSection === item.key ? "bg-green-100/80 text-green-700" : "bg-gray-50 text-gray-500"
+                    }`}>
+                      {renderIcon(item.key, activeSection === item.key)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate">{item.label}</p>
+                    </div>
+                    <svg
+                      className={`h-4 w-4 transition-transform ${
+                        activeSection === item.key ? "text-green-600" : "text-gray-400 group-hover:translate-x-0.5"
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileSectionContent({
+  activeSection,
+  compact,
+  featureUnlocked,
+  onOpenFeatureEvent,
+  onOpenPasswordModal,
+  openSourceAttributions,
+}) {
+  const wrapperClass = compact
+    ? "rounded-[28px] border border-black/5 bg-[#fcfcfc] p-5 shadow-sm"
+    : "max-w-3xl rounded-[30px] border border-black/5 bg-[#fcfcfc] p-7 shadow-sm";
+
+  if (activeSection === "guidelines") {
+    return (
+      <div className={`${wrapperClass} text-gray-700`}>
+        <p className={`${compact ? "text-base leading-9" : "text-lg leading-9"} font-medium`}>
+          These guidelines define acceptable usage, responsibilities,
+          and limitations of the platform.
+        </p>
+        <div className={`${compact ? "mt-6 space-y-2 text-sm leading-8" : "mt-8 space-y-3 text-sm leading-8"}`}>
+          <Section title="General Rules" items={["Accounts are personal.", "Access is role-based.", "Activity is logged."]} />
+          <Section title="Home Rules" items={["Dashboard is auto-generated.", "To-do lists are private."]} />
+          <Section title="AI Rules" items={["AI is for assistance only.", "Check generated content."]} />
+          <Section title="Privacy" items={["Data is secured.", "Do not share passwords."]} />
+        </div>
+      </div>
+    );
+  }
+
+  if (activeSection === "credits") {
+    return (
+      <div className={`${wrapperClass} text-gray-700`}>
+        <p className="mb-4 text-sm font-medium text-gray-600">Developed by:</p>
+        <FeatureList
+          unlocked={featureUnlocked}
+          onNameClick={onOpenFeatureEvent}
+        />
+      </div>
+    );
+  }
+
+  if (activeSection === "security") {
+    return (
+      <div className={wrapperClass}>
+        <div className={`${compact ? "rounded-[24px] p-5" : "rounded-[26px] p-6"} border border-black/5 bg-white shadow-sm`}>
+          <h3 className={`${compact ? "text-lg" : "text-xl"} font-bold text-primary`}>Password & Authentication</h3>
+          <p className="mt-2 text-sm leading-6 text-gray-500">
+            Update your password to keep your account secure.
+          </p>
+          {compact ? (
+            <button
+              onClick={onOpenPasswordModal}
+              className="mt-5 w-full rounded-2xl bg-[#0F172A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1e293b]"
+            >
+              Change Password
+            </button>
+          ) : (
+            <div className="mt-5 flex items-center justify-between gap-6">
+              <div>
+                <p className="font-medium text-gray-700">Change Password</p>
+                <p className="mt-1 text-sm text-gray-500">Update your password to keep your account secure.</p>
+              </div>
+              <button
+                onClick={onOpenPasswordModal}
+                className="rounded-2xl bg-[#0F172A] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1e293b]"
+              >
+                Change Password
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (activeSection === "open") {
+    return (
+      <div className={`${wrapperClass} text-sm leading-7 text-gray-700`}>
+        <p className="font-medium">
+          This project uses open-source libraries and third-party assets. Thanks to the
+          creators and communities behind these tools.
+        </p>
+
+        <div className={`${compact ? "mt-5 rounded-[24px] p-4" : "mt-6 rounded-[26px] p-5"} border border-black/5 bg-white shadow-sm`}>
+          <h3 className="text-sm font-bold text-gray-800">Libraries & Assets</h3>
+          <ul className="mt-4 space-y-3">
+            {openSourceAttributions.map((item) => (
+              <li key={item.name} className={`${compact ? "p-3" : "p-4"} rounded-2xl border border-black/5 bg-[#fafafa]`}>
+                <div className={`flex ${compact ? "items-center justify-between" : "items-center gap-3"}`}>
+                  <span className="font-semibold text-gray-800">{item.name}</span>
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-semibold text-blue-600 underline"
+                  >
+                    Source
+                  </a>
+                </div>
+                <div className="mt-1 text-xs text-gray-500">{item.usage}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-4 text-xs italic text-gray-500">
+          If any attribution is missing or incorrect, let us know and we will update it
+          promptly.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full items-center justify-center rounded-[30px] border border-dashed border-black/10 bg-[#fcfcfc] px-6 py-16 text-center text-sm italic text-gray-400">
+      Content for {activeSection} coming soon.
+    </div>
   );
 }
 
