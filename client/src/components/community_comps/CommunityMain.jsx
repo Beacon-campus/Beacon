@@ -221,7 +221,7 @@ export default function Community({ role }) {
   const classColor = activeClassroom ? getClassroomColor(activeClassroom._id) : "#E2F0CB";
 
   return (
-    <div className="w-full h-full relative flex flex-col">
+    <div className="w-full h-full relative flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       {role === "teacher" && teacherViewMode === "list" && (
         <TeacherClassList
           classes={secondaryChats.filter(c => c.type === 'classroom' && c.classroomMode === 'official')}
