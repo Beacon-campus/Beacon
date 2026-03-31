@@ -254,3 +254,135 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ========================================================= */
+/* BEACON LOADING SPINNER                                    */
+/* ========================================================= */
+
+@keyframes beacon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes beacon-arc {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35;
+  }
+
+  100% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: -124;
+  }
+}
+
+@keyframes beacon-scale-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes beacon-flash {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes beacon-glow {
+  0%,
+  100% {
+    opacity: 0.15;
+    filter: blur(8px);
+  }
+
+  50% {
+    opacity: 0.35;
+    filter: blur(12px);
+  }
+}
+
+@keyframes mesh-drift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.beacon-mesh-bg {
+  background: linear-gradient(
+    135deg,
+    #06b6d4 0%,
+    #a78bfa 25%,
+    #f59e0b 50%,
+    #a78bfa 75%,
+    #06b6d4 100%
+  );
+  background-size: 400% 400%;
+  animation: mesh-drift 12s ease infinite;
+}
+
+.soft-mesh-bg {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.4) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(187, 247, 208, 0.4) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(216, 180, 254, 0.3) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(199, 210, 254, 0.3) 0px, transparent 50%);
+  background-size: 100% 100%;
+}
+
+.beacon-spinner-container {
+  animation: beacon-scale-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.beacon-spinner-rotation {
+  animation: beacon-spin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center center;
+}
+
+.beacon-spinner-track {
+  stroke: #0f172a;
+  stroke-opacity: 0.15;
+}
+
+.beacon-spinner-arc {
+  stroke: #7ef640;
+  animation: beacon-arc 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(126, 246, 64, 0.4));
+}
+
+.beacon-flash-dot {
+  animation: beacon-flash 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.beacon-glow-ring {
+  animation: beacon-glow 2s ease-in-out infinite;
+}

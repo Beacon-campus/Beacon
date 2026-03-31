@@ -395,12 +395,16 @@ export default function StudentLayout() {
               <Navbar />
             </div>
 
+<<<<<<< HEAD
             <div className="flex-1 px-6 max-[768px]:px-0 pb-6 max-[768px]:pb-0 overflow-hidden flex flex-col">
+=======
+            <div className={`flex-1 px-6 max-[768px]:px-0 ${isCommunity ? "max-[768px]:px-3 max-[425px]:px-2" : ""} pb-6 max-[768px]:pb-0 overflow-hidden flex flex-col bg-transparent`} style={{ backgroundColor: "transparent" }}>
+>>>>>>> b85c1ab4d6378d5cb00b267befb71ae64fc36b94
               <div className="shrink-0 mb-3 pb-0 hidden min-[769px]:block">
                 <Breadcrumb />
               </div>
               
-              <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar w-full flex flex-col">
+              <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar w-full flex flex-col bg-transparent" style={{ backgroundColor: "transparent" }}>
                 <Outlet />
               </div>
             </div>

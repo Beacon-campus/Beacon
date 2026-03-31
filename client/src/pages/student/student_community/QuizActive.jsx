@@ -19,6 +19,7 @@ export default function QuizActive() {
   const [submitted, setSubmitted] = useState(false);
   const [started, setStarted] = useState(false);
   const [violation, setViolation] = useState(false);
+  const [isProtecting, setIsProtecting] = useState(false);
   const hasFlaggedCheatRef = useRef(false);
 
   const recordCheat = async () => {
@@ -123,6 +124,45 @@ export default function QuizActive() {
     };
   }, [started]);
 
+  useEffect(() => {
+    // Screenshot and screen recording protection
+    const handleBlur = () => {
+      setIsProtecting(true);
+      setViolation(true);
+      kickUser("Focus lost: Possible screenshot tool or unauthorized action detected");
+    };
+    const handleFocus = () => setIsProtecting(false);
+
+    const handleKeyDownGlobal = (e) => {
+      // Mac screenshot combinations often involve Meta + Shift
+      if (e.metaKey && e.shiftKey) {
+        setIsProtecting(true);
+      }
+      if (e.key === "PrintScreen") {
+        setIsProtecting(true);
+        try { navigator.clipboard.writeText(""); } catch (err) {}
+      }
+    };
+
+    const handleKeyUpGlobal = (e) => {
+      if (e.key === "Meta" || e.key === "Shift" || e.key === "PrintScreen") {
+        setTimeout(() => setIsProtecting(false), 1000); 
+      }
+    };
+
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("keydown", handleKeyDownGlobal);
+    window.addEventListener("keyup", handleKeyUpGlobal);
+
+    return () => {
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("keydown", handleKeyDownGlobal);
+      window.removeEventListener("keyup", handleKeyUpGlobal);
+    };
+  }, []);
+
   const handleStartQuiz = async () => {
     try {
       if (document.documentElement.requestFullscreen) {
@@ -200,18 +240,19 @@ export default function QuizActive() {
     if (
       e.key === "F12" ||
       (e.ctrlKey && e.shiftKey && e.key === "I") ||
-      e.key === "PrintScreen"
+      e.key === "PrintScreen" ||
+      (e.metaKey && e.shiftKey && (e.key === "3" || e.key === "4" || e.key === "5" || e.key === "s"))
     ) {
       e.preventDefault();
-      navigator.clipboard.writeText("");
+      try { navigator.clipboard.writeText(""); } catch (err) {}
       setViolation(true);
-      kickUser("Security violation detected");
+      kickUser("Security violation detected: Screenshot or DevTools");
     }
   };
 
   const handleKeyUp = (e) => {
     if (e.key === "PrintScreen") {
-      navigator.clipboard.writeText("");
+      try { navigator.clipboard.writeText(""); } catch (err) {}
       setViolation(true);
       kickUser("Screenshot blocked");
     }
@@ -279,6 +320,11 @@ export default function QuizActive() {
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
+      {isProtecting && (
+        <div className="fixed inset-0 z-[999999] bg-black pointer-events-none flex items-center justify-center">
+          <p className="text-gray-500 font-bold text-xl select-none">Screen capture restricted</p>
+        </div>
+      )}
       {!started && (
         <div className="fixed inset-0 z-[60] bg-gray-900/95 flex flex-col items-center justify-center p-4 text-center">
           <div className="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6">
