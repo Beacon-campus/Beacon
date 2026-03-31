@@ -102,16 +102,16 @@ export default function UserManagement() {
 
 
     return (
-        <div className="h-full flex flex-col pt-3 bg-white">
+        <div className="h-full flex flex-col bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             {/* Header Area */}
-            <div className="px-8 pb-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-black text-gray-800 tracking-tight">User Management</h1>
                     <p className="text-sm font-medium text-gray-400 mt-1">Manage students, teachers, and admins</p>
                 </div>
                 <button
                     onClick={() => setModalState({ isOpen: true, mode: "create", user: null })}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-md hover:bg-black transition-all active:scale-95 whitespace-nowrap"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[#0F172A] text-white font-bold rounded-xl shadow-md hover:bg-[#1e293b] transition-all active:scale-95 whitespace-nowrap"
                 >
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" /></svg>
                     Add New User
@@ -131,7 +131,7 @@ export default function UserManagement() {
                                 setFilterCourse("All"); // Reset course filter on tab change
                             }}
                             className={`flex-1 xl:flex-none capitalize px-5 py-2 rounded-xl text-sm font-bold border transition-all ${activeTab === tab
-                                ? "bg-primary border-primary text-white shadow-md shadow-primary/20"
+                                ? "bg-[#0F172A] border-[#0F172A] text-white shadow-md shadow-[#0F172A]/20"
                                 : "bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300"
                                 }`}
                         >
@@ -184,7 +184,7 @@ export default function UserManagement() {
             </div>
 
             {/* Table Area */}
-            <div className="flex-1 overflow-y-auto soft-scrollbar pr-2">
+            <div className="flex-1 overflow-y-auto no-scrollbar pr-2">
                 {loading ? (
                     <div className="h-full flex items-center justify-center">
                         <LoadingState size="sm" />

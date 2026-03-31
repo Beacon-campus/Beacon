@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import LoadingState from "./ui/LoadingState";
+import { LayoutSkeleton } from "./ui/LayoutSkeleton";
 
 export default function ProtectedRoute({ children, allowedRole }) {
   const { user, loading } = useAuth();
@@ -8,11 +8,7 @@ export default function ProtectedRoute({ children, allowedRole }) {
 
   // Still checking auth state
   if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <LoadingState size="lg" />
-      </div>
-    );
+    return <LayoutSkeleton />;
   }
 
   // Not logged in or user missing

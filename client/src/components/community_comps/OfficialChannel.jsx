@@ -183,7 +183,7 @@ export default function OfficialChannel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50/50 relative">
+    <div className="flex flex-col h-full relative">
       {showDateBadge && dateBadgeText && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 rounded-full border border-black/10 bg-white/95 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-700 shadow">
               {dateBadgeText}

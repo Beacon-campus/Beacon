@@ -95,19 +95,19 @@ function StatCard({ label, value, helper, tone = "neutral" }) {
     neutral: "border-slate-200 bg-slate-50 text-slate-800",
   };
   return (
-    <div className={`rounded-xl border p-4 ${tones[tone] || tones.neutral}`}>
-      <p className="text-xs uppercase tracking-wide font-bold opacity-75">{label}</p>
-      <p className="text-2xl font-black mt-1">{value}</p>
-      {helper ? <p className="text-xs mt-2 opacity-85">{helper}</p> : null}
+    <div className={`rounded-xl border p-3 min-[426px]:p-4 ${tones[tone] || tones.neutral}`}>
+      <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs uppercase tracking-wide font-bold opacity-75">{label}</p>
+      <p className="text-[1.35rem] min-[426px]:text-[1.35rem] min-[1025px]:text-2xl font-black mt-1 break-words">{value}</p>
+      {helper ? <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs mt-2 opacity-85">{helper}</p> : null}
     </div>
   );
 }
 
 function ChartPanel({ title, subtitle, children }) {
   return (
-    <div className="rounded-xl bg-white border border-slate-200 p-4">
+    <div className="rounded-xl bg-white border border-slate-200 p-3 min-[426px]:p-4">
       <h3 className="text-sm font-black text-slate-800">{title}</h3>
-      <p className="text-xs text-slate-500 mt-1 mb-3">{subtitle}</p>
+      <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs text-slate-500 mt-1 mb-3">{subtitle}</p>
       {children}
     </div>
   );
@@ -245,24 +245,24 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="h-full w-full overflow-auto p-6 bg-slate-50">
+    <div className="h-full w-full overflow-auto no-scrollbar p-3 min-[426px]:p-4 min-[769px]:p-5 min-[1025px]:p-6 bg-slate-50 rounded-2xl min-[1025px]:rounded-3xl shadow-sm border border-slate-100">
       <div className="max-w-[1600px] mx-auto space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-col min-[769px]:flex-row min-[769px]:items-center min-[769px]:justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-black text-slate-800">System Health Dashboard</h1>
-            <p className="text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
+            <h1 className="text-[1.45rem] min-[426px]:text-[1.45rem] min-[1025px]:text-2xl font-black text-slate-800">System Health Dashboard</h1>
+            <p className="text-sm min-[426px]:text-[13px] min-[1025px]:text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
           </div>
-          <button onClick={() => refresh(false, true)} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-bold">
+          <button onClick={() => refresh(false, true)} className="w-full min-[426px]:w-auto px-4 py-2 rounded-lg bg-[#0F172A] text-white text-sm font-bold hover:bg-[#1e293b] transition-all shadow-md active:scale-95">
             Refresh
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar min-[769px]:flex-wrap">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-black text-white border-black" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+              className={`shrink-0 px-3 min-[426px]:px-4 py-2 rounded-lg text-sm min-[426px]:text-[13px] min-[1025px]:text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-[#0F172A] text-white border-[#0F172A] shadow-md shadow-[#0F172A]/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
                 }`}
             >
               {tab.label}
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
 
         {activeTab === "main" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-4 gap-4">
               <StatCard
                 label="Database Health"
                 value={overview?.mongodb?.state === "connected" ? "Connected" : "Needs Attention"}
@@ -305,12 +305,12 @@ export default function AdminDashboard() {
               />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 min-[769px]:grid-cols-2 gap-4">
               <ChartPanel
                 title="Speed and Traffic Over Time"
                 subtitle="Shows how fast the server is responding and how many requests are being handled. Spikes suggest slowdowns or load bursts."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={chartRows}>
                       <defs>
@@ -335,7 +335,7 @@ export default function AdminDashboard() {
                 title="Request Quality Mix"
                 subtitle="Compares healthy, warning, and critical responses. More red indicates user-facing failures."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={statusBars}>
                       <CartesianGrid strokeDasharray="3 3" stroke={COLORS.neutralSoft} />
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
 
         {activeTab === "firebase" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-3 gap-4">
               <StatCard label="Firebase Profiles" value={Number(overview?.firebase?.firestoreUsers || 0).toLocaleString()} helper="User documents stored in Firebase." tone="healthy" />
               <StatCard label="App User Records" value={Number(overview?.firebase?.mongoUsers || 0).toLocaleString()} helper="User records stored in MongoDB." tone="neutral" />
               <StatCard
@@ -363,12 +363,12 @@ export default function AdminDashboard() {
                 tone={Math.abs(overview?.firebase?.syncGap || 0) > 0 ? "warning" : "healthy"}
               />
             </div>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 min-[769px]:grid-cols-2 gap-4">
               <ChartPanel
                 title="User Counts by Source"
                 subtitle="Tracks whether Firebase and app user records stay aligned over time."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartRows}>
                       <defs>
@@ -395,7 +395,7 @@ export default function AdminDashboard() {
                 title="Sync Difference Trend"
                 subtitle="Shows mismatch over time. A flat line near zero means both systems are in sync."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartRows}>
                       <CartesianGrid strokeDasharray="3 3" stroke={COLORS.neutralSoft} />
@@ -413,7 +413,7 @@ export default function AdminDashboard() {
 
         {activeTab === "mongodb" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-5 gap-4">
               <StatCard label="Users" value={Number(overview?.mongodb?.counts?.users || 0).toLocaleString()} helper="Registered user records." tone="healthy" />
               <StatCard label="Messages" value={Number(overview?.mongodb?.counts?.messages || 0).toLocaleString()} helper="Chat and channel messages." tone="neutral" />
               <StatCard label="Assignments" value={Number(overview?.mongodb?.counts?.assignments || 0).toLocaleString()} helper="Total assignment documents." tone="warning" />
@@ -424,7 +424,7 @@ export default function AdminDashboard() {
               title="Data Growth Snapshot"
               subtitle="Shows how quickly your core MongoDB collections are growing. Sudden jumps can indicate usage spikes."
             >
-              <div className="h-80">
+              <div className="h-64 min-[426px]:h-72 min-[1025px]:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartRows}>
                     <defs>
@@ -453,14 +453,14 @@ export default function AdminDashboard() {
 
         {activeTab === "cloudinary" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-4 gap-4">
               <StatCard label="Storage Used" value={formatBytes(cloudUsage?.storage || 0)} helper={`Limit: ${formatBytes(cloudUsage?.storage_limit || 0)}`} tone={storagePct > 85 ? "critical" : storagePct > 70 ? "warning" : "healthy"} />
               <StatCard label="Bandwidth Used" value={formatBytes(cloudUsage?.bandwidth || 0)} helper={`Limit: ${formatBytes(cloudUsage?.bandwidth_limit || 0)}`} tone={bandwidthPct > 85 ? "critical" : bandwidthPct > 70 ? "warning" : "healthy"} />
               <StatCard label="Stored Files" value={Number(cloudUsage?.objects || 0).toLocaleString()} helper="Total uploaded objects." tone="neutral" />
               <StatCard label="Credits Used" value={Number(cloudUsage?.credits || 0).toLocaleString()} helper={`Limit: ${Number(cloudUsage?.credits_limit || 0).toLocaleString()}`} tone="warning" />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 min-[769px]:grid-cols-2 gap-4">
               <ChartPanel
                 title="Usage Against Limits"
                 subtitle="Simple progress view of current storage and bandwidth consumption."
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                 title="Live Capacity Gauge"
                 subtitle="Half-circle gauge for quick at-a-glance capacity checks."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadialBarChart innerRadius="35%" outerRadius="95%" data={halfGaugeData} startAngle={180} endAngle={0} barSize={22}>
                       <RadialBar background dataKey="value" />
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
               title="Where Files Are Coming From"
               subtitle="Breaks down uploads by feature area so you can spot storage hotspots quickly."
             >
-              <div className="h-80">
+              <div className="h-64 min-[426px]:h-72 min-[1025px]:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={folderBars}>
                     <CartesianGrid strokeDasharray="3 3" stroke={COLORS.neutralSoft} />
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
 
         {activeTab === "server" && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-5 gap-4">
               <StatCard label="Server Uptime" value={Number(overview?.uptimeSec || 0).toLocaleString()} helper="Seconds since server start." tone="healthy" />
               <StatCard
                 label="Memory Usage"
@@ -522,12 +522,12 @@ export default function AdminDashboard() {
               <StatCard label="Critical Errors" value={`${Number(errorPct).toFixed(1)}%`} helper="Error share in last 60 minutes." tone={errorPct > 2 ? "critical" : errorPct > 0 ? "warning" : "healthy"} />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 min-[769px]:grid-cols-2 gap-4">
               <ChartPanel
                 title="Server Health Timeline"
                 subtitle="Tracks server response speed and critical errors together. Red spikes indicate instability."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={chartRows}>
                       <defs>
@@ -552,7 +552,7 @@ export default function AdminDashboard() {
                 title="Memory Trend"
                 subtitle="Shows server memory usage over time. Sustained upward movement can signal memory pressure."
               >
-                <div className="h-72">
+                <div className="h-56 min-[426px]:h-64 min-[1025px]:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartRows}>
                       <defs>

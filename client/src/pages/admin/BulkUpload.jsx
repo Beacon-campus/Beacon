@@ -247,7 +247,7 @@ export default function BulkUpload() {
 
             {/* Confirmation & Uploading Modals */}
             {fileData && !isUploading && (
-                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 bg-[#0F172A]/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
                         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 shrink-0">
                             <h2 className="text-lg font-bold text-gray-800">Confirm {uploadType === 'student' ? 'Student' : 'Staff'} Import</h2>
@@ -312,7 +312,7 @@ export default function BulkUpload() {
                         </div>
                         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-3 justify-end shrink-0">
                             <button onClick={() => setFileData(null)} className="px-5 py-2 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
-                            <button onClick={handleConfirmUpload} className="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition-all active:scale-95">
+                            <button onClick={handleConfirmUpload} className="px-6 py-2 text-sm font-bold text-white bg-[#0F172A] hover:bg-[#1e293b] rounded-xl shadow-md transition-all active:scale-95">
                                 Start Import
                             </button>
                         </div>
@@ -321,13 +321,13 @@ export default function BulkUpload() {
             )}
 
             {isUploading && (
-                <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+                <div className="fixed inset-0 bg-[#0F172A]/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl w-full max-w-sm p-8 flex flex-col items-center text-center shadow-2xl relative overflow-hidden">
 
                         {/* Fake Loading Bar Background */}
                         <div className="absolute top-0 left-0 h-1 bg-gray-100 w-full">
                             <div
-                                className="h-full bg-indigo-500 transition-all duration-300 ease-out"
+                                className="h-full bg-[#0F172A] transition-all duration-300 ease-out"
                                 style={{ width: `${(progress.current / progress.total) * 100}%` }}
                             ></div>
                         </div>

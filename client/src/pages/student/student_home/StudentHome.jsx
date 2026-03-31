@@ -235,11 +235,11 @@ export default function StudentHome() {
     if (relativeTime === "Tomorrow") widgetHeader = "Tomorrow's Event";
 
     return (
-        <div className="h-full w-full pt-1 animate-fade-in-up">
-            <div className="flex flex-col h-full gap-4">
+        <div className="min-h-full h-auto w-full px-4 max-[425px]:px-3 pt-0 pb-0 animate-fade-in-up min-[769px]:h-full min-[769px]:px-0 min-[769px]:pt-1 min-[769px]:pb-2">
+            <div className="flex flex-col gap-4 min-h-full min-[769px]:h-full">
 
-                {/* TOP SECTION */}
-                <div className="flex-[3] flex gap-4 min-h-0">
+                {/* MOBILE + TABLET */}
+                <div className="flex flex-col gap-4 min-[769px]:hidden">
                     <WelcomeCard
                         user={user}
                         quote={quote}
@@ -248,7 +248,7 @@ export default function StudentHome() {
                         loadingQuote={quoteLoading}
                     />
 
-                    <div className="flex-[2] flex flex-col gap-4">
+                    <div className="hidden min-[426px]:grid min-[426px]:grid-cols-2 gap-4">
                         <EventWidget
                             nextEvent={nextEvent}
                             loadingEvent={loadingEvent}
@@ -268,10 +268,28 @@ export default function StudentHome() {
                             navigate={navigate}
                         />
                     </div>
-                </div>
 
-                {/* BOTTOM SECTION */}
-                <div className="flex-[2] flex gap-4 min-h-0">
+                    <div className="flex flex-col gap-4 min-[426px]:hidden">
+                        <EventWidget
+                            nextEvent={nextEvent}
+                            loadingEvent={loadingEvent}
+                            relativeTime={relativeTime}
+                            widgetHeader={widgetHeader}
+                            onClickRoute="/student/calender"
+                            navigate={navigate}
+                        />
+
+                        <NotificationsWidget
+                            activeNotif={activeNotif}
+                            notifications={homeNotifications}
+                            setActiveNotif={setActiveNotif}
+                            prevNotif={prevNotif}
+                            nextNotif={nextNotif}
+                            onClickRoute="/student/notif"
+                            navigate={navigate}
+                        />
+                    </div>
+
                     <QuickTodosWidget
                         quickTodos={quickTodos}
                         animatingIds={animatingIds}
@@ -292,6 +310,63 @@ export default function StudentHome() {
                         navigateTo="/student/community"
                         enableAdvancedPreview={true}
                     />
+                </div>
+
+                {/* DESKTOP */}
+                <div className="hidden min-[769px]:flex min-[769px]:flex-col min-[769px]:h-full min-[769px]:gap-4">
+                    <div className="flex-[3] flex gap-4 min-h-0">
+                        <WelcomeCard
+                            user={user}
+                            quote={quote}
+                            theme="green"
+                            roleLabel="Student"
+                            loadingQuote={quoteLoading}
+                        />
+
+                        <div className="flex-[2] flex flex-col gap-4">
+                            <EventWidget
+                                nextEvent={nextEvent}
+                                loadingEvent={loadingEvent}
+                                relativeTime={relativeTime}
+                                widgetHeader={widgetHeader}
+                                onClickRoute="/student/calender"
+                                navigate={navigate}
+                            />
+
+                            <NotificationsWidget
+                                activeNotif={activeNotif}
+                                notifications={homeNotifications}
+                                setActiveNotif={setActiveNotif}
+                                prevNotif={prevNotif}
+                                nextNotif={nextNotif}
+                                onClickRoute="/student/notif"
+                                navigate={navigate}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex-[2] flex gap-4 min-h-0">
+                        <QuickTodosWidget
+                            quickTodos={quickTodos}
+                            animatingIds={animatingIds}
+                            handleComplete={handleComplete}
+                            getTodoDateInfo={getTodoDateInfo}
+                            navigate={navigate}
+                            themeColor="red"
+                            navigateTo="/student/todo"
+                        />
+
+                        <AnnouncementsWidget
+                            activeAnnounce={activeAnnounce}
+                            announcements={universityAnnouncements}
+                            setActiveAnnounce={setActiveAnnounce}
+                            prevAnnounce={prevAnnounce}
+                            nextAnnounce={nextAnnounce}
+                            navigate={navigate}
+                            navigateTo="/student/community"
+                            enableAdvancedPreview={true}
+                        />
+                    </div>
                 </div>
 
             </div>

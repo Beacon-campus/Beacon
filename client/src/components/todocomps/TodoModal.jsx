@@ -35,20 +35,20 @@ export default function TodoModal({
     <Modal 
       isOpen={open} 
       onClose={onClose} 
-      className="max-w-md h-auto"
+      className="max-w-[22.75rem] min-[426px]:max-w-[26.5rem] min-[769px]:max-w-[27rem] min-[1024px]:max-w-[28rem] h-auto"
     >
         
         {/* Header */}
-        <div className="bg-white px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-primary">
+        <div className="bg-white px-4 min-[426px]:px-5 min-[769px]:px-6 py-3.5 min-[426px]:py-4 border-b border-gray-100 flex justify-between items-center gap-3">
+          <h2 className="text-lg min-[769px]:text-xl font-bold text-primary">
             {mode === "edit" ? "Edit Task" : "New Task"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex items-center justify-center">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 min-[426px]:p-5 min-[769px]:p-6 space-y-4 min-[426px]:space-y-4.5 min-[769px]:space-y-5">
           
           {/* Title Input */}
           <div>
@@ -68,7 +68,7 @@ export default function TodoModal({
                 setTitle(e.target.value);
                 if(error) setError("");
               }}
-              className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors outline-none
+              className={`w-full h-11 px-4 rounded-xl border text-sm font-medium transition-colors outline-none
                 ${error ? "bg-red-50 border-red-200 text-red-900 placeholder-red-300" : "bg-gray-50 border-transparent text-primary placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-primary/10"}
               `}
             />
@@ -90,8 +90,8 @@ export default function TodoModal({
               value={description}
               maxLength={MAX_DESC_CHARS}
               onChange={e => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-transparent text-primary placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-primary/10 outline-none resize-none transition-all"
+              rows={3}
+              className="w-full min-h-[108px] px-4 py-3 rounded-xl border border-transparent text-sm bg-gray-50 text-primary placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-primary/10 outline-none resize-none transition-all"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function TodoModal({
                 onChange={(date) => setDueDate(date)}
                 dateFormat="MMM d, yyyy"
                 placeholderText="Select due date"
-                className="w-full px-4 py-3 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
+                className="w-full h-11 px-4 rounded-xl text-sm font-medium outline-none border transition-all cursor-pointer bg-gray-50 text-primary border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm focus:ring-2 focus:ring-primary/10"
                 // This renders the calendar icon inside the input
                 showIcon
                 icon={
@@ -118,10 +118,10 @@ export default function TodoModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-2 flex gap-3">
+        <div className="px-4 min-[426px]:px-5 min-[769px]:px-6 pb-4 min-[426px]:pb-5 min-[769px]:pb-6 pt-2 flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 hover:text-primary transition-all"
+            className="flex-1 h-11 px-4 rounded-xl border border-gray-200 bg-white text-gray-600 font-semibold text-sm hover:bg-gray-50 hover:text-primary transition-all"
           >
             Cancel
           </button>
@@ -139,7 +139,7 @@ export default function TodoModal({
               });
               onClose();
             }}
-            className="flex-1 px-4 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-black shadow-lg shadow-primary/20 transition-all transform active:scale-95"
+            className="flex-1 h-11 px-4 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-black shadow-lg shadow-primary/20 transition-all transform active:scale-95"
           >
             {mode === "edit" ? "Save Changes" : "Create Task"}
           </button>

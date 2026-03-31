@@ -5,7 +5,7 @@ export default function StudentNotes() {
     const { notes } = useHomeData();
 
     return (
-        <div className="w-full h-full min-h-0 overflow-hidden" data-note-count={notes.length}>
+        <div className="w-full min-h-full h-auto px-4 max-[425px]:px-3 pt-3 pb-4 min-[769px]:px-0 min-[769px]:pt-0 min-[769px]:pb-0 min-[769px]:h-full min-[769px]:min-h-0 overflow-visible min-[769px]:overflow-hidden" data-note-count={notes.length}>
             <Notes />
         </div>
     );

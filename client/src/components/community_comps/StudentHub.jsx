@@ -175,7 +175,7 @@ export default function StudentHub({
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-50/50">
+        <div className="flex flex-col h-full">
             {!channelId ? (
                 <div className="text-center text-gray-400 mt-10">Connecting to Student Hub...</div>
             ) : (

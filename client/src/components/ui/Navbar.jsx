@@ -7,17 +7,27 @@ import { notifyServerLogout } from "../../services/session.service";
 
 // Import your SVGs
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [isHovered, setIsHovered] = useState(false);
+  const [isLogoAnimating, setIsLogoAnimating] = useState(false);
 
   const [showAdminProfile, setShowAdminProfile] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  useEffect(() => {
+    if (!isLogoAnimating) return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setIsLogoAnimating(false);
+    }, 450);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isLogoAnimating]);
 
   if (!user) return null;
 
@@ -35,6 +45,14 @@ export default function Navbar() {
     navigate("/", { replace: true });
   };
 
+  const triggerMobileLogoAnimation = () => {
+    setIsLogoAnimating(false);
+
+    window.requestAnimationFrame(() => {
+      setIsLogoAnimating(true);
+    });
+  };
+
   const getTabClass = (isActive) => {
     const base = "relative z-10 flex items-center justify-center gap-2 w-36 px-4 py-2 rounded-full text-sm font-bold text-center transition-all duration-200";
     return isActive ? `${base} text-white` : `${base} text-[#64748B] hover:text-[#0F172A] hover:bg-gray-200/50`;
@@ -47,8 +65,75 @@ export default function Navbar() {
   const avatarUrl = new URL(`../../assets/profile/${avatarId}.png`, import.meta.url).href;
 
   return (
-    <div className="">
-      <div className="relative flex items-center justify-between min-h-[60px]">
+    <div className="w-full">
+      {/* Mobile Top Header Strip */}
+      <div className="hidden max-[768px]:flex fixed top-0 left-0 right-0 z-[60] h-[64px] items-center justify-between border-b border-white/50 bg-white/55 px-4 py-2 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.45)] backdrop-blur-2xl supports-[backdrop-filter]:bg-white/45">
+        {/* Mobile Header Logo */}
+        <button
+          type="button"
+          onClick={triggerMobileLogoAnimation}
+          className={`group flex items-center gap-3 rounded-full border border-transparent px-1.5 py-1 transition-all duration-300 active:scale-95 ${isLogoAnimating ? "scale-[1.02] -translate-y-0.5" : ""}`}
+          aria-label="Animate Beacon logo"
+        >
+          <div className="flex items-center justify-center min-w-[34px] w-[34px] flex-shrink-0">
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="h-[34px] w-[34px] overflow-visible">
+              <defs>
+                <linearGradient id="beam-left-mob" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                  <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                </linearGradient>
+                <linearGradient id="beam-right-mob" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.7"/>
+                  <stop offset="100%" stopColor="#FBBF24" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              <g className={`origin-bottom transition-all duration-300 ease-out ${isLogoAnimating ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
+                <path d="M 45 32 L -15 10 L -15 45 Z" fill="url(#beam-left-mob)" className="text-yellow-400" />
+                <path d="M 45 32 L -5 -5 L 10 -5 Z" fill="url(#beam-left-mob)" className="text-yellow-400" />
+                <path d="M 55 32 L 115 10 L 115 45 Z" fill="url(#beam-right-mob)" className="text-yellow-400" />
+                <path d="M 55 32 L 105 -5 L 90 -5 Z" fill="url(#beam-right-mob)" className="text-yellow-400" />
+                <path d="M 22 20 L 23 23 L 26 24 L 23 25 L 22 28 L 21 25 L 18 24 L 21 23 ZM 78 20 L 79 23 L 82 24 L 79 25 L 78 28 L 77 25 L 74 24 L 77 23 Z" className="fill-yellow-400" />
+                <circle cx="15" cy="35" r="1.5" className="fill-yellow-400" />
+                <circle cx="85" cy="35" r="1.5" className="fill-yellow-400" />
+                <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
+                <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
+              </g>
+              <g className={`fill-slate-800 stroke-slate-800 transition-all duration-300 ${isLogoAnimating ? "scale-[1.02]" : "scale-100"}`}>
+                <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
+                <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
+                <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
+                <path d="M 39 73 L 61 73 L 58 68 L 42 68 Z" fill="currentColor" stroke="none" />
+                <path d="M 43 68 L 46 38 L 54 38 L 57 68 Z" fill="none" strokeWidth="3" />
+                <path d="M 44.5 58 C 48 61 52 56 55.5 58 M 45 46 C 49 49 51 43 55 46" strokeWidth="3" fill="none" />
+                <path d="M 47.5 68 L 47.5 61 C 47.5 59 52.5 59 52.5 61 L 52.5 68 Z" fill="currentColor" stroke="none" />
+                <rect x="48.5" y="44" width="3" height="5" rx="1.5" fill="currentColor" stroke="none" />
+                <path d="M 42 38 L 58 38 L 59 34 L 41 34 Z" fill="currentColor" stroke="none" />
+                <rect x="44.5" y="26" width="11" height="8" fill="none" strokeWidth="3" />
+                <rect x="48.5" y="26" width="3" height="8" fill="currentColor" stroke="none" />
+                <path d="M 43 27 L 57 27" fill="none" strokeWidth="2" strokeLinecap="round" />
+                <path d="M 42 26 L 58 26 C 58 19 53 18 50 18 C 47 18 42 19 42 26 Z" fill="currentColor" stroke="none" />
+                <path d="M 49 18 L 49 14 L 51 14 L 51 18 Z" fill="currentColor" stroke="none" />
+                <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
+              </g>
+            </svg>
+          </div>
+          <span className="text-[1.32rem] font-extrabold tracking-tight text-slate-800">Beacon</span>
+        </button>
+
+        {/* Mobile Header Logout */}
+        <button
+          onClick={handleLogout}
+          className="group flex items-center gap-1.5 rounded-full border border-white/60 bg-white/55 px-3 py-2 text-xs font-bold text-gray-600 shadow-[0_8px_20px_-16px_rgba(15,23,42,0.55)] transition-all hover:scale-105 hover:bg-white/75 hover:text-black"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4 group-hover:opacity-100 transition-opacity" fill="currentColor">
+            <path d="m15.889 16.011c-.817-.099-1.57.488-1.668 1.311-.117.979-.253 1.74-.36 2.263-.483.095-1.137.204-1.86.288v-14.354c.78.119 1.458.28 1.935.413.081.416.181 1 .272 1.751.098.826.865 1.41 1.672 1.306.822-.101 1.407-.85 1.307-1.672-.233-1.893-.51-2.873-.54-2.978-.133-.455-.474-.821-.918-.986.018.009-1.903-.691-3.728-.847v-.444c0-.521-.401-.956-.921-.997-.519-.041-1.049-.065-1.579-.065-3.44 0-6.813 1-6.954 1.042-.329.099-.585.359-.677.69-.035.128-.869 3.201-.869 9.268s.824 9.619.859 9.768c.095.402.427.705.837.762.139.019 2.304.471 6.804.471 2.679 0 6.016-.664 5.976-.7.511-.131.915-.521 1.064-1.025.016-.053.386-1.312.659-3.596.099-.823-.488-1.569-1.311-1.668zm-8.889-4.011c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5zm15.8 1.1c-.768 1.024-1.676 1.933-2.701 2.701-.176.132-.387.2-.6.2-.536.01-1.011-.461-1-1v-1h-3c-.828 0-1.5-.671-1.5-1.5s.672-1.5 1.5-1.5h3v-1c0-.379.214-.725.553-.895s.744-.133 1.047.094c1.024.768 1.933 1.676 2.701 2.701.266.355.266.844 0 1.199z" />
+          </svg>
+          <span className="hidden min-[321px]:inline">LOGOUT</span>
+        </button>
+      </div>
+
+      {/* Desktop Navbar */}
+      <div className="relative flex flex-col md:flex-row items-center justify-between min-h-[60px] max-[768px]:hidden flex-1 w-full">
         {/* Spacer to push Logout button to the right in flex justify-between */}
         <div className="w-32"></div>
 
@@ -57,9 +142,10 @@ export default function Navbar() {
             FIX: Removed 'relative' from the end of this className.
             It is now purely 'absolute' so it centers correctly.
            ============================================================ */}
-        {/* Center: Tabs Container (Hidden for Admin) */}
+        {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
+        {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
         {role !== "admin" && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center glass-panel rounded-full p-1 shadow-sm">
+          <div className="absolute left-1/2 top-1/2 hidden min-[769px]:flex -translate-x-1/2 -translate-y-1/2 items-center glass-panel rounded-full p-1 shadow-sm">
 
             {/* THE SLIDING PILL BACKGROUND */}
             <div
@@ -172,7 +258,7 @@ export default function Navbar() {
             >
               <path d="m15.889 16.011c-.817-.099-1.57.488-1.668 1.311-.117.979-.253 1.74-.36 2.263-.483.095-1.137.204-1.86.288v-14.354c.78.119 1.458.28 1.935.413.081.416.181 1 .272 1.751.098.826.865 1.41 1.672 1.306.822-.101 1.407-.85 1.307-1.672-.233-1.893-.51-2.873-.54-2.978-.133-.455-.474-.821-.918-.986.018.009-1.903-.691-3.728-.847v-.444c0-.521-.401-.956-.921-.997-.519-.041-1.049-.065-1.579-.065-3.44 0-6.813 1-6.954 1.042-.329.099-.585.359-.677.69-.035.128-.869 3.201-.869 9.268s.824 9.619.859 9.768c.095.402.427.705.837.762.139.019 2.304.471 6.804.471 2.679 0 6.016-.664 5.976-.7.511-.131.915-.521 1.064-1.025.016-.053.386-1.312.659-3.596.099-.823-.488-1.569-1.311-1.668zm-8.889-4.011c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5zm15.8 1.1c-.768 1.024-1.676 1.933-2.701 2.701-.176.132-.387.2-.6.2-.536.01-1.011-.461-1-1v-1h-3c-.828 0-1.5-.671-1.5-1.5s.672-1.5 1.5-1.5h3v-1c0-.379.214-.725.553-.895s.744-.133 1.047.094c1.024.768 1.933 1.676 2.701 2.701.266.355.266.844 0 1.199z" />
             </svg>
-            <span>LOGOUT</span>
+            <span className="hidden min-[321px]:inline">LOGOUT</span>
           </button>
         )}
       </div>

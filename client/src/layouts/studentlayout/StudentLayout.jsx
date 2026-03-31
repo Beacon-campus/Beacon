@@ -15,7 +15,11 @@ export default function StudentLayout() {
   const location = useLocation();
   const { user, loading } = useAuth();
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState("home"); // "home" | "community"
+
   const isCommunity = location.pathname.startsWith("/student/community");
+  const homeMobileContentPadding = isCommunity ? "max-[768px]:px-3 max-[425px]:px-2" : "max-[768px]:px-0";
 
 
   const getLinkClass = ({ isActive }) => {
@@ -118,8 +122,8 @@ export default function StudentLayout() {
 
         {/* Sidebar */}
         <div
-          className={`fixed top-4 bottom-4 left-4 z-50 ${collapsed ? "w-20" : "w-56"
-            } glass-panel rounded-3xl p-4 flex flex-col justify-between transition-all duration-300`}
+          className={`hidden min-[769px]:flex fixed top-4 bottom-4 left-4 z-50 ${collapsed ? "w-20" : "w-56"
+            } glass-panel rounded-3xl p-4 flex-col justify-between transition-all duration-300`}
         >
           {/* ... Sidebar content (we will extract this if needed, but for now we rely on the parent div) ... */}
           {/* NOTE: We just add fixed top-0 left-0 h-screen instead of flex flex-1 wrapper */}
@@ -127,9 +131,9 @@ export default function StudentLayout() {
 
               {/* HEADER: Logo Area */}
               <div 
-                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-2 px-4 py-3 -ml-4 hover:bg-slate-900 rounded-xl"} mb-2 transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-95`}
+                className={`flex items-center group cursor-pointer ${collapsed ? "justify-center p-0 mx-auto mt-6" : "gap-3 px-4 py-3"} mb-2 transition-transform duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95`}
               >
-                <div className="flex items-center justify-center shrink-0 -mr-1">
+                <div className="flex items-center justify-center min-w-[40px] w-[40px] flex-shrink-0 -mr-1">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-10 h-10 overflow-visible">
                     <defs>
                       <linearGradient id="beam-left" x1="1" y1="0" x2="0" y2="0">
@@ -152,7 +156,7 @@ export default function StudentLayout() {
                       <circle cx="35" cy="10" r="1.5" className="fill-yellow-400" />
                       <circle cx="65" cy="10" r="1.5" className="fill-yellow-400" />
                     </g>
-                    <g className="fill-slate-800 stroke-slate-800 transition-colors duration-300 group-hover:fill-white group-hover:stroke-white">
+                    <g className="fill-slate-800 stroke-slate-800 transition-colors duration-300">
                       <path d="M 5 70 C 20 78 35 82 50 73 C 65 82 80 78 95 70 C 80 81 65 86 50 78 C 35 86 20 81 5 70 Z" fill="currentColor" stroke="none" />
                       <path d="M 12 78 C 25 86 38 90 50 81 C 62 90 75 86 88 78 C 75 89 62 94 50 86 C 38 94 25 89 12 78 Z" fill="currentColor" stroke="none" />
                       <path d="M 19 86 C 30 94 41 98 50 89 C 59 98 70 94 81 86 C 70 97 59 102 50 94 C 41 102 30 97 19 86 Z" fill="currentColor" stroke="none" />
@@ -172,7 +176,7 @@ export default function StudentLayout() {
                   </svg>
                 </div>
                 
-                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 transition-all duration-300 group-hover:text-white whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden hidden" : "opacity-100"}`}>
+                <span className={`text-2xl font-extrabold tracking-tight text-slate-800 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out origin-left ${collapsed ? "w-0 opacity-0 -translate-x-2" : "w-24 opacity-100 translate-x-0"}`}>
                   Beacon
                 </span>
               </div>
@@ -387,13 +391,13 @@ export default function StudentLayout() {
           </div>
 
           {/* Content Area */}
-          <div className={`relative z-10 flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "ml-28" : "ml-64"}`}>
-            <div className="px-6 pt-4 pb-0">
+          <div className={`relative flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ${collapsed ? "min-[769px]:ml-28 ml-0" : "min-[769px]:ml-64 ml-0"} pb-20 min-[769px]:pb-0 pt-[64px] min-[769px]:pt-0`}>
+            <div className={`px-6 pt-4 pb-0 max-[768px]:px-0 max-[768px]:pt-0 ${isCommunity ? "max-[768px]:px-3 max-[425px]:px-2 max-[768px]:pt-4" : ""}`}>
               <Navbar />
             </div>
 
-            <div className="flex-1 px-6 pb-6 overflow-hidden flex flex-col">
-              <div className="shrink-0 mb-3 pb-0">
+            <div className={`flex-1 px-6 max-[768px]:px-0 ${isCommunity ? "max-[768px]:px-3 max-[425px]:px-2" : ""} pb-6 max-[768px]:pb-0 overflow-hidden flex flex-col`}>
+              <div className="shrink-0 mb-3 pb-0 hidden min-[769px]:block">
                 <Breadcrumb />
               </div>
               
@@ -402,6 +406,162 @@ export default function StudentLayout() {
               </div>
             </div>
           </div>
+
+        {/* ================= MOBILE BOTTOM NAVIGATION ================= */}
+        {mobileMenuOpen && (
+          <div className="max-[768px]:block hidden fixed inset-0 z-[60] bg-black/10 transition-opacity" onClick={() => setMobileMenuOpen(false)}></div>
+        )}
+
+        <div className="max-[768px]:flex hidden fixed bottom-0 left-0 right-0 z-[70] bg-white border-t border-gray-200 px-3 sm:px-6 py-2.5 justify-around items-end shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+          {/* Mobile Menu Overlay absolutely positioned above */}
+          {mobileMenuOpen && (
+            <div className="absolute bottom-[100%] left-0 right-0 min-h-[30vh] max-h-[60vh] overflow-hidden flex flex-col">
+              <div className="animate-slide-up flex-1 glass-panel bg-white/70 backdrop-blur-3xl rounded-t-[32px] p-4 flex flex-col gap-1 border-x border-t border-white/60 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.15)] mb-0">
+                <div className="w-10 h-1 bg-gray-300/80 rounded-full mx-auto mb-3" />
+                <div className="flex justify-between items-center mb-2 px-1">
+                  <h2 className="text-lg font-extrabold text-gray-800 tracking-tight">{mobileTab === 'home' ? 'Home Menu' : 'Community Menu'}</h2>
+                  <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 bg-white/60 rounded-full text-gray-500 hover:bg-white/90 transition-colors">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                       <path d="M24 2.4 21.6 0 12 9.6 2.4 0 0 2.4 9.6 12 0 21.6 2.4 24 12 14.4 21.6 24 24 21.6 14.4 12 24 2.4z" />
+                    </svg>
+                  </button>
+                </div>
+
+                <nav className="space-y-0.5 flex-1 overflow-y-auto no-scrollbar px-1" onClick={(e) => {
+                   if (e.target.closest('a')) setMobileMenuOpen(false);
+                }}>
+                  {mobileTab === 'community' ? (
+                    <>
+                      <NavLink to="/student/community" end className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="M19.675,2.758A11.936,11.936,0,0,0,10.474.1,12,12,0,0,0,12.018,24H19a5.006,5.006,0,0,0,5-5V11.309l0-.063A12.044,12.044,0,0,0,19.675,2.758ZM8,7h4a1,1,0,0,1,0,2H8A1,1,0,0,1,8,7Zm8,10H8a1,1,0,0,1,0-2h8a1,1,0,0,1,0,2Zm0-4H8a1,1,0,0,1,0-2h8a1,1,0,0,1,0,2Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Messages</span>
+                      </NavLink>
+                      <NavLink to="/student/community/classroom" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="m23,24h-5c-.4,0-.761-.238-.919-.605s-.082-.794.194-1.084c.792-.833,1.967-1.311,3.225-1.311s2.433.478,3.225,1.311c.276.29.352.717.194,1.084s-.519.605-.919.605Zm-7.581-.605c.158-.367.082-.794-.194-1.084-.792-.833-1.967-1.311-3.225-1.311s-2.433.478-3.225,1.311c-.276.29-.352.717-.194,1.084s.519.605.919.605h5c.4,0,.761-.238.919-.605Zm-8.5,0c.158-.367.082-.794-.194-1.084-.792-.833-1.967-1.311-3.225-1.311s-2.433.478-3.225,1.311c-.276.29-.352.717-.194,1.084s.519.605.919.605h5c.4,0,.761-.238.919-.605Zm-3.419-3.395c1.105,0,2-.895,2-2s-.895-2-2-2-2,.895-2,2,.895,2,2,2Zm8.5,0c1.105,0,2-.895,2-2s-.895-2-2-2-2,.895-2,2,.895,2,2,2Zm8.5,0c1.105,0,2-.895,2-2s-.895-2-2-2-2,.895-2,2,.895,2,2,2ZM4.5,5c1.381,0,2.5-1.119,2.5-2.5S5.881,0,4.5,0s-2.5,1.119-2.5,2.5,1.119,2.5,2.5,2.5ZM20.5,0h-12.26c.479.715.76,1.575.76,2.5,0,.529-.108,1.029-.276,1.5h5.157c1.451,0,2.784.978,3.06,2.402.372,1.915-1.092,3.598-2.942,3.598h-4v3c0,.552.448,1,1,1h5v-1c0-.552.448-1,1-1h2c.552,0,1,.448,1,1v1h.5c1.933,0,3.5-1.567,3.5-3.5V3.5c0-1.933-1.567-3.5-3.5-3.5Zm-12.5,13v-5h6c.553,0,1-.448,1-1s-.447-1-1-1H4C1.791,6,0,7.791,0,10v3c0,.552.448,1,1,1h6c.552,0,1-.448,1-1Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Classroom</span>
+                      </NavLink>
+                      <NavLink to="/student/community/groups" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="m7.5 13a4.5 4.5 0 1 1 4.5-4.5 4.505 4.505 0 0 1 -4.5 4.5zm6.5 11h-13a1 1 0 0 1 -1-1v-.5a7.5 7.5 0 0 1 15 0v.5a1 1 0 0 1 -1 1zm3.5-15a4.5 4.5 0 1 1 4.5-4.5 4.505 4.505 0 0 1 -4.5 4.5zm-1.421 2.021a6.825 6.825 0 0 0 -4.67 2.831 9.537 9.537 0 0 1 4.914 5.148h6.677a1 1 0 0 0 1-1v-.038a7.008 7.008 0 0 0 -7.921-6.941z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Groups</span>
+                      </NavLink>
+                      <NavLink to="/student/community/study-materials" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="M4.395,16.061c.199-.041,.402-.061,.605-.061h1V.1C3.672,.575,2,2.624,2,5v12.025c.699-.527,1.525-.86,2.395-.964Zm17.605,1.939H5c-1.657,0-3,1.343-3,3s1.343,3,3,3h12c2.761,0,5-2.239,5-5v-1Zm0-13v11H8V0h5V10.348c0,.623,.791,.89,1.169,.395l1.331-1.743,1.331,1.743c.378,.495,1.169,.228,1.169-.395V.101c2.282,.463,4,2.48,4,4.899Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Study Material</span>
+                      </NavLink>
+                    </>
+                  ) : (
+                    <>
+                      <NavLink to="/student/home" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Zm10,15h-4c-1.103,0-2-.897-2-2v-5c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v2c0,2.757-2.243,5-5,5Zm3-11h-7c-1.103,0-2-.897-2-2V2c0-1.103.897-2,2-2h4c2.757,0,5,2.243,5,5v6c0,1.103-.897,2-2,2Zm-13,11h-4c-2.757,0-5-2.243-5-5v-6c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v9c0,1.103-.897,2-2,2Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Dashboard</span>
+                      </NavLink>
+                      <NavLink to="/student/todo" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="m13.27 7.48c-.813.813-1.27 1.915-1.27 3.065v.955c0 .276.224.5.5.5h.955c1.149 0 2.252-.457 3.064-1.269l6.715-6.715c.85-.85 1.013-2.236.252-3.167-.875-1.07-2.456-1.129-3.409-.176zm4.664 4.664c-1.195 1.196-2.786 1.855-4.479 1.855h-1.455c-1.104 0-2-.896-2-2v-1.455c0-1.692.659-3.282 1.855-4.479l5.468-5.466c-.697-.37-1.48-.599-2.323-.599h-10c-2.757 0-5 2.243-5 5v14c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5v-8.921l-2.066 2.066zm-9.767 4.522-1.687 1.687c-.431.431-.995.648-1.561.648-.533 0-1.066-.193-1.491-.582l-.669-.579c-.417-.362-.462-.993-.101-1.411.363-.417.994-.462 1.411-.101l.689.598c.103.093.228.092.307.013l1.687-1.687c.391-.391 1.023-.391 1.414 0s.391 1.023 0 1.414zm0-5-1.687 1.687c-.431.431-.995.648-1.561.648-.533 0-1.066-.193-1.491-.582l-.669-.579c-.417-.362-.462-.994-.101-1.411.363-.419.994-.461 1.411-.101l.689.598c.103.093.228.092.307.013l1.687-1.687c.391-.391 1.023-.391 1.414 0s.391 1.023 0 1.414zm0-4.96-1.687 1.687c-.431.431-.995.648-1.561.648-.533 0-1.066-.193-1.491-.582l-.669-.579c-.417-.362-.462-.994-.101-1.411.363-.418.994-.461 1.411-.101l.689.598c.103.094.228.092.307.013l1.687-1.687c.391-.391 1.023-.391 1.414 0s.391 1.023 0 1.414zm7.833 11.293h-4c-.553 0-1-.447-1-1s.447-1 1-1h4c.553 0 1 .447 1 1s-.447 1-1 1z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">To-dos</span>
+                      </NavLink>
+                      <NavLink to="/student/notes" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 512 512" className="w-4 h-4 fill-current">
+                               <path d="M320,170.667h139.52c-7.448-19.736-19.019-37.656-33.941-52.565l-74.325-74.368c-14.927-14.905-32.852-26.468-52.587-33.92   v139.52C298.667,161.115,308.218,170.667,320,170.667z" />
+                               <path d="M468.821,213.333H320c-35.346,0-64-28.654-64-64V0.512C252.565,0.277,249.131,0,245.653,0h-96.32   C90.452,0.071,42.737,47.786,42.667,106.667v298.667C42.737,464.214,90.452,511.93,149.333,512h213.333   c58.881-0.07,106.596-47.786,106.667-106.667V223.68C469.333,220.203,469.056,216.768,468.821,213.333z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Notes</span>
+                      </NavLink>
+                      <NavLink to="/student/sketch" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="M23.305,16.25a1.888,1.888,0,0,1-1.377,1.177,1.912,1.912,0,0,1-1.769-.521l-.1-.1a3.567,3.567,0,0,0-6.089,2.553l.04,4.516-.924.077c-.331.028-.663.05-1,.05A12,12,0,0,1,3.745,3.371,11.885,11.885,0,0,1,12.5.007,12.155,12.155,0,0,1,24.08,11.7,11.924,11.924,0,0,1,23.305,16.25Zm-6.19-8.2A1.5,1.5,0,1,0,18.95,9.115,1.5,1.5,0,0,0,17.115,8.05Zm-5-3A1.5,1.5,0,1,0,13.95,6.115,1.5,1.5,0,0,0,12.115,5.05Zm-5,3A1.5,1.5,0,1,0,8.95,9.115,1.5,1.5,0,0,0,7.115,8.05Zm0,6A1.5,1.5,0,1,0,8.95,15.115,1.5,1.5,0,0,0,7.115,14.05Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Sketch</span>
+                      </NavLink>
+                      <NavLink to="/student/calender" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="M24,7v1H0v-1C0,4.239,2.239,2,5,2h1V1c0-.552,.448-1,1-1h0c.552,0,1,.448,1,1v1h8V1c0-.552,.448-1,1-1h0c.552,0,1,.448,1,1v1h1c2.761,0,5,2.239,5,5Zm0,10c0,3.86-3.141,7-7,7s-7-3.14-7-7,3.141-7,7-7,7,3.14,7,7Zm-5,.586l-1-1v-1.586c0-.552-.448-1-1-1h0c-.552,0-1,.448-1,1v2c0,.265,.105,.52,.293,.707l1.293,1.293c.39,.39,1.024,.39,1.414,0h0c.39-.39,.39-1.024,0-1.414Zm-11-.586c0-2.829,1.308-5.35,3.349-7H0v9c0,2.761,2.239,5,5,5h6.349c-2.041-1.65-3.349-4.171-3.349-7Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Calendar</span>
+                      </NavLink>
+                      <NavLink to="/student/studybot" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="m22.5,9h-.5v-1c0-2.757-2.243-5-5-5h-4V1c0-.552-.447-1-1-1s-1,.448-1,1v2h-4c-2.757,0-5,2.243-5,5v1h-.5c-.827,0-1.5.673-1.5,1.5v3c0,.827.673,1.5,1.5,1.5h.5v1c0,2.757,2.243,5,5,5h7.697l3.963,2.642c.36.24.775.361,1.191.361.348,0,.696-.084,1.015-.255.699-.375,1.134-1.1,1.134-1.894v-6.855h.5c.827,0,1.5-.673,1.5-1.5v-3c0-.827-.673-1.5-1.5-1.5Zm-14-1c.828,0,1.5.672,1.5,1.5s-.672,1.5-1.5,1.5-1.5-.672-1.5-1.5.672-1.5,1.5-1.5Zm8.031,7.573c-1.037.651-2.666,1.427-4.531,1.427s-3.494-.776-4.531-1.427c-.468-.293-.609-.911-.315-1.378.294-.467.911-.609,1.378-.316.815.512,2.079,1.121,3.469,1.121s2.653-.609,3.469-1.121c.466-.294,1.085-.152,1.378.316.294.468.152,1.085-.315,1.378Zm-1.031-4.573c-.828,0-1.5-.672-1.5-1.5s.672-1.5,1.5-1.5,1.5.672,1.5,1.5-.672,1.5-1.5,1.5Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Study Bot</span>
+                      </NavLink>
+                      <NavLink to="/student/notif" className={({ isActive }) => `flex items-center gap-3 p-2.5 rounded-[14px] transition-all duration-300 ${isActive ? "bg-green-50 text-green-700 shadow-sm border border-green-100/50" : "text-gray-600 hover:bg-white/50 border border-transparent"}`}>
+                          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                               <path d="M4.068,18H19.724a3,3,0,0,0,2.821-4.021L19.693,6.094A8.323,8.323,0,0,0,11.675,0h0A8.321,8.321,0,0,0,3.552,6.516l-2.35,7.6A3,3,0,0,0,4.068,18Z" /><path d="M7.1,20a5,5,0,0,0,9.8,0Z" />
+                           </svg>
+                          </div>
+                          <span className="font-bold text-sm">Notifications</span>
+                      </NavLink>
+                    </>
+                  )}
+                </nav>
+              </div>
+            </div>
+          )}
+          
+          <button 
+            onClick={() => {
+              setMobileTab("home");
+              setMobileMenuOpen(true);
+            }} 
+            className={`flex flex-col items-center gap-1.5 transition-colors px-5 py-1 max-[425px]:px-3 ${mobileTab === 'home' || (!mobileMenuOpen && !isCommunity) ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}
+          >
+            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-[22px] max-[425px]:h-[22px] fill-current">
+              <path d="m9,9H2c-1.103,0-2-.897-2-2v-2C0,2.243,2.243,0,5,0h4c1.103,0,2,.897,2,2v5c0,1.103-.897,2-2,2Zm10,15h-4c-1.103,0-2-.897-2-2v-5c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v2c0,2.757-2.243,5-5,5Zm3-11h-7c-1.103,0-2-.897-2-2V2c0-1.103.897-2,2-2h4c2.757,0,5,2.243,5,5v6c0,1.103-.897,2-2,2Zm-13,11h-4c-2.757,0-5-2.243-5-5v-6c0-1.103.897-2,2-2h7c1.103,0,2,.897,2,2v9c0,1.103-.897,2-2,2Z" />
+            </svg>
+            <span className="text-[11px] max-[425px]:text-[9px] font-bold">Home</span>
+          </button>
+          
+          <Link to="/student/profile" className="relative -top-1.5 max-[425px]:-top-1 glass-panel p-1.5 rounded-full shadow-md border border-gray-100 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+             <img src={avatarUrl} alt="Profile" className="w-12 h-12 max-[425px]:w-11 max-[425px]:h-11 rounded-full object-cover border-2 border-slate-700 bg-white" />
+             <div className="absolute bottom-1 right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+          </Link>
+
+          <button 
+            onClick={() => {
+              setMobileTab("community");
+              setMobileMenuOpen(true);
+            }} 
+            className={`flex flex-col items-center gap-1.5 transition-colors px-5 py-1 max-[425px]:px-3 ${mobileTab === 'community' || (!mobileMenuOpen && isCommunity) ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}
+          >
+            <svg viewBox="0 0 24 24" className="w-6 h-6 max-[425px]:w-[22px] max-[425px]:h-[22px] fill-current">
+               <path d="m.213,9.145c-.341-.435-.264-1.063.171-1.404L8.919,1.062c1.814-1.419,4.348-1.42,6.162,0l8.535,6.679c.435.34.512.969.171,1.404-.197.252-.491.384-.788.384-.215,0-.433-.069-.615-.212L13.849,2.638c-1.088-.852-2.609-.852-3.697,0L1.616,9.316c-.436.34-1.063.262-1.403-.171Zm4.395,9.06c.247.189.393.483.393.795v4c0,.553-.447,1-1,1H1c-.553,0-1-.447-1-1,0-2.286,1.571-4.374,3.737-4.965.299-.08.622-.019.87.17Zm19.393,4.795c0,.553-.447,1-1,1h-3c-.553,0-1-.447-1-1v-4c0-.312.146-.605.393-.795.249-.188.573-.25.87-.17,2.166.591,3.737,2.679,3.737,4.965ZM4.5,11c-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5,2.5-1.119,2.5-2.5-1.119-2.5-2.5-2.5Zm17.5,2.5c0-1.381-1.119-2.5-2.5-2.5s-2.5,1.119-2.5,2.5,1.119,2.5,2.5,2.5,2.5-1.119,2.5-2.5Zm-10-5.5c-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5,2.5-1.119,2.5-2.5-1.119-2.5-2.5-2.5Zm5,12v3c0,.553-.447,1-1,1h-8c-.553,0-1-.447-1-1v-3c0-2.757,2.243-5,5-5s5,2.243,5,5Z" />
+            </svg>
+            <span className="text-[11px] max-[425px]:text-[9px] font-bold">Community</span>
+          </button>
+        </div>
       </div>
     </>
   );

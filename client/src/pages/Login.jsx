@@ -27,7 +27,8 @@ import toast from "react-hot-toast";
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import studentLottie from '../assets/loading/STUDENT.lottie';
 import { preloadAsset } from "../utils/preloadAsset";
-import LoadingState from "../components/ui/LoadingState";
+import { LoginSkeleton } from "../components/ui/LayoutSkeleton";
+import axios from "axios";
 
 preloadAsset(studentLottie, {
   as: "fetch",
@@ -280,11 +281,7 @@ export default function Login() {
   };
 
   if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <LoadingState size="lg" />
-      </div>
-    );
+    return <LoginSkeleton />;
   }
 
   /* ================= UI RENDER ================= */
@@ -521,7 +518,7 @@ export default function Login() {
           </form>
 
           {/* Social Proof */}
-          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50">
+          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50 max-[425px]:hidden">
             <div className="flex -space-x-2.5">
               <img src={profile1} alt="User 1" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
               <img src={profile5} alt="User 2" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />

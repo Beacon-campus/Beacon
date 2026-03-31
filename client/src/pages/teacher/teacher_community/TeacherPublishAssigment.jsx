@@ -725,7 +725,7 @@ function PublishAssignmentForm({ classroomId, onClose, onPublished }) {
           disabled={isSubmitting}
           className="w-full py-3.5 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl transition-all disabled:opacity-60"
         >
-          {isSubmitting ? "Publishing..." : "Assignments"}
+          {isSubmitting ? "Publishing..." : "Publish Assignment"}
         </button>
       </div>
 
@@ -1467,7 +1467,7 @@ export default function TeacherPublishAssignment() {
 
   if (step === 0) {
     stepContent = (
-      <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto">
+      <div className="w-full h-full p-6 relative overflow-y-auto">
         <h2 className="text-xl font-bold text-gray-700 mb-6">Select a Class to Manage Assignments</h2>
         {invalidClassroomId && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -1479,12 +1479,12 @@ export default function TeacherPublishAssignment() {
             No official classrooms available.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {teacherClasses.map((cls) => (
               <div
                 key={cls.id}
                 onClick={() => handleClassSelect(cls)}
-                className="p-6 rounded-2xl border-2 border-gray-200 cursor-pointer hover:shadow-md transition-all flex flex-col items-center justify-center text-center h-40 gap-2 bg-gray-50"
+                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 premium-transition cursor-pointer flex flex-col items-center justify-center text-center h-40 gap-2"
               >
                 <div className="flex items-center gap-2">
                    <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1501,7 +1501,7 @@ export default function TeacherPublishAssignment() {
     );
   } else if (step === 2) {
     stepContent = (
-      <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm relative flex flex-col">
+      <div className="w-full h-full p-6 relative flex flex-col">
         {renderSubmissionModal()}
         <div className="flex items-center gap-4 mb-6 shrink-0">
           <button
@@ -1760,7 +1760,7 @@ export default function TeacherPublishAssignment() {
     );
   } else {
     stepContent = (
-      <div className="w-full h-full p-6 bg-white rounded-2xl border border-gray-100 shadow-sm relative flex flex-col">
+      <div className="w-full h-full p-6 relative flex flex-col">
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={handleBack}
@@ -1790,9 +1790,9 @@ export default function TeacherPublishAssignment() {
                 <div
                   key={assign._id}
                   onClick={() => setSelectedAssignment(assign)}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all ${String(selectedAssignment?._id) === String(assign._id)
-                    ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+                  className={`p-6 rounded-2xl border cursor-pointer premium-transition ${String(selectedAssignment?._id) === String(assign._id)
+                    ? "border-slate-300 bg-white shadow-md -translate-y-1"
+                    : "border-slate-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-1"
                     }`}
                 >
                   <h3 className="font-bold text-primary">{assign.title}</h3>

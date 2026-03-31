@@ -25,6 +25,7 @@ export default function Notifications() {
   const [filter, setFilter] = useState("all"); // "all" | "friend_request"
   const [loading, setLoading] = useState(true);
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -158,6 +159,14 @@ export default function Notifications() {
       .finally(() => setLoading(false));
     fetchPendingFriendRequests(true);
   }, [fetchNotificationsAll, currentUserInfo?._id, currentUserInfo?.role, fetchPendingFriendRequests]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleChange = (event) => setIsCompactView(event.matches);
+    setIsCompactView(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     const nonFriendNotifications = (notificationsAll || []).filter(
@@ -356,60 +365,57 @@ export default function Notifications() {
   }
 
   return (
-    <div className="h-full w-full p-2">
-      <div className="h-full w-full premium-card p-6 flex flex-col gap-6 overflow-hidden">
+    <div className={`min-h-full h-auto min-[769px]:h-full w-full ${isCompactView ? "p-0" : "p-2"}`}>
+      <div className={`min-h-full min-[769px]:h-full w-full ${isCompactView ? "bg-transparent p-4 max-[425px]:px-3 max-[425px]:pt-3 max-[425px]:pb-4" : "premium-card p-4 min-[426px]:p-5 min-[769px]:p-6"} flex flex-col gap-5 min-[769px]:gap-6 overflow-hidden`}>
 
         {/* ================= HEADER ================= */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <BellIcon />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 leading-none">Notifications</h1>
-                <p className="text-xs text-gray-500 mt-1">You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
-              </div>
+        <div className="flex flex-col gap-4 pb-4 border-b border-gray-100">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 leading-none">Notifications</h1>
+              <p className="text-xs text-gray-500 mt-1">You have {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}</p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-4">
-            {/* ================= ICON-ONLY PILL FILTERS ================= */}
-            <div className="bg-gray-100 p-1 rounded-full flex items-center shadow-inner gap-1">
+            <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => setFilter("all")}
-                title="All Notifications"
-                className={`flex items-center justify-center rounded-full transition-all duration-300 ease-in-out w-9 h-9
-                        ${filter === "all" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
-                    `}
-              >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                onClick={deleteAllNotifications}
+                className="flex items-center justify-center gap-2 px-3 min-[400px]:px-4 h-10 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all w-auto">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"></path></svg>
+                <span className="hidden min-[400px]:inline">Delete all</span>
               </button>
 
-              {isStudent && (
+            {/* ================= ICON-ONLY PILL FILTERS ================= */}
+            {!isTeacher && (
+              <div className="bg-gray-100 p-1 rounded-full flex items-center shadow-inner gap-1">
                 <button
-                  onClick={() => setFilter("friend_request")}
-                  title="Friend Requests"
+                  onClick={() => setFilter("all")}
+                  title="All Notifications"
                   className={`flex items-center justify-center rounded-full transition-all duration-300 ease-in-out w-9 h-9
-                        ${filter === "friend_request" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
-                    `}
+                          ${filter === "all" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
+                      `}
                 >
-                  <svg className="w-5 h-5 flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                 </button>
-              )}
-            </div>
 
-            <button
-              onClick={deleteAllNotifications}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-100 transition-all">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              Delete all
-            </button>
+                {isStudent && (
+                  <button
+                    onClick={() => setFilter("friend_request")}
+                    title="Friend Requests"
+                    className={`flex items-center justify-center rounded-full transition-all duration-300 ease-in-out w-9 h-9
+                          ${filter === "friend_request" ? "bg-[#0F172A] text-white shadow-md transform scale-105" : "text-gray-500 hover:bg-gray-200 hover:text-gray-700"}
+                      `}
+                  >
+                    <svg className="w-5 h-5 flex-shrink-0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                  </button>
+                )}
+              </div>
+            )}
+            </div>
           </div>
         </div>
 
         {/* ================= NOTIFICATION LIST ================= */}
-        <div className="flex-1 overflow-y-auto pr-2 soft-scrollbar space-y-3">
+        <div className="flex-1 overflow-y-auto pr-1 min-[426px]:pr-2 soft-scrollbar space-y-3">
 
           {loading ? (
             <div className="flex flex-col items-center justify-center h-40 text-gray-400">
@@ -452,7 +458,7 @@ export default function Notifications() {
                         openDmWithUser(notif.relatedId);
                       }
                     }}
-                    className={`group relative border-b border-gray-100 p-4 pl-6 flex items-start gap-4 transition-all duration-200 ${!isFriendRequestGroup && (!isFriendRequest || isAccepted) ? "cursor-pointer" : ""}
+                    className={`group relative border-b border-gray-100 p-4 pl-5 min-[426px]:pl-6 flex items-start gap-3 min-[426px]:gap-4 transition-all duration-200 ${!isFriendRequestGroup && (!isFriendRequest || isAccepted) ? "cursor-pointer" : ""}
                             ${(!notif.read && !isAccepted) || notif.unread
                         ? `${palette.unreadBg} ${palette.unreadHover}`
                         : "bg-transparent hover:bg-gray-50"
@@ -490,11 +496,11 @@ export default function Notifications() {
 
                     {/* Text Content */}
                     <div className="flex-1 min-w-0 pt-0.5">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className={`text-sm font-bold truncate ${(!notif.read && !isAccepted) || notif.unread ? "text-gray-900" : "text-gray-700"}`}>
+                      <div className="flex flex-col min-[426px]:flex-row min-[426px]:items-center justify-between mb-1 gap-1 min-[426px]:gap-2">
+                        <h3 className={`text-sm font-bold min-w-0 ${(!notif.read && !isAccepted) || notif.unread ? "text-gray-900" : "text-gray-700"}`}>
                           {isAccepted ? "Friend Request Accepted" : (notif.isGrouped ? `${notif.activityCount} New Activities` : (notif.title || (isFriendRequest ? "Friend Request" : "Notification")))}
                         </h3>
-                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap ml-2">
+                        <span className="text-xs text-gray-400 font-medium whitespace-nowrap min-[426px]:ml-2">
                           {new Date(notif.timestamp).toLocaleString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                         </span>
                       </div>
@@ -514,12 +520,12 @@ export default function Notifications() {
                       {isFriendRequestGroup && (
                         <div className="mt-3 space-y-2">
                           {notif.requests.map((reqUser) => (
-                            <div key={reqUser._id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                            <div key={reqUser._id} className="flex flex-col min-[426px]:flex-row min-[426px]:items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
                               <div className="min-w-0">
                                 <p className="text-sm font-semibold text-gray-800 truncate">{reqUser.profile?.name || "User"}</p>
                                 <p className="text-xs text-gray-500 truncate">{reqUser.profile?.regno || ""}</p>
                               </div>
-                              <div className="flex gap-2 shrink-0">
+                              <div className="flex gap-2 shrink-0 flex-wrap">
                                 <button
                                   onClick={() => handleAcceptRequest(reqUser._id)}
                                   aria-label="Accept friend request"
@@ -667,7 +673,7 @@ export default function Notifications() {
 
                       {/* Expand/Collapse Toggle for Grouped Notifications */}
                       {notif.isGrouped && notif.subNotifications?.length > 1 && (
-                        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center gap-3">
                           <button
                             onClick={(e) => { e.stopPropagation(); toggleGroupExpand(notif.relatedId); }}
                             className="text-xs font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
@@ -689,7 +695,7 @@ export default function Notifications() {
                   {/* Sub-notifications List */}
                   {
                     notif.isGrouped && expandedGroups[notif.relatedId] && (
-                      <div className="ml-8 mr-2 mt-[-8px] mb-4 space-y-2 border-l-2 border-gray-100 pl-4 py-2">
+                      <div className="ml-4 min-[426px]:ml-8 mr-1 min-[426px]:mr-2 mt-[-8px] mb-4 space-y-2 border-l-2 border-gray-100 pl-3 min-[426px]:pl-4 py-2">
                         {notif.subNotifications.map((sub, sIdx) => (
                           <div key={sub.id || sub._id || sIdx} className="bg-gray-50/50 rounded-lg p-3 flex gap-3 text-sm border border-gray-100 items-start">
                             <div className="mt-0.5 text-gray-400">

@@ -88,11 +88,18 @@ h6,
 /* ========================================================= */
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+.premium-transition {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+  transform: translateZ(0); 
 }
 
 @keyframes blob {
@@ -115,6 +122,9 @@ h6,
 
 .animate-blob {
   animation: blob 10s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .animation-delay-2000 {
@@ -179,6 +189,23 @@ h6,
 .animate-glow-pulse {
   animation: glow-pulse 2s ease-in-out infinite;
   z-index: 10;
+}
+
+@keyframes slide-up-sheet {
+  0% {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up-sheet 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
 }
 
 /* Soft, subtle scrollbar for airy UI */

@@ -10,6 +10,7 @@ import {
   getMongoUserById,
   getMongoUserByFirebaseUid,
   createFirestoreUser,
+  updateFirestoreUser,
   deleteFirestoreUser,
   getAllClassrooms,
   findStudentsByCriteria,
@@ -263,11 +264,21 @@ export const updateUserAction = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    if (email && email !== user.email) {
+    const previousRole = user.role;
+    const nextRole = role ? role.toLowerCase() : user.role;
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : undefined;
+    const normalizedName = typeof name === "string" ? name.trim() : undefined;
+    const normalizedRegno = typeof regno === "string" ? regno.trim().toUpperCase() : undefined;
+    const normalizedDepartment = typeof department === "string" ? department.trim() : undefined;
+    const normalizedCourse = typeof course === "string" ? course.trim() : undefined;
+    const normalizedShift = typeof shift === "string" ? shift.trim() : undefined;
+    const normalizedSemester = semester !== undefined ? Number(semester) : undefined;
+
+    if (normalizedEmail && normalizedEmail !== user.email) {
       try {
         await admin.auth().updateUser(user.firebaseUid, {
-          email: email,
-          displayName: name,
+          email: normalizedEmail,
+          displayName: normalizedName || user.profile?.displayName || user.profile?.name || "User",
         });
       } catch (fbErr) {
         if (fbErr.code === 'auth/email-already-exists') {
@@ -275,45 +286,58 @@ export const updateUserAction = async (req, res) => {
         }
         throw fbErr;
       }
-    } else if (name && (!user.profile || name !== user.profile.displayName)) {
+    } else if (normalizedName && (!user.profile || normalizedName !== user.profile.displayName)) {
        try {
            await admin.auth().updateUser(user.firebaseUid, {
-              displayName: name,
+              displayName: normalizedName,
            });
        } catch (fbErr) {
            console.warn("Failed to update Firebase Auth DisplayName, continuing...", fbErr);
        }
     }
 
-    if (email) user.email = email;
-    if (role) user.role = role.toLowerCase();
-    if (regno !== undefined) user.regno = regno;
+    if (normalizedEmail !== undefined && normalizedEmail !== "") user.email = normalizedEmail;
+    user.role = nextRole;
+    if (normalizedRegno !== undefined) user.regno = normalizedRegno;
     
     if (!user.profile) user.profile = {};
-    if (name) {
-      user.profile.name = name;
-      user.profile.displayName = name;
+    if (normalizedName) {
+      user.profile.name = normalizedName;
+      user.profile.displayName = normalizedName;
     }
-    const isStudent = (role ? role.toLowerCase() : user.role) === "student";
+    const wasStudent = previousRole === "student";
+    const isStudent = nextRole === "student";
     let classroomChanged = false;
     
     if (isStudent) {
-      if (course !== undefined && course !== user.profile.course) classroomChanged = true;
-      if (semester !== undefined && semester !== user.profile.semester) classroomChanged = true;
-      if (shift !== undefined && shift !== user.profile.shift) classroomChanged = true;
+      if (!wasStudent) classroomChanged = true;
+      if (normalizedCourse !== undefined && normalizedCourse !== user.profile.course) classroomChanged = true;
+      if (normalizedSemester !== undefined && normalizedSemester !== user.profile.semester) classroomChanged = true;
+      if (normalizedShift !== undefined && normalizedShift !== user.profile.shift) classroomChanged = true;
     }
 
-    if (department !== undefined) user.profile.department = department;
-    if (course !== undefined) user.profile.course = course;
-    if (semester !== undefined) user.profile.semester = semester;
-    if (shift !== undefined) user.profile.shift = shift;
-    if (regno !== undefined) user.profile.regno = regno;
+    if (normalizedDepartment !== undefined) user.profile.department = normalizedDepartment;
+    if (normalizedCourse !== undefined) user.profile.course = normalizedCourse;
+    if (normalizedSemester !== undefined && Number.isFinite(normalizedSemester)) user.profile.semester = normalizedSemester;
+    if (normalizedShift !== undefined) user.profile.shift = normalizedShift;
+    if (normalizedRegno !== undefined) user.profile.regno = normalizedRegno;
 
     await user.save();
 
-    if (isStudent && classroomChanged) {
-        await removeStudentFromAllClassrooms(user);
-        await enrollStudentInMatchingClassroom(user);
+    await updateFirestoreUser(user.firebaseUid, {
+      email: user.email,
+      realName: user.profile?.displayName || user.profile?.name || "User",
+      regno: user.profile?.regno || user.regno || "",
+      role: user.role,
+      course: user.role === "student" ? (user.profile?.course || "") : "",
+      department: user.role === "teacher" ? (user.profile?.department || "") : "",
+    });
+
+    if (wasStudent && !isStudent) {
+      await removeStudentFromAllClassrooms(user);
+    } else if (isStudent && classroomChanged) {
+      await removeStudentFromAllClassrooms(user);
+      await enrollStudentInMatchingClassroom(user);
     }
 
     res.json({ message: "User updated successfully", user });

@@ -119,16 +119,16 @@ export default function AdminAnnouncements() {
   };
 
   return (
-    <div className="h-full w-full overflow-auto p-6 bg-slate-50">
+    <div className="h-full w-full overflow-auto no-scrollbar p-6 bg-slate-50 rounded-3xl shadow-sm border border-slate-100">
       <div className="max-w-[1500px] mx-auto space-y-6">
-        <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 p-6 text-white shadow-xl">
+        <div className="rounded-2xl bg-gradient-to-r from-[#0F172A] via-slate-800 to-slate-700 p-6 text-white shadow-xl">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 className="text-3xl font-black tracking-tight">University Announcements Center</h1>
               <p className="text-sm text-slate-200 mt-2">Create campus-wide updates, share files, and keep students and teachers in sync.</p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => loadAnnouncements(false, true)} className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-sm font-bold">
+              <button onClick={() => loadAnnouncements(false, true)} className="px-4 py-2 rounded-lg bg-[#1e293b] hover:bg-slate-700 text-white text-sm font-bold transition-all active:scale-95 shadow-lg">
                 Refresh
               </button>
             </div>
@@ -172,7 +172,7 @@ export default function AdminAnnouncements() {
                   type="button"
                   onClick={handlePost}
                   disabled={posting || uploading || ((!message || !message.trim()) && !attachment)}
-                  className="ml-auto px-4 py-2 rounded-lg bg-black text-white text-sm font-bold disabled:opacity-40"
+                  className="ml-auto px-4 py-2 rounded-lg bg-[#0F172A] hover:bg-[#1e293b] text-white text-sm font-bold disabled:opacity-40 transition-all active:scale-95 shadow-md"
                 >
                   {posting ? "Posting..." : "Post Now"}
                 </button>
