@@ -864,39 +864,62 @@ export default function Calendar() {
   const compactCalendarOverlay = isCompactView && showCalendar ? (
     <div className="fixed inset-0 z-[140] bg-white flex flex-col">
       <div className="shrink-0 border-b border-gray-100 px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <button
             onClick={() => { setShowCalendar(false); setActiveCell(null); }}
-            className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-600 flex items-center justify-center shadow-sm"
+            className="p-2 -ml-2 text-gray-600 hover:text-gray-900 active:scale-95 transition-all"
             aria-label="Back to calendar"
           >
-            <ChevronLeftIcon className="w-5 h-5" />
+            <ChevronLeftIcon className="w-6 h-6" />
           </button>
-          <div className="min-w-0 flex-1 text-center">
-            <h2 className="text-lg font-black text-primary truncate">Calendar</h2>
-            <p className="text-xs font-medium text-gray-500">Full schedule</p>
+          
+          <div className="min-w-0 flex-1 ml-2">
+            <h2 className="text-xl font-black text-primary truncate">Calendar</h2>
           </div>
-          <button
-            onClick={handleDownloadPdf}
-            disabled={isDownloading}
-            className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-600 flex items-center justify-center shadow-sm disabled:opacity-50"
-            aria-label="Download calendar"
-          >
-            <DownloadIcon />
-          </button>
-        </div>
 
-        <div className="mt-3 flex justify-center">
-          <button
-            onClick={() => setViewMode((prev) => prev === "grid" ? "calendar" : "grid")}
-            className="px-4 h-10 rounded-2xl border border-gray-200 bg-white text-sm font-bold text-gray-700 shadow-sm"
-          >
-            {viewMode === "grid" ? "Docs View" : "Grid View"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode((prev) => prev === "grid" ? "calendar" : "grid")}
+              className="px-3 py-1.5 rounded-xl bg-gray-100 text-xs font-bold text-gray-700 active:scale-95 transition-all"
+            >
+              {viewMode === "grid" ? "Docs" : "Grid"}
+            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="p-2 -mr-2 text-gray-600 hover:text-gray-900 active:scale-95 transition-all"
+                aria-label="Download options"
+              >
+                <DownloadIcon />
+              </button>
+              {showExportMenu && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                  <button onClick={() => handleDownloadRawPdf()} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">
+                    <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" /></svg>
+                    </div>
+                    Raw PDF
+                  </button>
+                  <button onClick={() => handleDownloadPdf()} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">
+                    <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5z" /></svg>
+                    </div>
+                    Schedule PDF
+                  </button>
+                  <button onClick={handleExportExcel} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-500">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13z" /></svg>
+                    </div>
+                    Excel
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {viewMode === "grid" && (
-          <div className="mt-3 flex items-center justify-center gap-3">
+          <div className="mt-3 flex items-center justify-between gap-3 bg-gray-50 rounded-2xl p-1.5 border border-gray-100 shadow-inner">
             <button
               onClick={() => {
                 const next = new Date(currentDate);
@@ -904,12 +927,12 @@ export default function Calendar() {
                 setActiveCell(null);
                 setCurrentDate(next);
               }}
-              className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-500 flex items-center justify-center shadow-sm"
+              className="p-2 rounded-xl bg-white text-gray-500 hover:text-gray-900 hover:shadow-sm active:scale-95 transition-all w-10 flex items-center justify-center border border-gray-100"
             >
               <ChevronLeftIcon />
             </button>
             <div className="text-center min-w-[148px]">
-              <p className="text-sm min-[426px]:text-base font-black text-primary">{currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+              <p className="text-base font-black text-primary tracking-tight">{currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
             </div>
             <button
               onClick={() => {
@@ -918,7 +941,7 @@ export default function Calendar() {
                 setActiveCell(null);
                 setCurrentDate(next);
               }}
-              className="w-10 h-10 rounded-2xl border border-gray-200 bg-white text-gray-500 flex items-center justify-center shadow-sm"
+              className="p-2 rounded-xl bg-white text-gray-500 hover:text-gray-900 hover:shadow-sm active:scale-95 transition-all w-10 flex items-center justify-center border border-gray-100"
             >
               <ChevronRightIcon />
             </button>
@@ -928,13 +951,13 @@ export default function Calendar() {
 
       <div className="flex-1 overflow-y-auto bg-white">
         {viewMode === "grid" ? (
-          <div className="p-4">
-            <div className="grid grid-cols-7 border border-gray-200 overflow-hidden">
+          <div className="p-2 min-[426px]:p-4">
+            <div className="grid grid-cols-7 mb-2">
               {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day) => (
-                <div key={day} className="bg-white py-2 text-[11px] min-[426px]:text-[12px] font-black text-center text-gray-400 tracking-widest border-r last:border-r-0 border-gray-200">{day}</div>
+                <div key={day} className="py-2 text-[10px] min-[426px]:text-[11px] font-bold text-center text-gray-400 tracking-widest">{day}</div>
               ))}
             </div>
-            <div className="grid grid-cols-7 auto-rows-fr border-x border-b border-gray-200 overflow-hidden">
+            <div className="grid grid-cols-7 gap-1 min-[426px]:gap-2">
               {(() => {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
@@ -950,11 +973,13 @@ export default function Calendar() {
                   const dayDate = new Date(d);
                   dayDate.setHours(0, 0, 0, 0);
                   const isToday = isActualDay && dayDate.getTime() === today.getTime();
+                  const isPastDay = isActualDay && dayDate.getTime() < today.getTime();
 
                   const cellDateKey = toDateKey(d);
                   const eventsOnDay = calendarEvents.filter(e => toDateKey(e.date) === cellDateKey);
                   const todosOnDay = activeGridTodos.filter(todo => (todo.__dueDateKey || toDateKey(todo.dueDate)) === cellDateKey);
-                  const count = eventsOnDay.length + todosOnDay.length;
+                  const allItems = [...eventsOnDay, ...todosOnDay];
+                  const hasItems = allItems.length > 0;
 
                   return (
                     <button
@@ -962,12 +987,14 @@ export default function Calendar() {
                       type="button"
                       disabled={!isActualDay}
                       onClick={() => isActualDay && setActiveCell(activeCell === i ? null : i)}
-                      className={`min-h-[64px] min-[426px]:min-h-[74px] px-2 py-2 text-left align-top transition-colors border-r border-b last:border-r-0 border-gray-200 ${isActualDay ? "bg-white" : "opacity-0 pointer-events-none"} ${isToday ? "!bg-emerald-500 text-white" : "text-gray-700 hover:bg-gray-50"}`}
+                      className={`min-h-[56px] min-[426px]:min-h-[64px] rounded-[16px] px-1.5 py-2 min-[426px]:px-2 flex flex-col items-center transition-all duration-[300ms] ${isActualDay ? "bg-white border hover:bg-gray-50 shadow-[0_2px_4px_rgba(0,0,0,0.02)]" : "opacity-0 pointer-events-none"} ${isToday ? "!bg-emerald-500 !border-emerald-600 text-white" : activeCell === i ? "bg-slate-100 border-gray-300 shadow-md text-slate-900" : isPastDay ? "bg-gray-50 border-gray-100 text-gray-400" : "border-gray-100 text-gray-800"}`}
                     >
-                      <div className="text-xs font-black">{dayNumber}</div>
-                      {count > 0 && (
-                        <div className={`mt-1 text-[9px] font-bold ${isToday ? "text-white/90" : "text-gray-400"}`}>
-                          {count} item{count > 1 ? "s" : ""}
+                      <span className={`text-[1.1rem] min-[426px]:text-[1.25rem] font-bold ${isToday ? "text-white" : activeCell === i ? "text-slate-900" : isPastDay ? "text-gray-400" : "text-gray-800"}`}>{dayNumber}</span>
+                      {hasItems && (
+                        <div className="flex gap-1 mt-1 flex-wrap justify-center w-full px-1">
+                          {allItems.slice(0, 3).map((item, idx) => (
+                             <div key={idx} className={`w-1.5 h-1.5 rounded-full ${isToday ? "bg-white/90" : item.type === "TO-DO" ? "bg-slate-900" : getDotColor(item.type)}`} />
+                          ))}
                         </div>
                       )}
                     </button>
@@ -996,10 +1023,10 @@ export default function Calendar() {
                   return (
                     <div className="space-y-3">
                       {items.map((item, idx) => (
-                        <div key={idx} className={`border-l-4 pl-3 py-1 ${item.isTodo ? "border-l-slate-900" : item.type === "Exam" ? "border-l-amber-500" : item.type === "Community" || item.type === "Event" || item.type === "Holiday" ? "border-l-emerald-500" : "border-l-slate-900"}`}>
-                          <p className="text-sm font-bold text-gray-800">{item.title}</p>
+                        <div key={idx} className={`p-3 pr-4 rounded-xl shadow-sm bg-white border border-gray-100 border-l-4 ${item.isTodo ? "border-l-slate-900" : getEventBorderColor(item.type)}`}>
+                          <p className="text-[13px] font-bold text-gray-800 leading-tight">{item.title}</p>
                           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-gray-400 mt-1">{item.type}</p>
-                          {item.description && <p className="text-xs text-gray-500 mt-2">{item.description}</p>}
+                          {item.description && <p className="text-xs font-medium text-gray-500 mt-2 leading-relaxed italic">{item.description}</p>}
                         </div>
                       ))}
                     </div>
@@ -1197,10 +1224,10 @@ export default function Calendar() {
       >
         <div className="flex flex-col h-full bg-white/85 backdrop-blur-xl border border-white rounded-[24px] p-4 min-[426px]:p-6 min-[769px]:p-8 shadow-2xl relative overflow-hidden">
           {/* REFERENCE HEADER */}
-          <div className="flex items-center justify-between gap-4 mb-6 shrink-0 relative z-30 px-1 min-[426px]:px-2">
+          <div className="flex flex-wrap lg:flex-nowrap items-center justify-between gap-4 mb-6 shrink-0 relative z-30 px-1 min-[426px]:px-2">
             {/* LEFT SIDE: Date Header */}
-            {viewMode === "grid" && (
-              <div className="flex items-center gap-4 shrink-0">
+            {(viewMode === "grid" || viewMode === "calendar") && (
+              <div className="flex items-center gap-4 shrink-0 order-1">
                 <div className="bg-slate-900 text-white px-4 min-[426px]:px-6 py-2 rounded-full shadow-lg border border-slate-800">
                   <h2 className="text-lg min-[426px]:text-2xl font-black tracking-tight flex items-center gap-2 relative">
                     <GlitchText text={currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} />
@@ -1209,29 +1236,31 @@ export default function Calendar() {
               </div>
             )}
 
-            {/* SLIDING TOGGLE (Centered) */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl p-1.5 z-40 overflow-hidden mx-auto">
-              <div
-                className={`absolute left-1.5 top-1.5 bottom-1.5 w-[calc(50%-0.375rem)] min-[769px]:w-[140px] rounded-xl bg-slate-900 shadow-md transition-transform duration-300 ease-out ${viewMode === "calendar" ? "translate-x-[calc(100%+0.75rem)] min-[769px]:translate-x-[140px]" : "translate-x-0"
-                  }`}
-              />
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`relative z-10 flex-1 min-[769px]:w-[140px] min-[769px]:flex-none px-3 min-[426px]:px-4 py-2 rounded-xl text-xs min-[426px]:text-sm font-bold text-center transition-colors duration-200 ${viewMode === "grid" ? "text-white" : "text-gray-600 hover:text-primary"
-                  }`}
-              >
-                Grid View
-              </button>
-              <button
-                onClick={() => setViewMode("calendar")}
-                className={`relative z-10 flex-1 min-[769px]:w-[140px] min-[769px]:flex-none px-3 min-[426px]:px-4 py-2 rounded-xl text-xs min-[426px]:text-sm font-bold text-center transition-colors duration-200 ${viewMode === "calendar" ? "text-white" : "text-gray-600 hover:text-primary"
-                  }`}
-              >
-                Document View
-              </button>
+            {/* SLIDING TOGGLE (Centered but wraps gracefully) */}
+            <div className="flex-1 flex justify-center order-3 lg:order-2 w-full lg:w-auto mt-4 lg:mt-0">
+              <div className="relative flex items-center bg-gray-100/50 border border-gray-200 rounded-2xl p-1 z-40 overflow-hidden">
+                <div
+                  className={`absolute left-1 top-1 bottom-1 w-[calc(50%-0.25rem)] min-[769px]:w-[150px] rounded-xl bg-slate-900 shadow-lg transition-transform duration-300 ease-out ${viewMode === "calendar" ? "translate-x-[calc(100%+0.5rem)] min-[769px]:translate-x-[150px]" : "translate-x-0"
+                    }`}
+                />
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`relative z-10 flex-1 min-[769px]:w-[150px] min-[769px]:flex-none px-6 py-2.5 rounded-xl text-sm font-bold text-center transition-colors duration-200 whitespace-nowrap ${viewMode === "grid" ? "text-white" : "text-gray-500 hover:text-primary"
+                    }`}
+                >
+                  Grid View
+                </button>
+                <button
+                  onClick={() => setViewMode("calendar")}
+                  className={`relative z-10 flex-1 min-[769px]:w-[150px] min-[769px]:flex-none px-6 py-2.5 rounded-xl text-sm font-bold text-center transition-colors duration-200 whitespace-nowrap ${viewMode === "calendar" ? "text-white" : "text-gray-500 hover:text-primary"
+                    }`}
+                >
+                  Document View
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 min-[426px]:gap-4 relative z-40 shrink-0">
+            <div className="flex items-center gap-3 min-[426px]:gap-4 relative z-40 shrink-0 order-2 lg:order-3">
               {viewMode === "grid" && (
                 <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
                   <button
@@ -1300,8 +1329,8 @@ export default function Calendar() {
                   </div>
                 )}
               </div>
-              <button onClick={() => { setShowCalendar(false); setActiveCell(null); }} className="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 flex items-center justify-center transition-all" aria-label="Close calendar">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button onClick={() => { setShowCalendar(false); setActiveCell(null); }} className="w-10 h-10 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-900 flex items-center justify-center transition-all" aria-label="Close calendar">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
