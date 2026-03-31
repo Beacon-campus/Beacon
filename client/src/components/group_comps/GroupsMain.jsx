@@ -12,6 +12,7 @@ export default function Groups() {
     const [activeGroupId, setActiveGroupId] = useState(null);
     const [showInfo, setShowInfo] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
+    const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
 
     const projects = useMemo(() =>
         (secondaryChats || []).filter(c => c.type === 'project_group'),
@@ -32,6 +33,12 @@ export default function Groups() {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        const handleResize = () => setIsCompactView(window.innerWidth < 769);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     const getDeadlineStatus = useCallback((deadlineStr) => {
         if (!deadlineStr) return null;
         const now = new Date();
@@ -49,13 +56,16 @@ export default function Groups() {
         };
     }, [tick]);
 
+    const showListPane = !isCompactView || !activeGroupId;
+    const showChatPane = !isCompactView || !!activeGroupId;
+
     return (
-        <div className="flex w-full h-full bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+        <div className="flex w-full h-full bg-white overflow-hidden min-[769px]:rounded-2xl min-[769px]:border min-[769px]:border-gray-100 min-[769px]:shadow-sm">
 
             {/* SIDEBAR: Project List */}
-            <div className="w-80 border-r border-gray-100 flex flex-col bg-gray-50/20">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                    <h2 className="text-lg font-black text-gray-800 uppercase tracking-tighter">Projects</h2>
+            <div className={`${showListPane ? "flex" : "hidden"} ${isCompactView ? "w-full" : "w-80"} border-r border-gray-100 flex-col bg-gray-50/20`}>
+                <div className="px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-6 border-b border-gray-100 flex justify-between items-center bg-white">
+                    <h2 className="text-[24px] min-[769px]:text-lg font-black text-[#0F172A] min-[769px]:text-gray-800 tracking-tight min-[769px]:uppercase min-[769px]:tracking-tighter">Groups</h2>
                     <button
                         onClick={() => setShowCreate(true)}
                         className="group/plus w-9 h-9 bg-transparent border-2 border-[#0F172A] text-[#0F172A] hover:bg-[#0F172A] hover:text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
@@ -64,7 +74,7 @@ export default function Groups() {
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
+                <div className="flex-1 overflow-y-auto px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-4 space-y-2 no-scrollbar">
                     {projects.length === 0 ? (
                         <div className="text-center py-12 opacity-30">
                             <div className="w-12 h-12 rounded-full bg-gray-200 mx-auto mb-3 flex items-center justify-center text-xl">📁</div>
@@ -80,8 +90,8 @@ export default function Groups() {
                                 <div
                                     key={p._id}
                                     onClick={() => setActiveGroupId(p._id)}
-                                    className={`p-4 cursor-pointer transition-all border border-transparent ${isSelected
-                                            ? "bg-[#F0FDF4] border-[#059669] shadow-sm font-medium rounded-2xl"
+                                    className={`p-4 cursor-pointer transition-all border border-transparent rounded-2xl ${isSelected
+                                            ? "bg-[#F0FDF4] border-[#059669] shadow-sm font-medium"
                                             : "hover:bg-gray-50 border-b border-b-gray-100"
                                         }`}
                                 >
@@ -116,7 +126,7 @@ export default function Groups() {
             </div>
 
             {/* MAIN CONTENT: Chat Area */}
-            <div className="flex-1 flex flex-col bg-white">
+            <div className={`${showChatPane ? "flex" : "hidden"} flex-1 flex-col bg-white`}>
                 {!activeGroupId ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-10 text-center select-none gap-6">
                         <div className="text-[80px] opacity-60 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-default">
@@ -131,8 +141,16 @@ export default function Groups() {
                     </div>
                 ) : (
                     <>
-                        <div className="shrink-0 h-[76px] bg-white border-b border-gray-100 flex items-center px-6 justify-between">
+                        <div className="shrink-0 h-[72px] min-[769px]:h-[76px] bg-white border-b border-gray-100 flex items-center px-4 min-[426px]:px-5 min-[769px]:px-6 justify-between">
                             <div className="flex items-center gap-4">
+                                {isCompactView && (
+                                    <button
+                                        onClick={() => setActiveGroupId(null)}
+                                        className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                                    </button>
+                                )}
                                 <div className="w-11 h-11 rounded-2xl bg-gray-50 flex items-center justify-center border-2 border-black/5 shadow-inner">
                                     <span className="font-black text-black/30 text-sm uppercase">
                                         {activeGroup?.name?.[0]}

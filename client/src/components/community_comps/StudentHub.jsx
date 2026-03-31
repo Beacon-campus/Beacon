@@ -188,7 +188,7 @@ export default function StudentHub({
                     {showScrollButton && (
                         <button onClick={scrollToBottom} className="absolute top-14 right-1/2 translate-x-1/2 bg-black text-white p-2 rounded-full shadow-lg z-20 animate-in fade-in zoom-in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg></button>
                     )}
-                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto pb-4 px-4 pt-4 no-scrollbar" onScroll={handleScroll}>
+                    <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:px-4 min-[769px]:pt-4 min-[769px]:pb-4 no-scrollbar" onScroll={handleScroll}>
                         {isLoadingOlder && (
                             <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
                                 <LoadingState size="xs" />
@@ -216,7 +216,7 @@ export default function StudentHub({
 
             {typingUsers.length > 0 && <div className="px-6 py-1 bg-white text-xs text-gray-400 italic animate-pulse transition-all border-t border-gray-50">{typingUsers.length === 1 ? `${typingUsers[0].userName || "Someone"} is typing...` : "Several people are typing..."}</div>}
 
-            <div className="p-4 bg-white border-t border-gray-100 shrink-0">
+            <div className="px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:p-4 bg-white border-t border-gray-100 shrink-0">
                 <div className="flex flex-col gap-2 relative w-full">
                     {(emojiError || languageError) && <p className="text-xs text-red-500 font-bold px-2 animate-pulse">{emojiError || languageError}</p>}
                     {selectedGif && (
@@ -232,7 +232,7 @@ export default function StudentHub({
                         </div>
                     )}
                     {isUploadingAttachment && <p className="text-xs text-gray-500 font-semibold px-2">Uploading attachment...</p>}
-                    <div className="flex items-center gap-3 relative">
+                    <div className="flex items-center gap-1.5 min-[426px]:gap-2 relative w-full bg-gray-50 rounded-[24px] min-[426px]:rounded-[28px] border border-gray-100 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
                         <input
                             ref={uploadInputRef}
                             type="file"
@@ -240,30 +240,30 @@ export default function StudentHub({
                             accept={ACCEPTED_ATTACHMENT_EXTENSIONS}
                             onChange={handleUploadSelected}
                         />
-                        <button onClick={handlePickUpload} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Attach document/image">
+                        <div className="flex items-center pl-1 shrink-0">
+                        <button onClick={handlePickUpload} className="p-1.5 min-[426px]:p-2 text-gray-400 hover:text-[#0F172A] rounded-full transition-colors" title="Attach document/image">
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
                                 <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </button>
                         <div className="relative">
-                            <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-2 rounded-full transition-colors ${showMediaPicker ? 'bg-gray-200' : 'hover:bg-gray-100'}`} title="Add GIF or Emoji">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current text-gray-500 hover:text-black transition-colors"><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z" /></svg>
+                            <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-1.5 min-[426px]:p-2 rounded-full transition-colors ${showMediaPicker ? 'text-[#0F172A] bg-gray-200' : 'text-gray-400 hover:text-[#0F172A]'}`} title="Add GIF or Emoji">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" className="fill-current"><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z" /></svg>
                             </button>
                             {showMediaPicker && <div className="absolute bottom-full left-0 mb-2 z-50"><ChatMediaPicker hideGifs={currentUser?.role === 'teacher'} onGifSelect={(gif) => { setSelectedGif(gif); setShowMediaPicker(false); }} onEmojiSelect={(e) => setChatInput(p => p + e)} onClose={() => setShowMediaPicker(false)} /></div>}
                         </div>
-                        <input value={chatInput} onChange={handleInputChange} onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} className={`flex-1 bg-gray-100 rounded-full px-4 py-3 pr-20 text-sm focus:outline-none focus:ring-2 transition-all ${emojiError || languageError || chatInput.length > MAX_CHAR_COUNT ? "focus:ring-red-500 bg-red-50" : "focus:ring-black/5"}`} placeholder="Message class group..." />
-                        <div className={`absolute bottom-3 right-16 text-[10px] font-bold pointer-events-none transition-colors ${chatInput.length > MAX_CHAR_COUNT ? "text-red-500" : "text-gray-400"}`}>{chatInput.length} / {MAX_CHAR_COUNT}</div>
+                        </div>
+                        <div className="flex-1 relative flex items-center min-w-0">
+                        <input value={chatInput} onChange={handleInputChange} onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} className={`w-full bg-transparent pl-2 pr-12 min-[426px]:pr-14 outline-none text-sm min-[426px]:text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || chatInput.length > MAX_CHAR_COUNT ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} placeholder="Message class group..." />
+                        <div className={`absolute right-2 text-[9px] font-bold pointer-events-none transition-colors ${chatInput.length > MAX_CHAR_COUNT ? "text-red-500" : "text-gray-400"}`}>{chatInput.length}/{MAX_CHAR_COUNT}</div>
+                        </div>
                         <button 
                             onClick={handleSend} 
                             disabled={isSendDisabled} 
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                isSendDisabled 
-                                ? "bg-gray-200 cursor-not-allowed" 
-                                : "bg-[#0F172A] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 shadow-lg shadow-[#0F172A]/20"
-                            }`}
+                            className={`p-2 min-[426px]:p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${isSendDisabled ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}
                         >
-                            <img src={SendIcon} className={`w-5 h-5 invert ${isSendDisabled ? 'opacity-40' : 'opacity-100'}`} alt="Send" />
+                            <img src={SendIcon} className={`w-4 h-4 min-[426px]:w-5 min-[426px]:h-5 translate-x-0.5 ${isSendDisabled ? "opacity-30" : "invert"}`} alt="Send" />
                         </button>
                     </div>
                 </div>

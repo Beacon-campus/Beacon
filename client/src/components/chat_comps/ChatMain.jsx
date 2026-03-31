@@ -98,6 +98,7 @@ export default function Chat({ role }) {
 
   const [isAddChatOpen, setIsAddChatOpen] = useState(false);
   const [profileUser, setProfileUser] = useState(null);
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
 
   const [showDoubtModal, setShowDoubtModal] = useState(false);
   const [activeAnnouncement, setActiveAnnouncement] = useState(null);
@@ -154,6 +155,18 @@ export default function Chat({ role }) {
     socket.on("event", handleFriendEvent);
     return () => socket.off("event", handleFriendEvent);
   }, [refreshUser, fetchChats, isFriendEventRelevant]);
+
+  useEffect(() => {
+    const handleResize = () => setIsCompactView(window.innerWidth < 769);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isCompactView) {
+      setMobileView("list");
+    }
+  }, [isCompactView]);
 
   const handleFriendAction = async (unfriendedId) => {
     await fetchChats(true);
@@ -678,7 +691,7 @@ export default function Chat({ role }) {
   }, [role, activeChat, setMessages, buildTeacherReplyMessage]);
 
   return (
-    <div className="flex w-full h-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="flex w-full h-full bg-white overflow-hidden min-[769px]:rounded-2xl min-[769px]:border min-[769px]:border-gray-100 min-[769px]:shadow-sm">
       {/* LEFT SIDEBAR */}
       <ChatSidebar
         isHidden={mobileView === "chat"}
@@ -701,7 +714,7 @@ export default function Chat({ role }) {
 
       {/* RIGHT WINDOW */}
       <ChatWindow
-        isHidden={mobileView === "list"}
+        isHidden={isCompactView ? mobileView === "list" : false}
         activeChat={activeChat}
         activeChatTitle={activeChatTitle}
         messages={messages}

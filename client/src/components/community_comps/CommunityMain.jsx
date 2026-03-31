@@ -23,6 +23,7 @@ const getClassroomColor = (id) => {
 };
 
 export default function Community({ role }) {
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
   const { user: currentUser } = useAuth();
   const { secondaryChats, loading: chatLoading, fetchChats } = useChat();
   const {
@@ -54,6 +55,12 @@ export default function Community({ role }) {
   const [hubTypingUsers, setHubTypingUsers] = useState([]);
   const [teacherSubjects, setTeacherSubjects] = useState("");
   const [teacherSubjectsLoading, setTeacherSubjectsLoading] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsCompactView(window.innerWidth < 769);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (currentUser && !hasSynced) {
@@ -221,7 +228,10 @@ export default function Community({ role }) {
   const classColor = activeClassroom ? getClassroomColor(activeClassroom._id) : "#E2F0CB";
 
   return (
-    <div className="w-full h-full relative flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="w-full h-full relative flex flex-col bg-white overflow-hidden min-[769px]:rounded-2xl min-[769px]:border min-[769px]:border-gray-100 min-[769px]:shadow-sm">
+      <div className="shrink-0 px-4 pt-4 pb-3 min-[426px]:px-5 min-[426px]:pt-5 min-[426px]:pb-4 min-[769px]:hidden bg-white border-b border-gray-100">
+        <h1 className="text-[24px] font-black tracking-tight text-[#0F172A]">Classroom</h1>
+      </div>
       {role === "teacher" && teacherViewMode === "list" && (
         <TeacherClassList
           classes={secondaryChats.filter(c => c.type === 'classroom' && c.classroomMode === 'official')}
@@ -231,18 +241,18 @@ export default function Community({ role }) {
 
       {isClassView && (
         <>
-          <div className="shrink-0 py-4 px-5 bg-white border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="shrink-0 px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:py-4 min-[769px]:px-5 bg-white border-b border-gray-100 flex items-start min-[426px]:items-center justify-between gap-3">
+            <div className="flex items-start min-[426px]:items-center gap-3 min-w-0">
               {role === 'teacher' && (
                 <button onClick={() => setTeacherViewMode("list")} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                 </button>
               )}
-              <div className="w-10 h-10 rounded-full flex items-center justify-center border border-black/5 shrink-0" style={{ backgroundColor: classColor }}>
+              <div className="w-9 h-9 min-[426px]:w-10 min-[426px]:h-10 rounded-full flex items-center justify-center border border-black/5 shrink-0" style={{ backgroundColor: classColor }}>
                 <img src={BookIcon} className="w-5 h-5 object-contain opacity-80" alt="Logo" />
               </div>
-              <div className="flex flex-col items-start gap-1">
-                <h2 className="text-sm font-black text-gray-800 leading-tight">{activeClassroom?.name || "Classroom"}</h2>
+              <div className="flex flex-col items-start gap-1 min-w-0">
+                <h2 className="text-[14px] min-[426px]:text-sm font-black text-gray-800 leading-tight truncate max-w-full">{activeClassroom?.name || "Classroom"}</h2>
                 {role === 'teacher' ? (
                   teacherSubjectsLoading ? (
                     <LoadingState
@@ -255,15 +265,15 @@ export default function Community({ role }) {
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">YOU ARE TEACHING {teacherSubjects}</span>
                   )
                 ) : (
-                  <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 mt-0.5">
-                    <div className={`absolute top-1 bottom-1 w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />
-                    <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
-                    <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
+                  <div className={`relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 mt-0.5 ${isCompactView ? "max-w-full" : ""}`}>
+                    <div className={`absolute top-1 bottom-1 w-[74px] min-[426px]:w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[74px] min-[426px]:translate-x-[80px]' : 'translate-x-0'}`} />
+                    <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[74px] min-[426px]:w-[80px] py-1.5 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
+                    <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[74px] min-[426px]:w-[80px] py-1.5 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
                   </div>
                 )}
               </div>
             </div>
-            <button onClick={() => setShowInfoModal(true)} className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 font-serif font-bold italic hover:border-black hover:text-black hover:bg-gray-50 transition-all">i</button>
+            <button onClick={() => setShowInfoModal(true)} className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 font-serif font-bold italic hover:border-black hover:text-black hover:bg-gray-50 transition-all shrink-0">i</button>
           </div>
 
           <div className="flex-1 overflow-hidden relative">
