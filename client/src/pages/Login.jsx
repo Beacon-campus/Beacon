@@ -521,7 +521,7 @@ export default function Login() {
           </form>
 
           {/* Social Proof */}
-          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50">
+          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50 max-[425px]:hidden">
             <div className="flex -space-x-2.5">
               <img src={profile1} alt="User 1" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
               <img src={profile5} alt="User 2" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
