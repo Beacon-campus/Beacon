@@ -96,9 +96,9 @@ function StatCard({ label, value, helper, tone = "neutral" }) {
   };
   return (
     <div className={`rounded-xl border p-3 min-[426px]:p-4 ${tones[tone] || tones.neutral}`}>
-      <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs uppercase tracking-wide font-bold opacity-75">{label}</p>
-      <p className="text-[1.35rem] min-[426px]:text-[1.6rem] min-[1025px]:text-2xl font-black mt-1 break-words">{value}</p>
-      {helper ? <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs mt-2 opacity-85">{helper}</p> : null}
+      <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs uppercase tracking-wide font-bold opacity-75">{label}</p>
+      <p className="text-[1.35rem] min-[426px]:text-[1.35rem] min-[1025px]:text-2xl font-black mt-1 break-words">{value}</p>
+      {helper ? <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs mt-2 opacity-85">{helper}</p> : null}
     </div>
   );
 }
@@ -107,7 +107,7 @@ function ChartPanel({ title, subtitle, children }) {
   return (
     <div className="rounded-xl bg-white border border-slate-200 p-3 min-[426px]:p-4">
       <h3 className="text-sm font-black text-slate-800">{title}</h3>
-      <p className="text-xs min-[426px]:text-[13px] min-[1025px]:text-xs text-slate-500 mt-1 mb-3">{subtitle}</p>
+      <p className="text-xs min-[426px]:text-[11px] min-[1025px]:text-xs text-slate-500 mt-1 mb-3">{subtitle}</p>
       {children}
     </div>
   );
@@ -249,8 +249,8 @@ export default function AdminDashboard() {
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div className="flex flex-col min-[769px]:flex-row min-[769px]:items-center min-[769px]:justify-between gap-3">
           <div>
-            <h1 className="text-[1.45rem] min-[426px]:text-[1.7rem] min-[1025px]:text-2xl font-black text-slate-800">System Health Dashboard</h1>
-            <p className="text-sm min-[426px]:text-[15px] min-[1025px]:text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
+            <h1 className="text-[1.45rem] min-[426px]:text-[1.45rem] min-[1025px]:text-2xl font-black text-slate-800">System Health Dashboard</h1>
+            <p className="text-sm min-[426px]:text-[13px] min-[1025px]:text-sm text-slate-500 mt-1">Quickly understand performance, reliability, and capacity across all core services.</p>
           </div>
           <button onClick={() => refresh(false, true)} className="w-full min-[426px]:w-auto px-4 py-2 rounded-lg bg-[#0F172A] text-white text-sm font-bold hover:bg-[#1e293b] transition-all shadow-md active:scale-95">
             Refresh
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`shrink-0 px-3 min-[426px]:px-4 py-2 rounded-lg text-sm min-[426px]:text-[15px] min-[1025px]:text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-[#0F172A] text-white border-[#0F172A] shadow-md shadow-[#0F172A]/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+              className={`shrink-0 px-3 min-[426px]:px-4 py-2 rounded-lg text-sm min-[426px]:text-[13px] min-[1025px]:text-sm font-bold border transition-colors ${activeTab === tab.id ? "bg-[#0F172A] text-white border-[#0F172A] shadow-md shadow-[#0F172A]/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
                 }`}
             >
               {tab.label}

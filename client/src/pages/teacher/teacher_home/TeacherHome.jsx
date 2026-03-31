@@ -219,22 +219,20 @@ export default function TeacherHome() {
     if (relativeTime === "Tomorrow") widgetHeader = "Tomorrow's Event";
 
     return (
-        <div className="min-h-full h-auto w-full pt-1 pb-2 animate-fade-in-up">
-            <div className="flex flex-col gap-4 min-h-full">
+        <div className="min-h-full h-auto w-full pt-1 pb-2 animate-fade-in-up min-[769px]:h-full">
+            <div className="flex flex-col gap-4 min-h-full min-[769px]:h-full">
 
-                {/* ================= TOP SECTION ================= */}
-                <div className="grid grid-cols-1 gap-4 min-[426px]:grid-cols-2 min-[1025px]:grid-cols-5">
-                    <div className="min-[426px]:col-span-2 min-[1025px]:col-span-3">
-                        <WelcomeCard
-                            user={user}
-                            quote={quote}
-                            theme="blue"
-                            roleLabel="Teacher"
-                            loadingQuote={quoteLoading}
-                        />
-                    </div>
+                {/* MOBILE + TABLET */}
+                <div className="flex flex-col gap-4 min-[769px]:hidden">
+                    <WelcomeCard
+                        user={user}
+                        quote={quote}
+                        theme="blue"
+                        roleLabel="Teacher"
+                        loadingQuote={quoteLoading}
+                    />
 
-                    <div className="grid grid-cols-1 gap-4 min-[426px]:col-span-2 min-[426px]:grid-cols-2 min-[1025px]:col-span-2 min-[1025px]:grid-cols-1">
+                    <div className="hidden min-[426px]:grid min-[426px]:grid-cols-2 gap-4">
                         <EventWidget
                             nextEvent={nextEvent}
                             loadingEvent={loadingEvent}
@@ -254,10 +252,28 @@ export default function TeacherHome() {
                             navigate={navigate}
                         />
                     </div>
-                </div>
 
-                {/* ================= BOTTOM SECTION - SPLIT ================= */}
-                <div className="grid grid-cols-1 gap-4 min-[426px]:grid-cols-2">
+                    <div className="flex flex-col gap-4 min-[426px]:hidden">
+                        <EventWidget
+                            nextEvent={nextEvent}
+                            loadingEvent={loadingEvent}
+                            relativeTime={relativeTime}
+                            widgetHeader={widgetHeader}
+                            onClickRoute="/teacher/calender"
+                            navigate={navigate}
+                        />
+
+                        <NotificationsWidget
+                            activeNotif={activeNotif}
+                            notifications={notifications}
+                            setActiveNotif={setActiveNotif}
+                            prevNotif={prevNotif}
+                            nextNotif={nextNotif}
+                            onClickRoute="/teacher/notif"
+                            navigate={navigate}
+                        />
+                    </div>
+
                     <QuickTodosWidget
                         quickTodos={quickTodos}
                         animatingIds={animatingIds}
@@ -278,6 +294,63 @@ export default function TeacherHome() {
                         navigateTo="/teacher/community"
                         enableAdvancedPreview={true}
                     />
+                </div>
+
+                {/* DESKTOP */}
+                <div className="hidden min-[769px]:flex min-[769px]:flex-col min-[769px]:h-full min-[769px]:gap-4">
+                    <div className="flex-[3] flex gap-4 min-h-0">
+                        <WelcomeCard
+                            user={user}
+                            quote={quote}
+                            theme="blue"
+                            roleLabel="Teacher"
+                            loadingQuote={quoteLoading}
+                        />
+
+                        <div className="flex-[2] flex flex-col gap-4">
+                            <EventWidget
+                                nextEvent={nextEvent}
+                                loadingEvent={loadingEvent}
+                                relativeTime={relativeTime}
+                                widgetHeader={widgetHeader}
+                                onClickRoute="/teacher/calender"
+                                navigate={navigate}
+                            />
+
+                            <NotificationsWidget
+                                activeNotif={activeNotif}
+                                notifications={notifications}
+                                setActiveNotif={setActiveNotif}
+                                prevNotif={prevNotif}
+                                nextNotif={nextNotif}
+                                onClickRoute="/teacher/notif"
+                                navigate={navigate}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex-[2] flex gap-4 min-h-0">
+                        <QuickTodosWidget
+                            quickTodos={quickTodos}
+                            animatingIds={animatingIds}
+                            handleComplete={handleComplete}
+                            getTodoDateInfo={getTodoDateInfo}
+                            navigate={navigate}
+                            themeColor="blue"
+                            navigateTo="/teacher/todo"
+                        />
+
+                        <AnnouncementsWidget
+                            activeAnnounce={activeAnnounce}
+                            announcements={universityAnnouncements}
+                            setActiveAnnounce={setActiveAnnounce}
+                            prevAnnounce={prevAnnounce}
+                            nextAnnounce={nextAnnounce}
+                            navigate={navigate}
+                            navigateTo="/teacher/community"
+                            enableAdvancedPreview={true}
+                        />
+                    </div>
                 </div>
 
             </div>

@@ -54,7 +54,7 @@ export default function Navbar() {
   };
 
   const getTabClass = (isActive) => {
-    const base = "relative z-10 flex items-center justify-center gap-2 w-32 min-[1025px]:w-36 px-4 py-2 rounded-full text-sm font-bold text-center transition-all duration-200";
+    const base = "relative z-10 flex items-center justify-center gap-2 w-36 px-4 py-2 rounded-full text-sm font-bold text-center transition-all duration-200";
     return isActive ? `${base} text-white` : `${base} text-[#64748B] hover:text-[#0F172A] hover:bg-gray-200/50`;
   };
 
@@ -145,11 +145,11 @@ export default function Navbar() {
         {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
         {/* Center: Tabs Container (Hidden for Admin/Mobile) */}
         {role !== "admin" && (
-          <div className="hidden min-[769px]:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center glass-panel rounded-full p-1 shadow-sm">
+          <div className="absolute left-1/2 top-1/2 hidden min-[769px]:flex -translate-x-1/2 -translate-y-1/2 items-center glass-panel rounded-full p-1 shadow-sm">
 
             {/* THE SLIDING PILL BACKGROUND */}
             <div
-              className={`absolute left-1 top-1 bottom-1 w-32 min-[1025px]:w-36 rounded-full bg-[#0F172A] shadow-sm transition-transform duration-300 ease-out border border-gray-800 ${isCommunity ? "translate-x-[8.5rem] min-[1025px]:translate-x-[9.5rem]" : "translate-x-0"
+              className={`absolute left-1 top-1 bottom-1 w-36 rounded-full bg-[#0F172A] shadow-sm transition-transform duration-300 ease-out border border-gray-800 ${isCommunity ? "translate-x-[9.5rem]" : "translate-x-0"
                 }`}
             />
 
@@ -249,11 +249,11 @@ export default function Navbar() {
         ) : (
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 lg:gap-2 px-3 lg:px-5 py-2 rounded-full text-xs lg:text-sm font-bold text-gray-600 hover:text-black transition-all group glass-panel hover:scale-105"
+            className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:text-black transition-all group glass-panel hover:scale-105"
           >
             <svg
               viewBox="0 0 24 24"
-              className="w-4 h-4 lg:w-5 lg:h-5 group-hover:opacity-100 transition-opacity"
+              className="w-5 h-5 group-hover:opacity-100 transition-opacity"
               fill="currentColor"
             >
               <path d="m15.889 16.011c-.817-.099-1.57.488-1.668 1.311-.117.979-.253 1.74-.36 2.263-.483.095-1.137.204-1.86.288v-14.354c.78.119 1.458.28 1.935.413.081.416.181 1 .272 1.751.098.826.865 1.41 1.672 1.306.822-.101 1.407-.85 1.307-1.672-.233-1.893-.51-2.873-.54-2.978-.133-.455-.474-.821-.918-.986.018.009-1.903-.691-3.728-.847v-.444c0-.521-.401-.956-.921-.997-.519-.041-1.049-.065-1.579-.065-3.44 0-6.813 1-6.954 1.042-.329.099-.585.359-.677.69-.035.128-.869 3.201-.869 9.268s.824 9.619.859 9.768c.095.402.427.705.837.762.139.019 2.304.471 6.804.471 2.679 0 6.016-.664 5.976-.7.511-.131.915-.521 1.064-1.025.016-.053.386-1.312.659-3.596.099-.823-.488-1.569-1.311-1.668zm-8.889-4.011c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5zm15.8 1.1c-.768 1.024-1.676 1.933-2.701 2.701-.176.132-.387.2-.6.2-.536.01-1.011-.461-1-1v-1h-3c-.828 0-1.5-.671-1.5-1.5s.672-1.5 1.5-1.5h3v-1c0-.379.214-.725.553-.895s.744-.133 1.047.094c1.024.768 1.933 1.676 2.701 2.701.266.355.266.844 0 1.199z" />
