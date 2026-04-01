@@ -23,6 +23,7 @@ const getClassroomColor = (id) => {
 };
 
 export default function Community({ role }) {
+  const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 769);
   const { user: currentUser } = useAuth();
   const { secondaryChats, loading: chatLoading, fetchChats } = useChat();
   const {
@@ -56,6 +57,12 @@ export default function Community({ role }) {
   const [teacherSubjectsLoading, setTeacherSubjectsLoading] = useState(false);
 
   useEffect(() => {
+    const handleResize = () => setIsCompactView(window.innerWidth < 769);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     if (currentUser && !hasSynced) {
       syncClassrooms();
       fetchChats();
@@ -64,12 +71,10 @@ export default function Community({ role }) {
 
   const studentClassroom = useMemo(() => {
     if (role === "teacher") return null;
-    // Preference: Enrolled array in user profile
     if (currentUser?.enrolledClassroomIds?.length > 0) {
       const enrolled = currentUser.enrolledClassroomIds[0];
       if (typeof enrolled === 'object' && enrolled !== null) return enrolled;
     }
-    // Fallback: Find in secondary chats
     return secondaryChats.find(c => c.type === 'classroom');
   }, [secondaryChats, currentUser, role]);
 
@@ -81,7 +86,6 @@ export default function Community({ role }) {
     return (unofficialChannelId ? hubMessages[unofficialChannelId] : []) || [];
   }, [unofficialChannelId, hubMessages]);
 
-  // --- 3. FETCH ON TAB CHANGE & SUBJECTS ---
   useEffect(() => {
     if (activeTab === "official" && officialChannelId) {
       fetchAnnouncements(officialChannelId);
@@ -119,7 +123,6 @@ export default function Community({ role }) {
     }
   }, [activeTeacherClass, role, currentUser]);
 
-  // --- 4. TYPING LISTENERS ---
   useEffect(() => {
     if (!unofficialChannelId || activeTab !== 'unofficial') return;
     const handleStart = ({ userId, userName }) => setHubTypingUsers(p => p.find(u => u.userId === userId) ? p : [...p, { userId, userName }]);
@@ -221,7 +224,21 @@ export default function Community({ role }) {
   const classColor = activeClassroom ? getClassroomColor(activeClassroom._id) : "#E2F0CB";
 
   return (
-    <div className="w-full h-full relative flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="w-full h-full relative flex flex-col bg-white overflow-hidden min-[769px]:rounded-2xl min-[769px]:border min-[769px]:border-gray-100 min-[769px]:shadow-sm">
+      {/* Mobile/Tablet top header for students — shows "Classroom" title + toggle side by side */}
+      {role === 'student' && (
+        <div className="shrink-0 px-4 pt-4 pb-3 min-[426px]:px-5 min-[426px]:pt-5 min-[426px]:pb-4 min-[769px]:hidden bg-white border-b border-gray-100 flex items-center justify-between gap-3">
+          <h1 className="text-[1.4rem] font-black tracking-tight text-primary leading-tight">Classroom</h1>
+          {isClassView && (
+            <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 shrink-0">
+              <div className={`absolute top-1 bottom-1 w-[72px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[72px]' : 'translate-x-0'}`} />
+              <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
+              <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[72px] py-1.5 text-[9px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
+            </div>
+          )}
+        </div>
+      )}
+
       {role === "teacher" && teacherViewMode === "list" && (
         <TeacherClassList
           classes={secondaryChats.filter(c => c.type === 'classroom' && c.classroomMode === 'official')}
@@ -231,19 +248,29 @@ export default function Community({ role }) {
 
       {isClassView && (
         <>
-          <div className="shrink-0 py-4 px-5 bg-white border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          {/* Classroom sub-header — clickable to open info modal */}
+          <div
+            className="shrink-0 px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:py-4 min-[769px]:px-5 bg-white border-b border-gray-100 flex items-center justify-between gap-3 cursor-pointer group"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <div className="flex-1 flex items-center gap-2 min-w-0">
               {role === 'teacher' && (
-                <button onClick={() => setTeacherViewMode("list")} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setTeacherViewMode("list"); }}
+                  className="p-1.5 -ml-1 hover:bg-gray-100 rounded-full transition-colors shrink-0"
+                >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                 </button>
               )}
-              <div className="w-10 h-10 rounded-full flex items-center justify-center border border-black/5 shrink-0" style={{ backgroundColor: classColor }}>
+              <div className="w-9 h-9 min-[426px]:w-10 min-[426px]:h-10 rounded-full flex items-center justify-center border border-black/5 shrink-0 transition-transform group-hover:scale-105" style={{ backgroundColor: classColor }}>
                 <img src={BookIcon} className="w-5 h-5 object-contain opacity-80" alt="Logo" />
               </div>
-              <div className="flex flex-col items-start gap-1">
-                <h2 className="text-sm font-black text-gray-800 leading-tight">{activeClassroom?.name || "Classroom"}</h2>
-                {role === 'teacher' ? (
+              <div className="flex flex-col items-start gap-0.5 min-w-0">
+                <h2 className="text-[14px] min-[426px]:text-sm font-black text-gray-800 leading-tight truncate group-hover:text-black transition-colors">
+                  <span className="hidden min-[376px]:inline">{activeClassroom?.name || "Classroom"}</span>
+                  <span className="min-[376px]:hidden">{(activeClassroom?.name || "Classroom").replace(/\s*-\s*Official$/, "")}</span>
+                </h2>
+                {role === 'teacher' && (
                   teacherSubjectsLoading ? (
                     <LoadingState
                       size="xs"
@@ -252,18 +279,26 @@ export default function Community({ role }) {
                       messageClassName="text-[10px] font-bold text-gray-400 uppercase tracking-wider"
                     />
                   ) : (
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">YOU ARE TEACHING {teacherSubjects}</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors">
+                      <span className="hidden min-[376px]:inline">YOU ARE TEACHING {teacherSubjects}</span>
+                      <span className="min-[376px]:hidden">YOU TEACH {teacherSubjects}</span>
+                    </span>
                   )
-                ) : (
-                  <div className="relative flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 mt-0.5">
-                    <div className={`absolute top-1 bottom-1 w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />
-                    <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
-                    <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[80px] py-1 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
-                  </div>
                 )}
               </div>
             </div>
-            <button onClick={() => setShowInfoModal(true)} className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 font-serif font-bold italic hover:border-black hover:text-black hover:bg-gray-50 transition-all">i</button>
+
+            {/* Desktop-only Official/Unofficial toggle (hidden on mobile since it's in the top bar) */}
+            {role === 'student' && (
+              <div
+                className="relative hidden min-[769px]:flex items-center bg-gray-100 rounded-xl p-1 w-fit border border-gray-200/50 shrink-0"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={`absolute top-1 bottom-1 w-[80px] bg-[#0F172A] rounded-lg shadow-sm transition-transform duration-300 ease-out z-0 ${activeTab === 'unofficial' ? 'translate-x-[80px]' : 'translate-x-0'}`} />
+                <button onClick={() => setActiveTab("official")} className={`relative z-10 w-[80px] py-1.5 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'official' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Official</button>
+                <button onClick={() => setActiveTab("unofficial")} className={`relative z-10 w-[80px] py-1.5 text-[10px] font-bold uppercase tracking-wide text-center transition-colors duration-200 ${activeTab === 'unofficial' ? 'text-white' : 'text-gray-500 hover:text-black'}`}>Unofficial</button>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-hidden relative">

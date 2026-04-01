@@ -51,7 +51,7 @@ export default function UploadDoc({ subject, onUpload, uploading = false }) {
   };
 
   return (
-    <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 bg-[#F9FAFB] hover:bg-gray-50 flex flex-col items-center justify-center text-center transition-colors min-h-[140px] space-y-3">
+    <div className="border border-dashed border-gray-300 rounded-xl min-[769px]:rounded-2xl p-4 min-[769px]:p-6 bg-[#F9FAFB] hover:bg-gray-50 flex flex-col items-center justify-center transition-colors min-[769px]:min-h-[140px] gap-3">
       <input
         ref={fileInputRef}
         type="file"
@@ -61,16 +61,16 @@ export default function UploadDoc({ subject, onUpload, uploading = false }) {
       />
 
       {!file ? (
-        <button onClick={openPicker} className="flex flex-col items-center gap-2 text-gray-500 hover:text-gray-700 w-full h-full justify-center">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200">
+        <button onClick={openPicker} className="flex max-[768px]:flex-row min-[769px]:flex-col items-center gap-3 min-[769px]:gap-2 text-gray-500 hover:text-gray-700 w-full h-full justify-center min-[769px]:justify-center max-[768px]:justify-start">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
           </div>
-          <span className="font-semibold text-sm">+ Upload document</span>
+          <span className="font-semibold text-sm max-[768px]:text-base text-gray-700">Upload document</span>
         </button>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2 w-full text-left">
           <p className="text-sm">
             Selected: <strong>{file.name}</strong>
           </p>

@@ -429,17 +429,17 @@ export default function ChatWindow({
     <div className={`flex-1 flex flex-col h-full bg-white ${isHidden ? "hidden md:flex" : "flex"}`}>
       {activeChat ? (
         <>
-          <div onClick={onProfileClick} className="p-4 border-b border-gray-100 flex items-center gap-3 shadow-sm bg-white z-10 cursor-pointer hover:bg-gray-50 transition-colors shrink-0">
+          <div onClick={onProfileClick} className="px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:p-4 border-b border-gray-100 flex items-center gap-3 shadow-sm bg-white z-10 cursor-pointer hover:bg-gray-50 transition-colors shrink-0">
             <button onClick={(e) => { e.stopPropagation(); onBack(); }} className="md:hidden">
               <img src={BackIcon} className="w-5 h-5" alt="back" />
             </button>
-            <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold shrink-0 overflow-hidden border border-gray-100">
+            <div className="w-9 h-9 min-[426px]:w-10 min-[426px]:h-10 rounded-full bg-black text-white flex items-center justify-center font-bold shrink-0 overflow-hidden border border-gray-100">
               {(() => {
                 const other = activeChat?.participants?.find(p => p.firebaseUid !== auth.currentUser?.uid);
                 return <img src={getAvatarUrl(other?.profile?.avatar || 11)} className="w-full h-full object-cover" alt={activeChatTitle} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerText = activeChatTitle?.[0] }} />;
               })()}
             </div>
-            <h3 className="font-bold text-gray-800">{activeChatTitle}</h3>
+            <h3 className="font-bold text-[15px] min-[426px]:text-base text-gray-800 truncate">{activeChatTitle}</h3>
             {role === 'student' && !activeChat.isTeacherChat && !activeChat.type?.includes("group") && (
               <div
                 ref={actionsMenuRef}
@@ -498,7 +498,7 @@ export default function ChatWindow({
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
               </button>
             )}
-            <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto soft-scrollbar p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
+            <div ref={scrollContainerRef} className="absolute inset-0 overflow-y-auto soft-scrollbar px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-4 space-y-4 bg-gray-50/50" onScroll={handleScroll}>
               {isLoadingOlder && (
                 <div className="text-center text-[10px] uppercase tracking-widest font-bold text-gray-400 py-2 flex items-center justify-center">
                   <LoadingState size="xs" />
@@ -533,7 +533,7 @@ export default function ChatWindow({
             </div>
           )}
 
-          <div className="p-4 border-t border-gray-100 bg-white shrink-0">
+          <div className="px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:p-4 border-t border-gray-100 bg-white shrink-0">
             {(role === 'student' && activeChat.isTeacherChat && !activeChat.canMessage) ? (
               <div className="flex items-center justify-center gap-2 w-full bg-gray-50 rounded-[28px] border border-gray-100 py-3 px-4 shadow-sm text-gray-400 cursor-not-allowed select-none">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -558,7 +558,7 @@ export default function ChatWindow({
                 {(emojiError || languageError) && <p className="text-xs text-red-500 font-bold px-2 animate-pulse">{emojiError || languageError}</p>}
                 {isUploadingAttachment && <p className="text-xs text-gray-500 font-semibold px-2">Uploading attachment...</p>}
 
-                <div className="flex items-center gap-2 relative w-full bg-gray-50 rounded-[28px] border border-gray-100 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
+                <div className="flex items-center gap-1.5 min-[426px]:gap-2 relative w-full bg-gray-50 rounded-[24px] min-[426px]:rounded-[28px] border border-gray-100 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
                   <input
                     ref={uploadInputRef}
                     type="file"
@@ -569,11 +569,11 @@ export default function ChatWindow({
                   
                   {/* LEFT ICONS */}
                   <div className="flex items-center pl-1 shrink-0">
-                    <button onClick={handlePickUpload} className="p-2 text-gray-400 hover:text-[#0F172A] rounded-full transition-colors" title="Attach document/image">
+                      <button onClick={handlePickUpload} className="p-1.5 min-[426px]:p-2 text-gray-400 hover:text-[#0F172A] rounded-full transition-colors" title="Attach document/image">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                     </button>
                     <div className="relative">
-                      <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-2 rounded-full transition-colors ${showMediaPicker ? "text-[#0F172A] bg-gray-200" : "text-gray-400 hover:text-[#0F172A]"}`} title="Add GIF or Emoji">
+                      <button onClick={() => setShowMediaPicker(!showMediaPicker)} className={`p-1.5 min-[426px]:p-2 rounded-full transition-colors ${showMediaPicker ? "text-[#0F172A] bg-gray-200" : "text-gray-400 hover:text-[#0F172A]"}`} title="Add GIF or Emoji">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
                       </button>
                       {showMediaPicker && (
@@ -597,7 +597,7 @@ export default function ChatWindow({
                       onChange={handleInputChange} 
                       onKeyDown={(e) => e.key === "Enter" && !isSendDisabled && handleSend()} 
                       placeholder="Type a message..." 
-                      className={`w-full bg-transparent pl-2 pr-14 outline-none text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || isOverLimit ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} 
+                      className={`w-full bg-transparent pl-2 pr-12 min-[426px]:pr-14 outline-none text-sm min-[426px]:text-[15px] text-gray-800 placeholder-gray-400 min-w-0 ${emojiError || languageError || isOverLimit ? "bg-red-50 text-red-600 rounded-lg py-1.5" : "py-2"}`} 
                     />
                     {/* CHAR COUNT */}
                     <div className={`absolute right-2 text-[9px] font-bold pointer-events-none transition-colors ${isOverLimit ? "text-red-500" : "text-gray-400"}`}>
@@ -606,8 +606,8 @@ export default function ChatWindow({
                   </div>
                   
                   {/* SEND BUTTON */}
-                  <button onClick={handleSend} disabled={isSendDisabled} className={`p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${isSendDisabled ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}>
-                    <img src={SendIcon} className={`w-5 h-5 translate-x-0.5 ${isSendDisabled ? "opacity-30" : "invert"}`} alt="Send" />
+                  <button onClick={handleSend} disabled={isSendDisabled} className={`p-2 min-[426px]:p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${isSendDisabled ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}>
+                    <img src={SendIcon} className={`w-4 h-4 min-[426px]:w-5 min-[426px]:h-5 translate-x-0.5 ${isSendDisabled ? "opacity-30" : "invert"}`} alt="Send" />
                   </button>
                 </div>
               </div>

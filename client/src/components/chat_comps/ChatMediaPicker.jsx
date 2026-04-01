@@ -27,7 +27,7 @@ export default function ChatMediaPicker({ onGifSelect, onEmojiSelect, onClose, h
   };
 
   return (
-    <div className="absolute bottom-14 left-0 z-50 w-72 h-80 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="w-[calc(100vw-2rem)] max-w-[280px] min-[426px]:w-72 h-80 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       
       {/* Header / Search */}
       <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">

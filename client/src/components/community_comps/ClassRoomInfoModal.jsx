@@ -100,10 +100,21 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
         : [];
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className="max-w-md w-full bg-white !rounded-[30px] overflow-hidden">
+        <Modal 
+            isOpen={isOpen} 
+            onClose={onClose} 
+            overlayClassName="max-[768px]:!p-0"
+            className="max-[768px]:max-w-full max-[768px]:h-[100dvh] max-[768px]:max-h-[100dvh] max-[768px]:!rounded-none min-[769px]:max-w-md w-full bg-white min-[769px]:!rounded-[30px] overflow-hidden flex flex-col"
+        >
 
             {/* --- HEADER --- */}
-            <div className="relative">
+            <div className="relative shrink-0">
+                <button 
+                  onClick={onClose} 
+                  className="absolute top-4 left-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                </button>
                 <div style={{ backgroundColor: bgColor }} className="h-32 w-full relative overflow-hidden transition-colors duration-500">
                     <div className="absolute top-[-20px] left-[-20px] w-32 h-32 bg-white opacity-30 rounded-full blur-xl"></div>
                     <div className="absolute bottom-[-10px] right-[-10px] w-24 h-24 bg-white opacity-40 rounded-full blur-xl"></div>
@@ -118,7 +129,7 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
             </div>
 
             {/* --- TITLE --- */}
-            <div className="pt-12 pb-6 px-6 text-center">
+            <div className="pt-12 pb-6 px-6 text-center shrink-0">
                 <h2 className="text-xl font-black text-gray-800 tracking-tight leading-tight">
                     {fullData?.name || classroom.name}
                 </h2>
@@ -128,7 +139,7 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
             </div>
 
             {/* --- DESCRIPTION --- */}
-            <div className="px-6 mb-6">
+            <div className="px-6 mb-6 shrink-0">
                 <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 relative group">
                     <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-2 flex justify-between items-center">
                         About Group
@@ -166,7 +177,7 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
             </div>
 
             {/* --- PARTICIPANTS --- */}
-            <div className="flex-1 overflow-y-auto px-6 mb-6 max-h-48 soft-scrollbar">
+            <div className="flex-1 overflow-y-auto px-6 mb-6 soft-scrollbar">
                 <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-3 sticky top-0 bg-white py-2 z-10">
                     Participants ({participants.length || 0})
                 </h3>
@@ -192,7 +203,7 @@ export default function ClassroomInfoModal({ isOpen, onClose, classroom, isTeach
             </div>
 
             {/* --- FOOTER --- */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest shrink-0 mt-auto">
                 <span>Created {classroom.createdAt ? new Date(classroom.createdAt).toLocaleDateString() : "Recently"}</span>
                 <span>{participants.length} Members</span>
             </div>

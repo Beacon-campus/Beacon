@@ -8,7 +8,7 @@ export default function StudentCommunity() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-2xl">
+      <div className="w-full h-full flex items-center justify-center bg-gray-50 min-[769px]:rounded-2xl">
         <LoadingState size="md" />
       </div>
     );
@@ -16,14 +16,14 @@ export default function StudentCommunity() {
 
   if (!user) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-500 rounded-2xl">
+      <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-500 min-[769px]:rounded-2xl">
         Error loading profile. Please refresh.
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full px-0 pt-0 pb-0">
       <ChatInterface user={user} role="student" />
     </div>
   );
