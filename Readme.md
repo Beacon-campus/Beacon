@@ -1,8 +1,13 @@
-# StudyGroup - README
+# Beacon - README
 
 ## What This Project Is
 
-StudyGroup is a role-based campus collaboration platform with:
+Beacon is a role-based campus collaboration platform designed to eliminate the "WhatsApp chaos" in academic environments. It provides structured communication by separating:
+- **Official Channels**: For teachers and admins to post announcements and assignments that never get buried.
+- **Student Hubs**: For peer-to-peer collaboration and file sharing.
+- **Dedicated Resource Sections**: For notes, todos, and study materials that stay organized over time.
+
+It combines:
 - Firebase-authenticated login and onboarding flow.
 - Real-time messaging via Socket.IO.
 - Classroom channels (official + student hub), group chats, and friend-based student DMs.
