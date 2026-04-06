@@ -3,7 +3,7 @@ import ClassRoom from "../../../components/community_comps/CommunityMain"; // Ad
 
 export default function StudentClassRoom() {
   return (
-    <div className="w-full h-full p-2">
+    <div className="w-full h-full px-0 pt-0 pb-0">
       {/* Passing role="student" enables the Official/Unofficial toggle */}
       <ClassRoom role="student" />
     </div>

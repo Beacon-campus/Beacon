@@ -11,6 +11,7 @@ import { ACCEPTED_ATTACHMENT_EXTENSIONS, uploadAttachment } from "../../utils/at
 import { resolveAttachmentUrl } from "../../utils/cloudinaryUrl";
 import ImagePreviewModal from "../ui/ImagePreviewModal";
 import LoadingState from "../ui/LoadingState";
+import SendIcon from "../../assets/send.svg";
 
 export default function OfficialChannel({
   channelId,
@@ -198,9 +199,9 @@ export default function OfficialChannel({
           </button>
       )}
 
-      <div 
+      <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto p-6 flex flex-col no-scrollbar"
+        className="flex-1 overflow-y-auto px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-6 flex flex-col no-scrollbar"
         onScroll={handleScroll}
       >
          {isLoadingOlder && (
@@ -341,8 +342,8 @@ export default function OfficialChannel({
       </div>
       
       {isTeacher && (
-          <div className="p-4 border-t border-gray-100 bg-white shrink-0">
-             <div className="flex gap-3 items-center max-w-5xl mx-auto">
+          <div className="px-4 py-3.5 min-[426px]:px-5 min-[426px]:py-4 min-[769px]:p-4 border-t border-gray-100 bg-white shrink-0">
+             <div className="flex flex-col gap-2 relative w-full max-w-5xl mx-auto">
                 <input
                   ref={uploadInputRef}
                   type="file"
@@ -350,46 +351,53 @@ export default function OfficialChannel({
                   accept={ACCEPTED_ATTACHMENT_EXTENSIONS}
                   onChange={handleUploadSelected}
                 />
-                <button onClick={handlePickUpload} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors group" title="Attach document/image">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="currentColor" className="text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="currentColor" className="text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                </button>
-                <div className="relative">
-                     <button 
-                         onClick={() => setShowMediaPicker(!showMediaPicker)} 
-                         className={`p-2.5 rounded-full transition-colors flex items-center justify-center ${showMediaPicker ? 'bg-gray-200' : 'hover:bg-gray-100'}`} 
-                         title="Add Emoji"
-                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" className={`fill-current transition-colors ${showMediaPicker ? 'text-gray-600' : 'text-gray-400 hover:text-gray-600'}`}><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z"/></svg>
-                     </button>
-                     {showMediaPicker && (
-                         <div className="absolute bottom-full left-0 mb-2 z-50">
-                             <ChatMediaPicker 
-                                 hideGifs={true} 
-                                 onEmojiSelect={(e) => setAnnouncementInput(p => p + e)} 
-                                 onClose={() => setShowMediaPicker(false)} 
-                             />
-                         </div>
-                     )}
-                </div>
+                <div className="flex items-center gap-1.5 min-[426px]:gap-2 relative w-full bg-gray-50 rounded-[24px] min-[426px]:rounded-[28px] border border-gray-100 p-1.5 shadow-sm focus-within:ring-2 focus-within:ring-[#0F172A]/20 transition-all">
+                  <div className="flex items-center pl-1 shrink-0">
+                    <button onClick={handlePickUpload} className="p-1.5 min-[426px]:p-2 text-gray-400 hover:text-[#0F172A] rounded-full transition-colors" title="Attach document/image">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M13.5 3H12H8C6.34315 3 5 4.34315 5 6V18C5 19.6569 6.34315 21 8 21H12M13.5 3L19 8.625M13.5 3V7.625C13.5 8.17728 13.9477 8.625 14.5 8.625H19M19 8.625V11.8125" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M17.5 21L17.5 15M17.5 15L20 17.5M17.5 15L15 17.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowMediaPicker(!showMediaPicker)}
+                        className={`p-1.5 min-[426px]:p-2 rounded-full transition-colors ${showMediaPicker ? "text-[#0F172A] bg-gray-200" : "text-gray-400 hover:text-[#0F172A]"}`}
+                        title="Add Emoji"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" className="fill-current"><path d="M9 7c-5.533 0-8 2.468-8 8s2.467 8 8 8 8-2.468 8-8-2.467-8-8-8zm-2.5 4c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5zm6.213 6.701c-.86.874-2.074 1.299-3.713 1.299s-2.853-.425-3.713-1.299c-.387-.394-.382-1.026.012-1.414.395-.387 1.027-.383 1.414.012.471.479 1.197.701 2.287.701s1.816-.223 2.287-.701c.388-.395 1.021-.398 1.414-.012.394.388.399 1.021.012 1.414zm-1.213-3.701c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5zm11.5-8.5c0 .828-.671 1.5-1.5 1.5h-1.5v1.5c0 .828-.671 1.5-1.5 1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829 0-1.5-.672-1.5-1.5s.671-1.5 1.5-1.5h1.5v-1.5c0-.828.671-1.5 1.5-1.5s1.5.672 1.5 1.5v1.5h1.5c.829 0 1.5.672 1.5 1.5z"/></svg>
+                      </button>
+                      {showMediaPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 z-50">
+                          <ChatMediaPicker
+                            hideGifs={true}
+                            onEmojiSelect={(e) => setAnnouncementInput((p) => p + e)}
+                            onClose={() => setShowMediaPicker(false)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                <input 
-                    type="text"
-                    value={announcementInput} 
-                    onChange={(e) => setAnnouncementInput(e.target.value)} 
-                    onKeyDown={(e) => e.key === "Enter" && postAnnouncement()}
-                    placeholder="Post an official announcement..." 
-                    className="flex-1 bg-gray-50 border border-transparent rounded-xl px-5 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white transition-all" 
-                />
-                <button 
-                    onClick={postAnnouncement} 
+                  <div className="flex-1 relative flex items-center min-w-0">
+                    <input
+                      type="text"
+                      value={announcementInput}
+                      onChange={(e) => setAnnouncementInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && postAnnouncement()}
+                      placeholder="Post an official announcement..."
+                      className="w-full bg-transparent pl-2 pr-4 outline-none text-sm min-[426px]:text-[15px] text-gray-800 placeholder-gray-400 min-w-0 py-2"
+                    />
+                  </div>
+
+                  <button
+                    onClick={postAnnouncement}
                     disabled={(!announcementInput.trim() && !selectedAttachment) || isUploadingAttachment}
-                    className={`px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95 disabled:opacity-20 ${(!announcementInput.trim() && !selectedAttachment) ? 'bg-gray-300 text-gray-500' : 'bg-[#00D084] text-white hover:scale-105'}`}
-                >
-                    Post
-                </button>
+                    className={`p-2 min-[426px]:p-2.5 rounded-full transition-all duration-200 shrink-0 shadow-sm outline-none overflow-hidden flex items-center justify-center relative ${(!announcementInput.trim() && !selectedAttachment) || isUploadingAttachment ? "bg-gray-200 cursor-not-allowed border border-gray-300" : "bg-[#059669] shadow-md hover:scale-105"}`}
+                  >
+                    <img src={SendIcon} className={`w-4 h-4 min-[426px]:w-5 min-[426px]:h-5 translate-x-0.5 ${(!announcementInput.trim() && !selectedAttachment) || isUploadingAttachment ? "opacity-30" : "invert"}`} alt="Post" />
+                  </button>
+                </div>
              </div>
              {isUploadingAttachment && <p className="mt-2 text-xs text-gray-500 font-semibold">Uploading attachment...</p>}
              {selectedAttachment && (

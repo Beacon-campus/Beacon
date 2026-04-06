@@ -3,7 +3,7 @@ import ExcelJS from "exceljs";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../../components/todocomps/datepicker-custom.css";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, useOutletContext } from "react-router-dom";
 import toast from "react-hot-toast";
 import Modal from "../../../components/ui/Modal";
 import ImagePreviewModal from "../../../components/ui/ImagePreviewModal";
@@ -931,6 +931,19 @@ export default function TeacherPublishAssignment() {
     });
   };
 
+  const { setBreadcrumbExtra } = useOutletContext() || {};
+
+  useEffect(() => {
+    if (!setBreadcrumbExtra) return;
+    if (selectedAssignment) {
+      setBreadcrumbExtra([selectedClass?.name, selectedAssignment?.title]);
+    } else if (selectedClass) {
+      setBreadcrumbExtra([selectedClass?.name]);
+    } else {
+      setBreadcrumbExtra([]);
+    }
+  }, [selectedClass, selectedAssignment, setBreadcrumbExtra]);
+
   const isImageSubmission = (value) => {
     if (!value || typeof value !== "string") return false;
     const normalized = value.toLowerCase();
@@ -1467,62 +1480,74 @@ export default function TeacherPublishAssignment() {
 
   if (step === 0) {
     stepContent = (
-      <div className="w-full h-full p-6 relative overflow-y-auto">
-        <h2 className="text-xl font-bold text-gray-700 mb-6">Select a Class to Manage Assignments</h2>
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Page Heading */}
+        <div className="shrink-0 px-4 pt-4 pb-3 min-[769px]:px-6 min-[769px]:pt-5 min-[769px]:pb-4">
+          <h1 className="text-[22px] min-[769px]:text-2xl font-black min-[769px]:font-bold tracking-tight text-[#0F172A] min-[769px]:text-gray-800">Assignments</h1>
+          <p className="text-[11px] min-[769px]:text-xs font-bold text-gray-400 uppercase tracking-wider mt-0.5">Select a classroom</p>
+        </div>
         {invalidClassroomId && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div className="mx-4 min-[769px]:mx-6 mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             Selected classroom was not found. Please choose a valid classroom.
           </div>
         )}
-        {teacherClasses.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            No official classrooms available.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {teacherClasses.map((cls) => (
-              <div
-                key={cls.id}
-                onClick={() => handleClassSelect(cls)}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:-translate-y-1 premium-transition cursor-pointer flex flex-col items-center justify-center text-center h-40 gap-2"
-              >
-                <div className="flex items-center gap-2">
-                   <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="flex-1 overflow-y-auto px-4 pb-6 min-[769px]:px-6 no-scrollbar">
+          {teacherClasses.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+              No official classrooms available.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 min-[769px]:grid min-[769px]:grid-cols-2 min-[1024px]:grid-cols-3">
+              {teacherClasses.map((cls) => (
+                <button
+                  key={cls.id}
+                  onClick={() => handleClassSelect(cls)}
+                  className="border border-gray-100 rounded-2xl p-4 min-[769px]:p-5 bg-white hover:bg-gray-50 hover:border-gray-200 text-left transition-all shadow-sm hover:shadow active:scale-[0.98] flex items-center gap-3 min-[769px]:flex-col min-[769px]:items-start min-[769px]:h-36 min-[769px]:gap-2"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                   </svg>
-                   <h3 className="font-bold text-primary text-lg">{cls.name}</h3>
-                </div>
-                <p className="text-sm text-gray-500">(You teach {cls.subject})</p>
-              </div>
-            ))}
-          </div>
-        )}
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-[15px] text-gray-800 truncate">{cls.name}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{cls.subject}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   } else if (step === 2) {
     stepContent = (
-      <div className="w-full h-full p-6 relative flex flex-col">
+      <div className="flex flex-col h-full overflow-hidden">
         {renderSubmissionModal()}
-        <div className="flex items-center gap-4 mb-6 shrink-0">
+        {/* Header */}
+        <div className="shrink-0 px-4 pt-4 pb-3 min-[769px]:px-6 min-[769px]:pt-5 min-[769px]:pb-4 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 bg-[#F3F4F6] text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors shrink-0"
           >
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600">
-              <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
-            </svg>
-            <span className="font-bold text-sm">Go back</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
           </button>
-          <div>
-            <h2 className="text-xl font-bold text-primary">{selectedAssignment?.title}</h2>
-            <p className="text-sm text-gray-500">
-              Q: {selectedAssignment?.instructions || "No instructions"}
-            </p>
+          <div className="min-w-0">
+            <h1 className="text-[18px] min-[769px]:text-xl font-black min-[769px]:font-bold tracking-tight text-[#0F172A] min-[769px]:text-gray-800 leading-tight truncate">{selectedAssignment?.title}</h1>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{selectedClass?.name}</p>
           </div>
+          <button
+            onClick={handleDownloadSheet}
+            className="ml-auto p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
+            title="Download Sheet"
+          >
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+          </button>
         </div>
 
-        <div className="flex flex-1 overflow-hidden gap-6">
-          <div className="flex-1 overflow-y-auto pr-2 space-y-3">
+        <div className="flex flex-1 overflow-hidden gap-0 min-[769px]:gap-6 flex-col min-[769px]:flex-row">
+          {/* Submissions list */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 min-[769px]:px-0 min-[769px]:pl-6 no-scrollbar space-y-3">
             {loadingSubmissions ? (
               <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
                 <LoadingState size="sm" />
@@ -1533,10 +1558,10 @@ export default function TeacherPublishAssignment() {
               </div>
             ) : (
               submissions.map((row) => (
-                <div key={row.studentId} className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                  <span className="font-bold text-gray-700 w-1/3">
-                    <div className="flex items-center gap-2">
-                      {row.name}
+                <div key={row.studentId} className="flex items-start min-[769px]:items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-xl gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="font-bold text-gray-700 text-sm">{row.name}</span>
                       {row.attempts > 1 && (
                         <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full border border-yellow-200 font-medium">
                           {row.attempts} Attempts
@@ -1553,15 +1578,15 @@ export default function TeacherPublishAssignment() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-gray-500 font-medium mt-1">{row.regno || row.email || ""}</p>
+                    <p className="text-[11px] text-gray-500 font-medium mt-0.5">{row.regno || row.email || ""}</p>
                     {selectedAssignment?.type === "quiz" && row.submitted && row.correctCount !== null && (
-                      <p className="text-[11px] text-blue-600 font-semibold mt-1">
+                      <p className="text-[11px] text-blue-600 font-semibold mt-0.5">
                         Correct: {row.correctCount}/{row.totalQuestions || 0}
                       </p>
                     )}
-                  </span>
+                  </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => setViewSubmission(row)}
                       disabled={!row.submitted}
@@ -1596,7 +1621,8 @@ export default function TeacherPublishAssignment() {
             )}
           </div>
 
-          <div className="w-1/3 bg-[#F9FAFB] rounded-2xl p-4 border border-gray-100 flex flex-col">
+          {/* Doubts panel */}
+          <div className="hidden min-[769px]:flex w-1/3 bg-[#F9FAFB] rounded-2xl p-4 border border-gray-100 flex-col mr-6 mb-4">
             <h3 className="text-sm font-bold text-gray-800 mb-1">Student doubts</h3>
             <p className="text-[10px] text-gray-400 mb-4 leading-tight">
               *Select a doubt to reply specifically, or send a broadcast message to all.
@@ -1755,133 +1781,147 @@ export default function TeacherPublishAssignment() {
             </div>
           </div>
         </div>
-      </div>
 
+      </div>
     );
   } else {
     stepContent = (
-      <div className="w-full h-full p-6 relative flex flex-col">
-      <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 px-4 py-2 bg-[#F3F4F6] text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-95"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-600">
-            <path d="M10,22.03c-.77,0-1.51-.3-2.09-.88L1.18,14.82c-1.57-1.57-1.57-4.09-.02-5.64,0,0,.01-.01,.02-.02L7.93,2.81c.84-.85,2.09-1.1,3.22-.63s1.84,1.52,1.85,2.74v2.06h7.03c2.19,0,3.97,1.8,3.97,4.01v1.98c0,2.21-1.78,4.01-3.97,4.01h-7.03v2.06c0,1.23-.71,2.28-1.85,2.75-.38,.16-.77,.23-1.15,.23Z" />
-          </svg>
-          <span className="font-bold text-sm">Go back</span>
-        </button>
-        <h2 className="text-xl font-bold text-gray-800">{selectedClass?.name} / <span className="text-gray-500">Assignments</span></h2>
-      </div>
-
-      <div className="flex flex-1 gap-8 overflow-hidden min-h-0">
-        <div className="w-1/2 flex flex-col h-full overflow-hidden">
-          <div className="flex-1 flex flex-col gap-4 overflow-y-auto p-2 soft-scrollbar pb-4 pr-3 relative">
-            {loadingAssignments ? (
-              <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <LoadingState size="sm" />
-              </div>
-            ) : classAssignments.length === 0 ? (
-              <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <p className="text-gray-400 font-medium">No assignments yet. Publish one!</p>
-              </div>
-            ) : (
-              classAssignments.map((assign) => (
-                <div
-                  key={assign._id}
-                  onClick={() => setSelectedAssignment(assign)}
-                  className={`p-6 rounded-2xl border cursor-pointer premium-transition ${String(selectedAssignment?._id) === String(assign._id)
-                    ? "border-slate-300 bg-white shadow-md -translate-y-1"
-                    : "border-slate-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-1"
-                    }`}
-                >
-                  <h3 className="font-bold text-primary">{assign.title}</h3>
-                  <p className="text-xs text-gray-500 mt-1 truncate max-w-[300px]">
-                    {assign.instructions || "No instructions"}
-                  </p>
-                  <div className="mt-2 flex items-center gap-2 text-[10px] text-gray-400">
-                    <span className="bg-white px-2 py-0.5 rounded border border-gray-200 capitalize">{assign.type}</span>
-                    <span>{assign.totalMarks} Marks</span>
-                    <span>Due: {formatDeadline(assign.deadline)}</span>
-                  </div>
-                </div>
-              ))
-            )}
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Header */}
+        <div className="shrink-0 px-4 pt-4 pb-3 min-[769px]:px-6 min-[769px]:pt-5 min-[769px]:pb-4 flex items-center gap-3">
+          <button
+            onClick={handleBack}
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors shrink-0"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          </button>
+          <div className="min-w-0">
+            <h1 className="text-[1.4rem] min-[769px]:text-2xl font-black min-[769px]:font-bold tracking-tight text-primary min-[769px]:text-gray-800 leading-tight truncate">{selectedClass?.name}</h1>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assignments</p>
           </div>
-
-          <div className="shrink-0 pt-4 px-2">
-            <button
-              onClick={() => setShowPublishModal(true)}
-              className="w-full p-4 rounded-2xl bg-[#0F172A] hover:bg-slate-800 text-white font-bold text-center shadow-md transition-all flex items-center justify-center gap-2"
-            >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-white">
-                <path d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm4 13h-3v3a1 1 0 0 1 -2 0v-3h-3a1 1 0 0 1 0-2h3v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 0 2z" />
-              </svg>
-              Publish an assignment
-            </button>
-          </div>
-        </div>
-
-        <div className="w-1/2 border-l border-gray-100 pl-8 flex flex-col justify-center items-center text-center">
-          {selectedAssignment ? (
-            <div className="space-y-6 w-full max-w-sm">
-              <div>
-                <h3 className="text-2xl font-bold text-primary">{selectedAssignment.title}</h3>
-                <p className="text-gray-600 mt-2">{selectedAssignment.instructions || "No instructions provided."}</p>
-                <p className="text-xs text-blue-500 font-bold mt-2">
-                  Due: {formatDeadline(selectedAssignment.deadline)}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={handleGoToGrading}
-                  className="w-full py-3 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
-                >
-                  Grade students
-                </button>
-                <button
-                  onClick={handleDownloadSheet}
-                  className="w-full py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50"
-                >
-                  Download xlsheet
-                </button>
-                <p className="text-xs text-gray-400 italic mt-2">
-                  *Use Grade students to open detailed student list and doubts workspace
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-gray-400 italic">Select an assignment to view details</p>
-          )}
-        </div>
-      </div>
-
-      <Modal
-        isOpen={showPublishModal}
-        onClose={() => setShowPublishModal(false)}
-        className="max-w-2xl h-[90vh] flex flex-col p-0"
-      >
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
-          <h3 className="text-xl font-bold text-primary">Publish New Assignment</h3>
-          <button onClick={() => setShowPublishModal(false)} className="text-gray-400 hover:text-gray-600">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          {/* Publish button — icon on mobile, full on desktop */}
+          <button
+            onClick={() => setShowPublishModal(true)}
+            className="ml-auto flex items-center gap-2 px-3 py-2 min-[769px]:px-4 bg-[#0F172A] hover:bg-slate-800 text-white font-bold text-xs min-[769px]:text-sm rounded-xl shadow-md transition-all shrink-0"
+          >
+            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-white shrink-0">
+              <path d="m12 0a12 12 0 1 0 12 12 12.013 12.013 0 0 0 -12-12zm4 13h-3v3a1 1 0 0 1 -2 0v-3h-3a1 1 0 0 1 0-2h3v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 0 2z" />
             </svg>
+            <span className="hidden min-[426px]:inline">Publish Assignment</span>
           </button>
         </div>
-        <div className="flex-1 min-h-0 flex flex-col">
-          <PublishAssignmentForm
-            classroomId={selectedClass?.id || classroomId}
-            onClose={() => setShowPublishModal(false)}
-            onPublished={() => {
-              if (selectedClass?.id) fetchAssignmentsForClass(selectedClass.id, true);
-              setShowPublishModal(false);
-            }}
-          />
+
+        {/* Mobile/tablet: vertical stack. Desktop: side-by-side */}
+        <div className="flex flex-1 overflow-hidden">
+
+          {/* Assignment list column */}
+          <div className="flex flex-col flex-1 min-[769px]:w-1/2 min-[769px]:flex-none overflow-hidden">
+            <div className="flex-1 overflow-y-auto px-4 min-[769px]:px-6 pb-4 no-scrollbar space-y-3">
+              {loadingAssignments ? (
+                <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                  <LoadingState size="sm" />
+                </div>
+              ) : classAssignments.length === 0 ? (
+                <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                  <p className="text-gray-400 font-medium">No assignments yet. Publish one!</p>
+                </div>
+              ) : (
+                classAssignments.map((assign) => (
+                  <div
+                    key={assign._id}
+                    onClick={() => setSelectedAssignment(assign)}
+                    className={`p-4 min-[769px]:p-6 rounded-2xl border cursor-pointer premium-transition ${String(selectedAssignment?._id) === String(assign._id)
+                      ? "border-slate-300 bg-white shadow-md"
+                      : "border-slate-100 bg-white shadow-sm hover:shadow-md"
+                      }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-primary text-sm min-[769px]:text-base">{assign.title}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                          {assign.instructions || "No instructions"}
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5 min-[769px]:gap-2 text-[10px] text-gray-400">
+                          <span className="bg-white px-2 py-0.5 rounded border border-gray-200 capitalize">{assign.type}</span>
+                          <span>{assign.totalMarks} Marks</span>
+                          <span>Due: {formatDeadline(assign.deadline)}</span>
+                        </div>
+                      </div>
+                      {/* Mobile: grade button inline */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedAssignment(assign); handleGoToGrading(); }}
+                        className="min-[769px]:hidden shrink-0 px-3 py-1.5 bg-[#0F172A] text-white text-[10px] font-bold rounded-lg"
+                      >
+                        Grade
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Assignment detail panel — desktop only */}
+          <div className="hidden min-[769px]:flex w-1/2 border-l border-gray-100 pl-6 pr-6 pb-4 flex-col justify-center items-center text-center">
+            {selectedAssignment ? (
+              <div className="space-y-6 w-full max-w-sm">
+                <div>
+                  <h3 className="text-2xl font-bold text-primary">{selectedAssignment.title}</h3>
+                  <p className="text-gray-600 mt-2">{selectedAssignment.instructions || "No instructions provided."}</p>
+                  <p className="text-xs text-blue-500 font-bold mt-2">
+                    Due: {formatDeadline(selectedAssignment.deadline)}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleGoToGrading}
+                    className="w-full py-3 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                  >
+                    Grade students
+                  </button>
+                  <button
+                    onClick={handleDownloadSheet}
+                    className="w-full py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50"
+                  >
+                    Download xlsheet
+                  </button>
+                  <p className="text-xs text-gray-400 italic mt-2">
+                    *Use Grade students to open detailed student list and doubts workspace
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-400 italic">Select an assignment to view details</p>
+            )}
+          </div>
         </div>
-      </Modal>
-    </div>
+
+        <Modal
+          isOpen={showPublishModal}
+          onClose={() => setShowPublishModal(false)}
+          className="max-w-2xl h-[90vh] flex flex-col p-0"
+        >
+          <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+            <h3 className="text-xl font-bold text-primary">Publish New Assignment</h3>
+            <button onClick={() => setShowPublishModal(false)} className="text-gray-400 hover:text-gray-600">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <PublishAssignmentForm
+              classroomId={selectedClass?.id || classroomId}
+              onClose={() => setShowPublishModal(false)}
+              onPublished={() => {
+                if (selectedClass?.id) fetchAssignmentsForClass(selectedClass.id, true);
+                setShowPublishModal(false);
+              }}
+            />
+          </div>
+        </Modal>
+      </div>
     );
   }
 

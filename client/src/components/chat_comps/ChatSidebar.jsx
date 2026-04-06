@@ -57,6 +57,7 @@ export default function ChatSidebar({
   setIsAddChatOpen,
   classmates = [] // Default to empty array
 }) {
+  const isCompactView = typeof window !== "undefined" ? window.innerWidth < 769 : false;
   const [isPeersOpen, setIsPeersOpen] = useState(true);
   const [isOthersOpen, setIsOthersOpen] = useState(true);
   const [isTeachersOpen, setIsTeachersOpen] = useState(true);
@@ -120,11 +121,11 @@ export default function ChatSidebar({
                 if (chat.unreadCount > 0) markAsRead(chat._id);
             }}
             id={`chat-item-${chat._id}`}
-            className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3 relative overflow-hidden ${
+            className={`px-4 py-3.5 min-[769px]:p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors flex items-center gap-3 relative overflow-hidden ${
               activeChat?._id === chat._id ? "bg-blue-50" : ""
             } ${glowChatId === chat._id ? "animate-glow-pulse" : ""}`}>
             
-            <div className="relative w-10 h-10 shrink-0">
+            <div className="relative w-9 h-9 min-[426px]:w-10 min-[426px]:h-10 shrink-0">
               <div className="w-full h-full rounded-full bg-black text-white flex items-center justify-center font-bold overflow-hidden border border-gray-100">
                   <img 
                   src={getAvatarUrl(otherUserProfile.avatar || 11)} 
@@ -140,7 +141,7 @@ export default function ChatSidebar({
             </div>
             <div className="overflow-hidden flex-1 flex flex-col justify-center">
               <div className="flex justify-between items-center w-full">
-                <h3 className={`text-sm truncate pr-2 ${chat.unreadCount > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}>
+                <h3 className={`text-[13px] min-[426px]:text-sm truncate pr-2 ${chat.unreadCount > 0 ? "font-bold text-gray-900" : "font-semibold text-gray-800"}`}>
                     {otherUserProfile.name}
                   </h3>
                   {chat.lastMessage?.sentAt && (
@@ -150,7 +151,7 @@ export default function ChatSidebar({
                   )}
               </div>
               <div className="flex justify-between items-center w-full mt-0.5">
-                  <p className={`text-xs truncate flex-1 min-w-0 pr-2 ${chat.unreadCount > 0 ? "text-gray-900 font-semibold" : "text-gray-500"}`}>
+                  <p className={`text-[11px] min-[426px]:text-xs truncate flex-1 min-w-0 pr-2 ${chat.unreadCount > 0 ? "text-gray-900 font-semibold" : "text-gray-500"}`}>
                     {chat.lastMessage?.sender === currentUserInfo?._id && "You: "}
                     {chat.lastMessage?.text || "No messages yet"}
                   </p>
@@ -169,13 +170,13 @@ export default function ChatSidebar({
   return (
     <div className={`w-full md:w-1/3 border-r border-gray-100 flex flex-col h-full ${isHidden ? "hidden md:flex" : "flex"}`}>
         {/* SIDEBAR HEADER with EXPANDING BUTTON */}
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white z-10 sticky top-0 shrink-0">
-             <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+        <div className="px-4 py-4 min-[426px]:px-5 min-[426px]:py-5 min-[769px]:p-4 border-b border-gray-100 flex items-center justify-between bg-white z-10 sticky top-0 shrink-0">
+             <h2 className="text-lg min-[426px]:text-xl font-bold text-gray-800">Messages</h2>
              
              {/* EXPANDING NEW MESSAGE BUTTON */}
              <button
                  onClick={() => setIsAddChatOpen(true)}
-                 className="group relative flex items-center bg-[#0F172A] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-700 ease-out h-10 w-10 hover:w-36 overflow-hidden"
+                 className={`group relative flex items-center bg-[#0F172A] text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-700 ease-out overflow-hidden ${isCompactView ? "h-10 w-10" : "h-10 w-10 hover:w-36"}`}
                  title="New Message"
              >
                  {pendingFriendRequestCount > 0 && (
