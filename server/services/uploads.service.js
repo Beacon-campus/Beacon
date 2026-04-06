@@ -5,7 +5,6 @@ import path from "path";
 import { spawnSync } from "child_process";
 import { v2 as cloudinary } from "cloudinary";
 import libre from "libreoffice-convert";
-import { promisify } from "util";
 import PQueue from "p-queue";
 
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "";
@@ -64,8 +63,6 @@ if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
 
 export const isCloudinaryConfigured = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
 
-export const convertToPdf = promisify(libre.convert);
-
 const libreOfficeQueue = new PQueue({ concurrency: 1 });
 
 const libreOfficeTempDir = path.join(os.tmpdir(), "libreoffice-temp");
@@ -76,6 +73,48 @@ try {
 }
 
 let officeRuntimeCache = null;
+
+function resolveOfficeBinaryPaths(command) {
+  if (!command) return [];
+
+  if (path.isAbsolute(command) && fs.existsSync(command)) {
+    return [command];
+  }
+
+  const resolver = process.platform === "win32" ? "where" : "which";
+
+  try {
+    const probe = spawnSync(resolver, [command], {
+      encoding: "utf8",
+      shell: false,
+      timeout: 5000,
+    });
+    if (!probe.error && probe.status === 0) {
+      const resolved = String(probe.stdout || "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .find((line) => fs.existsSync(line));
+      if (resolved) return [resolved];
+    }
+  } catch {
+    // Fall back to libreoffice-convert default path probing.
+  }
+
+  return [];
+}
+
+function convertOfficeBufferToPdf(buffer, options = {}) {
+  return new Promise((resolve, reject) => {
+    libre.convertWithOptions(buffer, "pdf", undefined, options, (error, done) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(done);
+    });
+  });
+}
 
 export function getOfficeRuntimeStatus() {
   if (officeRuntimeCache) return officeRuntimeCache;
@@ -115,8 +154,12 @@ export async function generateOfficePreviewPdf(buffer) {
   }
 
   try {
+    const sofficeBinaryPaths = resolveOfficeBinaryPaths(runtime.command);
     const pdfBuffer = await libreOfficeQueue.add(() =>
-      convertToPdf(buffer, ".pdf", { tmpdir: libreOfficeTempDir })
+      convertOfficeBufferToPdf(buffer, {
+        tmpOptions: { dir: libreOfficeTempDir },
+        sofficeBinaryPaths,
+      })
     );
     if (!pdfBuffer?.length) {
       return { ok: false, error: "LibreOffice conversion returned empty output." };

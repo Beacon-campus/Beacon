@@ -6,6 +6,15 @@ import { resolveAttachmentUrl } from "../../../utils/cloudinaryUrl";
 
 const LONG_MESSAGE_THRESHOLD = 130;
 
+const cloneAnnouncement = (announcement) => {
+    if (!announcement) return null;
+    return {
+        ...announcement,
+        attachment: announcement.attachment ? { ...announcement.attachment } : null,
+        createdBy: announcement.createdBy ? { ...announcement.createdBy } : null,
+    };
+};
+
 export default function AnnouncementsWidget({
     activeAnnounce,
     announcements,
@@ -19,6 +28,7 @@ export default function AnnouncementsWidget({
     const list = announcements || [];
     const current = list[activeAnnounce] || null;
     const [textModalOpen, setTextModalOpen] = useState(false);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
     const [docFile, setDocFile] = useState(null);
     const [imageModalOpen, setImageModalOpen] = useState(false);
 
@@ -28,20 +38,45 @@ export default function AnnouncementsWidget({
     );
     const isLongMessage = message.length > LONG_MESSAGE_THRESHOLD;
     const shortMessage = isLongMessage ? `${message.slice(0, LONG_MESSAGE_THRESHOLD)}...` : message;
+    const selectedMessage = selectedAnnouncement?.text || selectedAnnouncement?.message || "";
+    const selectedSender = selectedAnnouncement?.sender || selectedAnnouncement?.createdBy?.name || "Admin";
+
+    const closeMessageModal = () => {
+        setTextModalOpen(false);
+        setSelectedAnnouncement(null);
+    };
+
+    const closeDocPreview = () => {
+        setDocFile(null);
+        setSelectedAnnouncement(null);
+    };
+
+    const closeImagePreview = () => {
+        setImageModalOpen(false);
+        setSelectedAnnouncement(null);
+    };
+
+    const openMessageModal = () => {
+        if (!current) return;
+        setSelectedAnnouncement(cloneAnnouncement(current));
+        setTextModalOpen(true);
+    };
 
     const openDocPreview = () => {
         if (!current?.attachment) return;
+        const selected = cloneAnnouncement(current);
+        setSelectedAnnouncement(selected);
         setDocFile({
-            ...current.attachment,
-            name: current.attachment.name || "attachment",
-            mimeType: current.attachment.mimeType || current.attachment.type || "",
-            type: current.attachment.mimeType || current.attachment.type || "",
-            previewUrl: current.attachment.previewUrl || null,
-            previewDownloadUrl: current.attachment.previewDownloadUrl || null,
-            previewPath: current.attachment.previewPath || null,
-            previewType: current.attachment.previewType || null,
-            previewStatus: current.attachment.previewStatus || null,
-            previewError: current.attachment.previewError || null,
+            ...selected.attachment,
+            name: selected.attachment.name || "attachment",
+            mimeType: selected.attachment.mimeType || selected.attachment.type || "",
+            type: selected.attachment.mimeType || selected.attachment.type || "",
+            previewUrl: selected.attachment.previewUrl || null,
+            previewDownloadUrl: selected.attachment.previewDownloadUrl || null,
+            previewPath: selected.attachment.previewPath || null,
+            previewType: selected.attachment.previewType || null,
+            previewStatus: selected.attachment.previewStatus || null,
+            previewError: selected.attachment.previewError || null,
         });
     };
 
@@ -53,6 +88,7 @@ export default function AnnouncementsWidget({
         }
 
         if (current?.attachment?.kind === "image" && resolveAttachmentUrl(current?.attachment)) {
+            setSelectedAnnouncement(cloneAnnouncement(current));
             setImageModalOpen(true);
             return;
         }
@@ -60,8 +96,8 @@ export default function AnnouncementsWidget({
             openDocPreview();
             return;
         }
-        if (isLongMessage) {
-            setTextModalOpen(true);
+        if (current?.text || current?.message) {
+            openMessageModal();
             return;
         }
         navigate(navigateTo);
@@ -103,7 +139,7 @@ export default function AnnouncementsWidget({
                                         className="mt-2 text-[11px] min-[426px]:text-xs min-[769px]:text-xs font-semibold text-blue-600 hover:underline"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setTextModalOpen(true);
+                                            openMessageModal();
                                         }}
                                     >
                                         Read full message
@@ -155,28 +191,48 @@ export default function AnnouncementsWidget({
                 <>
                     <Modal
                         isOpen={textModalOpen}
-                        onClose={() => setTextModalOpen(false)}
-                        className="max-w-2xl"
+                        onClose={closeMessageModal}
+                        className="max-w-[600px] max-h-[85vh]"
+                        backdropClassName="bg-black/40 backdrop-blur-sm"
                     >
-                        <div className="p-6">
-                            <h3 className="text-lg font-black text-slate-800">Announcement Message</h3>
-                            <p className="text-xs text-slate-500 mt-1">From {current?.sender || current?.createdBy?.name || "Admin"}</p>
-                            <p className="mt-4 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">{message}</p>
+                        <div className="p-6 flex flex-col max-h-[85vh]">
+                            <div className="flex justify-between items-start mb-4 gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-xl font-bold text-gray-800 break-words leading-tight">
+                                        Announcement
+                                    </h3>
+                                    <p className="text-xs text-slate-500 mt-1">From {selectedSender}</p>
+                                </div>
+                                <button
+                                    onClick={closeMessageModal}
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+                                    aria-label="Close announcement"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="overflow-y-auto pr-2 soft-scrollbar flex-1 min-h-[100px] text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+                                {selectedMessage || <p className="text-gray-400 italic">No message</p>}
+                            </div>
+
                             <div className="mt-6 flex justify-end">
-                                <button onClick={() => setTextModalOpen(false)} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-semibold">
+                                <button onClick={closeMessageModal} className="px-4 py-2 rounded-lg bg-black text-white text-sm font-semibold">
                                     Close
                                 </button>
                             </div>
                         </div>
                     </Modal>
 
-                    <DocViewer file={docFile} onClose={() => setDocFile(null)} />
+                    <DocViewer file={docFile} onClose={closeDocPreview} />
 
                     <ImagePreviewModal
                         isOpen={imageModalOpen}
-                        onClose={() => setImageModalOpen(false)}
-                        imageUrl={resolveAttachmentUrl(current?.attachment)}
-                        imageName={current?.attachment?.name || "Announcement image"}
+                        onClose={closeImagePreview}
+                        imageUrl={resolveAttachmentUrl(selectedAnnouncement?.attachment)}
+                        imageName={selectedAnnouncement?.attachment?.name || "Announcement image"}
                     />
                 </>
             )}
