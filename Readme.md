@@ -1,5 +1,16 @@
 # Beacon - README
 
+> **Live Demo:** [Launch Beacon App](https://streak-app-wrog.onrender.com)
+
+### Quick Access Accounts
+| Role | Registration No. | Password |
+| :--- | :--- | :--- |
+| **Student 1** | `232STUD01` | `pass123` |
+| **Student 2** | `232STUD02` | `pass123` |
+| **Teacher** | `232TEACH01` | `pass123` |
+
+---
+
 ## What This Project Is
 
 Beacon is a role-based campus collaboration platform designed to eliminate the "WhatsApp chaos" in academic environments. It provides structured communication by separating:
