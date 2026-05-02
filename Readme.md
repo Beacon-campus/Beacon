@@ -1,34 +1,50 @@
-# Beacon - README
+<div align="center">
 
-> **Live Demo:** [Launch Beacon App](https://streak-app-wrog.onrender.com)
+# Beacon
 
-### Quick Access Accounts
+![React](https://img.shields.io/badge/React_18-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express_5-000000?style=flat&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black)
+![Socket.io](https://img.shields.io/badge/Socket.IO-010101?style=flat&logo=socketdotio&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=flat&logo=cloudinary&logoColor=white)
+![Gemini API](https://img.shields.io/badge/Gemini_API-8E75B2?style=flat&logo=googlegemini&logoColor=white)
+
+**Live Demo:** [beacon-app.onrender.com](https://streak-app-wrog.onrender.com)
+
 | Role | Registration No. | Password |
-| :--- | :--- | :--- |
-| **Student 1** | `232STUD01` | `pass123` |
-| **Student 2** | `232STUD02` | `pass123` |
-| **Teacher** | `232TEACH01` | `pass123` |
+| :---: | :---: | :---: |
+| Student 1 | `232STUD01` | `pass123` |
+| Student 2 | `232STUD02` | `pass123` |
+| Teacher | `232TEACH01` | `pass123` |
+
+</div>
 
 ---
 
 ## What This Project Is
 
-Beacon is a role-based campus collaboration platform designed to eliminate the "WhatsApp chaos" in academic environments. It provides structured communication by separating:
-- **Official Channels**: For teachers and admins to post announcements and assignments that never get buried.
-- **Student Hubs**: For peer-to-peer collaboration and file sharing.
-- **Dedicated Resource Sections**: For notes, todos, and study materials that stay organized over time.
+Academic communication in colleges runs on WhatsApp groups - announcements get buried, assignments get missed, and there is no separation between official and casual conversation. **Beacon fixes that.**
 
-It combines:
-- Firebase-authenticated login and onboarding flow.
-- Real-time messaging via Socket.IO.
-- Classroom channels (official + student hub), group chats, and friend-based student DMs.
-- Assignment publishing, submission, quiz mode, doubt/reply workflows, and grading.
-- Personal productivity tools (todos, notes, persistent sketch board).
-- AI assistant chat (student study bot / teacher research bot) with session history.
-- University-wide announcements with optional attachments.
-- Admin panel for user/classroom operations and server observability.
-- Academic calendar + timetable system with image-backed semester docs and per-role schedule logic.
-- Session prefetch + page-cache layer to reduce redundant requests.
+It is a full-stack, role-based campus collaboration platform where every piece of communication has a defined place. Teachers post to official channels. Students collaborate in their own hubs. Nothing important ever gets lost in a chat scroll.
+
+### What Each Role Can Do
+
+| Feature | Student | Teacher | Admin |
+| :--- | :---: | :---: | :---: |
+| Real-time messaging (DMs, group chats) | Yes | Yes | - |
+| Classroom official channel | Read | Post / Announce | - |
+| Student hub (peer collaboration) | Yes | - | - |
+| Assignments - submit / grade | Submit | Publish & Grade | - |
+| Quizzes with cheat detection | Take | Create | - |
+| AI study / research assistant | Yes | Yes | - |
+| Notes, Todos, Sketch board | Yes | Yes | - |
+| University-wide announcements | Read | Read | Post |
+| User & classroom management | - | - | Yes |
+| Server logs & live metrics | - | - | Yes |
 
 ## Current Implementation Status
 
