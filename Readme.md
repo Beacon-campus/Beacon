@@ -296,3 +296,7 @@ Expected defaults:
 - Sketch save payload is rejected if too large.
 - Uploads require allowed MIME and size rules.
 - Some admin pages are intentionally UI placeholders (see status section).
+
+## 🤝 Team & Contributors
+
+For a full list of the creators and their specific contributions to this project, please see the [CONTRIBUTORS.md](./CONTRIBUTORS.md) file.
