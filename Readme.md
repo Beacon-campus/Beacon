@@ -299,4 +299,10 @@ Expected defaults:
 
 ## 🤝 Team & Contributors
 
+Beacon was developed by:
+* **[Charan R](https://github.com/charancreates)**
+* **Denzil Deepak**
+* **Sahil**
+* **Duke**
+
 For a full list of the creators and their specific contributions to this project, please see the [CONTRIBUTORS.md](./CONTRIBUTORS.md) file.
