@@ -163,10 +163,13 @@ export default function Login() {
     });
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (e, overrideRegno, overridePassword) => {
+    if (e && e.preventDefault) e.preventDefault();
 
-    if (!regno || !password) {
+    const loginRegno = overrideRegno || regno;
+    const loginPassword = overridePassword || password;
+
+    if (!loginRegno || !loginPassword) {
       toast.error("Please fill out all the fields");
       return;
     }
@@ -174,7 +177,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-      const normalizedRegno = regno.trim().toUpperCase();
+      const normalizedRegno = loginRegno.trim().toUpperCase();
       const q = query(collection(db, "users"), where("regno", "==", normalizedRegno));
       const snap = await getDocs(q);
 
@@ -183,12 +186,12 @@ export default function Login() {
       let loginEmail = data.pendingmail || data.email || `${normalizedRegno.toLowerCase()}@nexus.local`;
 
       try {
-        await signInWithEmailAndPassword(auth, loginEmail, password);
+        await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
         toast.success("Login successful");
       } catch (err) {
         if (data.pendingmail && err.code === "auth/invalid-credential") {
           const fallback = `${normalizedRegno.toLowerCase()}@nexus.local`;
-          await signInWithEmailAndPassword(auth, fallback, password);
+          await signInWithEmailAndPassword(auth, fallback, loginPassword);
           toast.success("Login successful");
         } else {
           throw err; // Re-throw to be caught by outer catch
@@ -352,14 +355,14 @@ export default function Login() {
       </div>
 
       {/* RIGHT PANEL - Form */}
-      <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
+      <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-6 lg:p-8 relative overflow-hidden">
 
-        <div className="w-full max-w-sm space-y-7 relative z-10">
+        <div className="w-full max-w-sm space-y-5 relative z-10">
 
           {/* Header */}
-          <div className="text-center space-y-1 mb-2 flex flex-col items-center w-full">
-            <div className="group transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] flex flex-col items-center justify-center gap-4 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-16 h-16 overflow-visible">
+          <div className="text-center space-y-1 flex flex-col items-center w-full">
+            <div className="group transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] flex flex-col items-center justify-center gap-3 mb-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="w-14 h-14 overflow-visible">
                 <defs>
                   <linearGradient id="beam-left-lg" x1="1" y1="0" x2="0" y2="0">
                     <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.7"/>
@@ -399,7 +402,7 @@ export default function Login() {
                   <circle cx="50" cy="13" r="1.5" fill="currentColor" stroke="none" />
                 </g>
               </svg>
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 transition-colors duration-300">
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 transition-colors duration-300">
                 Beacon
               </h1>
             </div>
@@ -409,7 +412,7 @@ export default function Login() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-6" noValidate>
+          <form onSubmit={handleLogin} className="space-y-4" noValidate>
 
             <div className="space-y-4">
               {/* Registration Number */}
@@ -490,10 +493,10 @@ export default function Login() {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-4 pt-2">
+            <div className="space-y-3 pt-1">
               <button
                 disabled={submitting}
-                className="w-full h-12 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center"
+                className="w-full h-11 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center justify-center"
               >
                 {submitting ? "Signing In..." : "Sign In"}
               </button>
@@ -508,7 +511,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="group w-full h-12 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+                className="group w-full h-11 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
               >
                 <div className="w-5 h-5 transition-all"><GoogleIcon /></div>
                 Sign in with Google
@@ -517,8 +520,55 @@ export default function Login() {
 
           </form>
 
+          {/* Demo Quick Access */}
+          <div className="pt-2 space-y-2">
+            <div className="relative flex items-center">
+              <div className="flex-grow border-t border-dashed border-slate-200"></div>
+              <span className="flex-shrink-0 mx-3 text-[9px] font-bold uppercase tracking-widest text-slate-400">Quick Demo Access</span>
+              <div className="flex-grow border-t border-dashed border-slate-200"></div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "Student 1", regno: "232STUD01", password: "pass123", icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
+                    <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286A48.4 48.4 0 0 1 13.06 15.473Z" />
+                    <path d="M4.462 19.462a.75.75 0 0 0 .24-1.035 47.606 47.606 0 0 0-.27-.444.75.75 0 1 0-1.272.79c.096.154.182.313.27.47a.75.75 0 0 0 1.032.22Z" />
+                  </svg>
+                )},
+                { label: "Student 2", regno: "232STUD02", password: "pass123", icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
+                    <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.711 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.442.121-2.87.255-4.286A48.4 48.4 0 0 1 13.06 15.473Z" />
+                    <path d="M4.462 19.462a.75.75 0 0 0 .24-1.035 47.606 47.606 0 0 0-.27-.444.75.75 0 1 0-1.272.79c.096.154.182.313.27.47a.75.75 0 0 0 1.032.22Z" />
+                  </svg>
+                )},
+                { label: "Teacher", regno: "232TEACH01", password: "pass123", icon: (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+                  </svg>
+                )},
+              ].map((demo) => (
+                <button
+                  key={demo.regno}
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => {
+                    setRegno(demo.regno);
+                    setPassword(demo.password);
+                    handleLogin(null, demo.regno, demo.password);
+                  }}
+                  className="group flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:border-slate-400 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="text-slate-400 group-hover:text-slate-700 transition-colors duration-200">{demo.icon}</span>
+                  <span className="text-[11px] font-bold text-slate-600 group-hover:text-slate-900 transition-colors">{demo.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Social Proof */}
-          <div className="flex items-center gap-3 pt-6 border-t border-slate-100/50 max-[425px]:hidden">
+          <div className="flex items-center gap-3 pt-4 border-t border-slate-100/50 max-[425px]:hidden">
             <div className="flex -space-x-2.5">
               <img src={profile1} alt="User 1" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
               <img src={profile5} alt="User 2" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
