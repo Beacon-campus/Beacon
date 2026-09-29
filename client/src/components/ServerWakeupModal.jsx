@@ -4,15 +4,16 @@ import { LayoutSkeleton } from "./ui/LayoutSkeleton";
 const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
 const WAKE_INTERVAL_MS = 5000;
 const MAX_BLOCKING_WAIT_MS = 15000;
+const wakeupEnabled = import.meta.env.VITE_ENABLE_RENDER_WAKEUP === "true";
 
 export default function ServerWakeupModal({ children }) {
-  const [isAwake, setIsAwake] = useState(false);
+  const [isAwake, setIsAwake] = useState(!wakeupEnabled);
   const [apiProbeStatus, setApiProbeStatus] = useState("loading");
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    if (isAwake) return;
+    if (!wakeupEnabled || isAwake) return;
 
     let cancelled = false;
     let timeoutId;
@@ -78,7 +79,7 @@ export default function ServerWakeupModal({ children }) {
     <>
       {children}
 
-      {!isWaking ? null : (
+      {!wakeupEnabled || !isWaking ? null : (
         <>
           {/* Background (Skeleton) */}
           <div className="fixed inset-0 z-[100] bg-slate-100/80 backdrop-blur-sm">

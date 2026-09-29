@@ -9,6 +9,7 @@ if (!apiBaseUrl) {
 const apiClient = axios.create({
   baseURL: apiBaseUrl,
   withCredentials: true,
+  timeout: 10000,
 });
 
 apiClient.interceptors.request.use(
@@ -22,7 +23,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 apiClient.interceptors.response.use(
@@ -31,7 +32,7 @@ apiClient.interceptors.response.use(
     // Optional global error handler
     console.error("API Error:", error.response?.data?.error || error.message);
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;
