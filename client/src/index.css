@@ -19,6 +19,29 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* Mobile controls remain reachable above browser and device UI. */
+@media (max-width: 768px) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 h1,
