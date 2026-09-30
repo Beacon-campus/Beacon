@@ -3,7 +3,6 @@ import { LayoutSkeleton } from "./ui/LayoutSkeleton";
 
 const VALID_READY_STATUS = new Set([200, 401, 403, 429, 502, 503]);
 const WAKE_INTERVAL_MS = 5000;
-const MAX_BLOCKING_WAIT_MS = 15000;
 
 export default function ServerWakeupModal({ children }) {
   const [isAwake, setIsAwake] = useState(false);
@@ -60,14 +59,10 @@ export default function ServerWakeupModal({ children }) {
     };
 
     pingApi();
-    const unlockTimerId = setTimeout(() => {
-      if (!cancelled) setIsAwake(true);
-    }, MAX_BLOCKING_WAIT_MS);
 
     return () => {
       cancelled = true;
       clearTimeout(timeoutId);
-      clearTimeout(unlockTimerId);
     };
   }, [apiBaseUrl, isAwake]);
 

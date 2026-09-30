@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * Primitive Skeleton component.
@@ -6,9 +6,7 @@ import React from 'react';
  */
 export function Skeleton({ className = "", variant = "light" }) {
   const baseClass = variant === "dark" ? "skeleton-dark" : "skeleton";
-  return (
-    <div className={`${baseClass} ${className}`} aria-hidden="true" />
-  );
+  return <div className={`${baseClass} ${className}`} aria-hidden="true" />;
 }
 
 /**
@@ -37,11 +35,11 @@ export function LayoutSkeleton() {
         </div>
         <div className="mt-auto flex flex-col gap-4">
           <div className="flex items-center gap-3 p-2">
-             <Skeleton className="w-10 h-10 rounded-full shrink-0" />
-             <div className="flex flex-col gap-1 w-full">
-               <Skeleton className="w-20 h-3 rounded" />
-               <Skeleton className="w-14 h-2 rounded opacity-50" />
-             </div>
+            <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+            <div className="flex flex-col gap-1 w-full">
+              <Skeleton className="w-20 h-3 rounded" />
+              <Skeleton className="w-14 h-2 rounded opacity-50" />
+            </div>
           </div>
           <Skeleton className="w-10 h-10 rounded-full self-center" />
         </div>
@@ -53,22 +51,22 @@ export function LayoutSkeleton() {
         <div className="flex items-center justify-between">
           <Skeleton className="w-48 h-8 rounded-lg" />
           <div className="flex gap-3">
-             <Skeleton className="w-10 h-10 rounded-full" />
-             <Skeleton className="w-32 h-10 rounded-xl" />
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <Skeleton className="w-32 h-10 rounded-xl" />
           </div>
         </div>
 
         {/* Content blocks */}
         <div className="flex-1 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <Skeleton className="h-32 rounded-3xl" />
-             <Skeleton className="h-32 rounded-3xl" />
-             <Skeleton className="h-32 rounded-3xl" />
+            <Skeleton className="h-32 rounded-3xl" />
+            <Skeleton className="h-32 rounded-3xl" />
+            <Skeleton className="h-32 rounded-3xl" />
           </div>
           <Skeleton className="w-full h-64 rounded-3xl" />
           <div className="grid grid-cols-2 gap-6">
-             <Skeleton className="h-48 rounded-3xl" />
-             <Skeleton className="h-48 rounded-3xl" />
+            <Skeleton className="h-48 rounded-3xl" />
+            <Skeleton className="h-48 rounded-3xl" />
           </div>
         </div>
       </div>
@@ -101,27 +99,27 @@ export function LoginSkeleton() {
       {/* Right Panel (Form Area) */}
       <div className="w-full lg:w-[40%] h-full flex flex-col items-center justify-center p-12 bg-white/40 backdrop-blur-md border-l border-white/50">
         <div className="w-full max-w-sm space-y-8">
-           <div className="flex flex-col items-center gap-4 mb-4">
-             <Skeleton className="w-16 h-16 rounded-2xl" />
-             <Skeleton className="w-32 h-8 rounded-lg" />
-           </div>
-           <div className="space-y-6">
-             <div className="space-y-2">
-               <Skeleton className="w-full h-14 rounded-xl" />
-               <Skeleton className="w-full h-14 rounded-xl" />
-             </div>
-             <div className="flex justify-between">
-               <Skeleton className="w-24 h-4 rounded" />
-               <Skeleton className="w-24 h-4 rounded" />
-             </div>
-             <Skeleton className="w-full h-12 rounded-xl" />
-             <div className="flex items-center gap-2">
-               <div className="flex-1 border-t border-gray-100"></div>
-               <Skeleton className="w-8 h-3 rounded" />
-               <div className="flex-1 border-t border-gray-100"></div>
-             </div>
-             <Skeleton className="w-full h-12 rounded-xl" />
-           </div>
+          <div className="flex flex-col items-center gap-4 mb-4">
+            <Skeleton className="w-16 h-16 rounded-2xl" />
+            <Skeleton className="w-32 h-8 rounded-lg" />
+          </div>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="w-full h-14 rounded-xl" />
+              <Skeleton className="w-full h-14 rounded-xl" />
+            </div>
+            <div className="flex justify-between">
+              <Skeleton className="w-24 h-4 rounded" />
+              <Skeleton className="w-24 h-4 rounded" />
+            </div>
+            <Skeleton className="w-full h-12 rounded-xl" />
+            <div className="flex items-center gap-2">
+              <div className="flex-1 border-t border-gray-100"></div>
+              <Skeleton className="w-8 h-3 rounded" />
+              <div className="flex-1 border-t border-gray-100"></div>
+            </div>
+            <Skeleton className="w-full h-12 rounded-xl" />
+          </div>
         </div>
       </div>
     </div>
