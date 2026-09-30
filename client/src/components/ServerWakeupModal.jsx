@@ -16,19 +16,6 @@ export default function ServerWakeupModal({ children }) {
     let cancelled = false;
     let timeoutId;
     let probeInFlight = false;
-    const fetchWithTimeout = async (url, options = {}, timeoutMs = 8000) => {
-      const controller = new AbortController();
-      const requestTimeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        return await fetch(url, {
-          method: "GET",
-          signal: controller.signal,
-          ...options,
-        });
-      } finally {
-        clearTimeout(requestTimeoutId);
-      }
-    };
 
     const pingApi = async () => {
       if (isAwake || cancelled || probeInFlight) return;
@@ -40,9 +27,9 @@ export default function ServerWakeupModal({ children }) {
       const apiHealthUrl = `${apiBaseUrl.replace(/\/api$/, "")}/health`;
       if (!cancelled) setApiProbeStatus("loading");
       try {
-        const response = await fetchWithTimeout(
-          `${apiHealthUrl}?wake=${Date.now()}`,
-        );
+        const response = await fetch(`${apiHealthUrl}?wake=${Date.now()}`, {
+          method: "GET",
+        });
         const ready = VALID_READY_STATUS.has(response.status);
         if (!cancelled) {
           setApiProbeStatus(ready ? "up" : "down");
